@@ -23,7 +23,7 @@ jobs:
             context: ./apps/api
             dockerfile: ./apps/api/Dockerfile.prod
           - app: web
-            context: ./apps/web
+            context: .
             dockerfile: ./apps/web/Dockerfile.prod
 
     steps:
@@ -92,7 +92,7 @@ jobs:
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: [build-and-push, generate-sbom]
+    needs: [ build-and-push, generate-sbom ]
 
     steps:
       - uses: actions/checkout@v4
