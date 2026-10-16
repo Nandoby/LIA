@@ -332,17 +332,17 @@ async def task_orchestrator_node(state: MessagesState, config: RunnableConfig) -
 @lru_cache(maxsize=1)
 def _build_tool_registry() -> dict[str, Any]:
     """
-    Construit le tool_registry (mapping tool_name → tool_function).
+    Build the tool_registry (mapping tool_name → tool_function).
 
-    Le tool_registry est nécessaire pour que PlanExecutor puisse exécuter
-    les tools directement sans passer par les agents.
+    The tool_registry is required for PlanExecutor to execute
+    tools directly without going through agents.
 
     Returns:
         Dict {tool_name: tool_function}
 
     Note:
-        Cette fonction importe tous les tools disponibles depuis tools/__init__.py.
-        Tout nouveau tool ajouté dans tools/ sera automatiquement disponible.
+        This function imports all available tools from tools/__init__.py.
+        Any new tool added in tools/ will be automatically available.
         Le résultat est mis en cache pour éviter de reconstruire le registre à chaque appel.
     """
     from src.domains.agents.tools import (
@@ -928,15 +928,17 @@ async def _handle_execution_plan(
             # ================================================================
             # BugFix 2026-01-24: Also capture pre_exec_registry to preserve parent items
             # (e.g., events) when child steps (e.g., routes) fail
-            pre_executed_steps, item_counts, pre_exec_registry = (
-                await _pre_execute_for_each_providers(
-                    execution_plan=execution_plan,
-                    for_each_steps=for_each_steps_requiring_hitl,
-                    config=config,
-                    run_id=run_id,
-                    initial_registry=initial_registry,
-                    turn_id=current_turn_id,
-                )
+            (
+                pre_executed_steps,
+                item_counts,
+                pre_exec_registry,
+            ) = await _pre_execute_for_each_providers(
+                execution_plan=execution_plan,
+                for_each_steps=for_each_steps_requiring_hitl,
+                config=config,
+                run_id=run_id,
+                initial_registry=initial_registry,
+                turn_id=current_turn_id,
             )
 
             # Note: pre_exec_registry is passed to execute_plan_parallel separately

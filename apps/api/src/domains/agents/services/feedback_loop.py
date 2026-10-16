@@ -1,7 +1,7 @@
 """
 FeedbackLoopService - Learning from Recovery Patterns.
 
-Architecture v3 - Intelligence, Autonomie, Pertinence.
+Architecture v3 - Intelligence, Autonomy, Relevance.
 
 This service provides:
 1. Recording of recovery attempts (success/failure)
@@ -123,9 +123,9 @@ class FeedbackLoopService:
 
         self.storage = storage or InMemoryRecoveryStorage()
         self._pattern_cache: dict[str, list[tuple[str, RecoveryOutcome]]] = {}
-        self._strategy_stats: dict[tuple[str, str], tuple[int, int]] = (
-            {}
-        )  # (strategy, domain) -> (success, failure)
+        self._strategy_stats: dict[
+            tuple[str, str], tuple[int, int]
+        ] = {}  # (strategy, domain) -> (success, failure)
 
     async def record_recovery(
         self,

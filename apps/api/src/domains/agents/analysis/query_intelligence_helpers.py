@@ -1,7 +1,7 @@
 """
 QueryIntelligence Helpers - Centralized utilities for QueryIntelligence access.
 
-Architecture v3 - Intelligence, Autonomie, Pertinence.
+Architecture v3 - Intelligence, Autonomy, Relevance.
 
 This module provides utilities for accessing QueryIntelligence from LangGraph state,
 handling both object and dict formats transparently.
@@ -39,9 +39,11 @@ STATE_KEY_QUERY_INTELLIGENCE = "query_intelligence"
 STATE_KEY_QUERY_INTELLIGENCE_OBJ = "_query_intelligence_obj"
 
 
-def get_qi_attr[
-    T
-](state: dict[str, Any], attr: str, default: T = None,) -> T:  # type: ignore
+def get_qi_attr[T](
+    state: dict[str, Any],
+    attr: str,
+    default: T = None,
+) -> T:  # type: ignore
     """
     Get an attribute from QueryIntelligence in state (object or dict).
 
