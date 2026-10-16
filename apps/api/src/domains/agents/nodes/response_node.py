@@ -1156,17 +1156,19 @@ async def response_node(state: MessagesState, config: RunnableConfig) -> dict[st
                 try:
                     # Get thread_id for embedding token tracking
                     thread_id_for_memory = config.get("configurable", {}).get("thread_id")
-                    profile_result, emotional_state, memory_debug_details = (
-                        await build_psychological_profile(
-                            store=store,
-                            user_id=user_id,
-                            query=last_user_message,
-                            limit=settings.memory_max_results,
-                            min_score=settings.memory_min_search_score,
-                            session_id=thread_id_for_memory,
-                            conversation_id=thread_id_for_memory,
-                            include_debug=True,
-                        )
+                    (
+                        profile_result,
+                        emotional_state,
+                        memory_debug_details,
+                    ) = await build_psychological_profile(
+                        store=store,
+                        user_id=user_id,
+                        query=last_user_message,
+                        limit=settings.memory_max_results,
+                        min_score=settings.memory_min_search_score,
+                        session_id=thread_id_for_memory,
+                        conversation_id=thread_id_for_memory,
+                        include_debug=True,
                     )
                     psychological_profile = profile_result
                     # Store debug details for debug panel (memory tuning)
@@ -2216,7 +2218,6 @@ async def response_node(state: MessagesState, config: RunnableConfig) -> dict[st
         # Uses safe_fire_and_forget to prevent GC issues with background tasks.
         # Non-blocking: extraction runs after response is returned to user.
         # GUARD: Same automated source filter as memory extraction above.
-        # Reference: C:\Users\jgouv\.claude\plans\radiant-weaving-simon.md
         try:
             if _is_automated_source:
                 logger.info(
