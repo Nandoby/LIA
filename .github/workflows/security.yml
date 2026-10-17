@@ -2,7 +2,7 @@ name: Security
 
 on:
   pull_request:
-    branches: [main]
+    branches: [ main ]
   schedule:
     # Every Monday at 9:00 UTC
     - cron: "0 9 * * 1"
@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [python, javascript]
+        language: [ python, javascript ]
 
     steps:
       - uses: actions/checkout@v4
@@ -64,7 +64,7 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
           cache: pnpm
