@@ -2,9 +2,7 @@
 
 > Guide complet du workflow de développement : environnement, Git, tests, CI/CD, et bonnes pratiques
 
-**Version**: 2.0
-**Date**: 2026-02-03
-**Compatibilité**: LIA v6.0.x
+**Version**: 2.0 **Date**: 2026-02-03 **Compatibilité**: LIA v6.0.x
 
 ## 📋 Table des Matières
 
@@ -26,6 +24,7 @@
 ### Setup Initial
 
 **Prérequis** :
+
 - Python 3.12+
 - Node.js 20+
 - Docker & Docker Compose
@@ -33,6 +32,7 @@
 - VS Code (recommandé) ou PyCharm
 
 **Extensions VS Code Recommandées** :
+
 ```json
 {
   "recommendations": [
@@ -69,6 +69,7 @@ pip list | grep pytest
 ```
 
 **Requirements Structure** :
+
 ```toml
 # pyproject.toml
 
@@ -78,7 +79,7 @@ version = "6.0.0"
 requires-python = ">=3.12"
 
 dependencies = [
-    "fastapi==0.128.0",
+    "fastapi==0.135.1",
     "langgraph==1.0.10",
     "langchain==1.2.10",
     "langchain-core==1.2.17",
@@ -116,6 +117,7 @@ pnpm list react
 ```
 
 **package.json Scripts** :
+
 ```json
 {
   "scripts": {
@@ -145,25 +147,27 @@ pnpm list react
   "python.formatting.blackPath": "${workspaceFolder}/apps/api/venv/bin/black",
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
-
   // Format on save
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
     "source.fixAll": "explicit"
   },
-
   // TypeScript/JavaScript
   "typescript.tsdk": "node_modules/typescript/lib",
   "javascript.updateImportsOnFileMove.enabled": "always",
   "typescript.updateImportsOnFileMove.enabled": "always",
-
   // Tailwind
   "tailwindCSS.experimental.classRegex": [
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
-    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+    [
+      "cva\\(([^)]*)\\)",
+      "[\"'`]([^\"'`]*).*?[\"'`]"
+    ],
+    [
+      "cx\\(([^)]*)\\)",
+      "(?:'|\"|`)([^']*)(?:'|\"|`)"
+    ]
   ],
-
   // Files
   "files.exclude": {
     "**/__pycache__": true,
@@ -171,7 +175,6 @@ pnpm list react
     "**/node_modules": true,
     "**/.next": true
   },
-
   // Git
   "git.enableSmartCommit": true,
   "git.confirmSync": false,
@@ -182,6 +185,7 @@ pnpm list react
 ### Variables d'Environnement
 
 **Backend .env** :
+
 ```bash
 # Development-specific
 ENVIRONMENT=development
@@ -218,6 +222,7 @@ CORS_ORIGINS=http://localhost:3000,http://localhost:3001
 ```
 
 **Frontend .env.local** :
+
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:8000
 NEXT_PUBLIC_DEFAULT_LOCALE=fr
@@ -230,10 +235,12 @@ NEXT_PUBLIC_DEFAULT_LOCALE=fr
 ### Branching Strategy
 
 **Main Branches** :
+
 - `main` - Production-ready code
 - `develop` - Integration branch (si utilisé)
 
 **Feature Branches** :
+
 ```bash
 # Pattern: feature/description-courte
 git checkout -b feature/add-weather-agent
@@ -247,6 +254,7 @@ git checkout -b docs/update-architecture
 **Format** : `<type>(<scope>): <description>`
 
 **Types** :
+
 - `feat` - Nouvelle fonctionnalité
 - `fix` - Bug fix
 - `refactor` - Refactoring (pas de changement fonctionnel)
@@ -257,6 +265,7 @@ git checkout -b docs/update-architecture
 - `style` - Formatting, missing semi-colons, etc.
 
 **Examples** :
+
 ```bash
 feat(agents): add weather agent with OpenWeatherMap integration
 fix(router): correct confidence threshold fallback logic
@@ -327,6 +336,7 @@ Avant chaque `git push` :
 **Base** : PEP 8 + Black formatting
 
 **Naming Conventions** :
+
 ```python
 # Modules : lowercase_with_underscores
 # my_module.py
@@ -335,17 +345,21 @@ Avant chaque `git push` :
 class UserRepository:
     pass
 
+
 # Functions/methods : snake_case
 def get_user_by_id(user_id: UUID):
     pass
+
 
 # Constants : UPPER_CASE_WITH_UNDERSCORES
 MAX_RETRIES = 3
 DEFAULT_TIMEOUT = 30
 
+
 # Private : _leading_underscore
 def _internal_helper():
     pass
+
 
 # Type vars : PascalCase
 ModelType = TypeVar("ModelType")
@@ -356,14 +370,15 @@ ModelType = TypeVar("ModelType")
 ```python
 # ✅ GOOD: Type hints complets
 async def get_user_by_id(
-    user_id: UUID,
-    session: AsyncSession
+        user_id: UUID,
+        session: AsyncSession
 ) -> User | None:
     """Get user by ID."""
     result = await session.execute(
         select(User).where(User.id == user_id)
     )
     return result.scalars().first()
+
 
 # ❌ BAD: Pas de type hints
 async def get_user_by_id(user_id, session):
@@ -375,10 +390,10 @@ async def get_user_by_id(user_id, session):
 
 ```python
 def process_message(
-    conversation_id: UUID,
-    message: str,
-    user_id: UUID,
-    max_tokens: int = 1000
+        conversation_id: UUID,
+        message: str,
+        user_id: UUID,
+        max_tokens: int = 1000
 ) -> dict:
     """
     Process user message through LangGraph.
@@ -454,6 +469,7 @@ async def fetch_multiple_contacts(contact_ids: list[str]) -> list[Contact]:
     contacts = await asyncio.gather(*tasks, return_exceptions=True)
     return [c for c in contacts if not isinstance(c, Exception)]
 
+
 # ❌ BAD: Sequential when parallel possible
 async def fetch_multiple_contacts(contact_ids: list[str]) -> list[Contact]:
     contacts = []
@@ -461,6 +477,7 @@ async def fetch_multiple_contacts(contact_ids: list[str]) -> list[Contact]:
         contact = await fetch_contact(cid)  # Sequential! Slow!
         contacts.append(contact)
     return contacts
+
 
 # ✅ GOOD: Proper async context manager
 async with AsyncSession() as session:
@@ -481,20 +498,25 @@ finally:
 
 ```typescript
 // Components : PascalCase
-function ChatMessage() {}
+function ChatMessage() {
+}
 
 // Hooks : camelCase avec "use" prefix
-function useChat() {}
+function useChat() {
+}
 
 // Types/Interfaces : PascalCase
-interface User {}
+interface User {
+}
+
 type ChatState = {}
 
 // Constants : UPPER_CASE
 const MAX_MESSAGE_LENGTH = 5000
 
 // Functions/variables : camelCase
-const fetchMessages = async () => {}
+const fetchMessages = async () => {
+}
 const userMessages = []
 ```
 
@@ -511,21 +533,21 @@ interface ChatMessageProps {
 }
 
 export const ChatMessage: FC<ChatMessageProps> = ({
-  message,
-  isStreaming = false,
-  onRetry
-}) => {
+                                                    message,
+                                                    isStreaming = false,
+                                                    onRetry
+                                                  }) => {
   // Component logic
   return (
-    <div className="message">
-      {/* JSX */}
-    </div>
+    <div className = "message" >
+      {/* JSX */ }
+      < /div>
   )
 }
 
 // ❌ BAD: Any types, no interface
 export function ChatMessage({ message, isStreaming, onRetry }: any) {
-  return <div>{/* JSX */}</div>
+  return <div>{/* JSX */ } < /div>
 }
 ```
 
@@ -581,6 +603,7 @@ from domains.agents.utils.message_windowing import (
 )
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
+
 def test_get_windowed_messages_basic():
     """Test basic windowing avec 5 turns."""
     # Arrange
@@ -608,11 +631,12 @@ def test_get_windowed_messages_basic():
     assert len(human_messages) == 5
     assert "Message 6" in human_messages[0].content
 
+
 @pytest.mark.parametrize("window_size,expected_count", [
-    (1, 3),   # 1 system + 1 turn × 2
-    (3, 7),   # 1 system + 3 turns × 2
+    (1, 3),  # 1 system + 1 turn × 2
+    (3, 7),  # 1 system + 3 turns × 2
     (5, 11),  # 1 system + 5 turns × 2
-    (10, 21), # 1 system + 10 turns × 2
+    (10, 21),  # 1 system + 10 turns × 2
 ])
 def test_get_windowed_messages_parametrized(window_size, expected_count):
     """Test windowing avec différentes tailles."""
@@ -635,13 +659,14 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_google_oauth_callback_success(
-    async_client: AsyncClient,
-    async_session: AsyncSession,
-    test_user,
-    mock_google_oauth_server
+        async_client: AsyncClient,
+        async_session: AsyncSession,
+        test_user,
+        mock_google_oauth_server
 ):
     """Test OAuth callback flow complet."""
     # Arrange: Initiate OAuth flow
@@ -690,6 +715,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from httpx import AsyncClient
 
+
 @pytest.fixture
 async def async_session():
     """Provide async session with rollback."""
@@ -708,6 +734,7 @@ async def async_session():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
+
 @pytest.fixture
 async def async_client(async_session):
     """Provide HTTP client with dependency overrides."""
@@ -720,6 +747,7 @@ async def async_client(async_session):
         yield client
 
     app.dependency_overrides.clear()
+
 
 @pytest.fixture
 def test_user(async_session):
@@ -767,8 +795,8 @@ pytest -m "not slow"   # Skip slow tests
 ### Coverage Target
 
 **Minimum** : 30% (CI gate)
-**Objectif** : 85%
-**Priorité** :
+**Objectif** : 85% **Priorité** :
+
 1. Business logic (services) : 90%+
 2. API routes : 80%+
 3. Utils : 85%+
@@ -789,7 +817,7 @@ repos:
     rev: v0.5.0
     hooks:
       - id: ruff
-        args: [--fix]
+        args: [ --fix ]
       - id: ruff-format
 
   # Black (formatting backup)
@@ -804,15 +832,15 @@ repos:
     rev: v1.10.0
     hooks:
       - id: mypy
-        additional_dependencies: [types-all]
-        args: [--ignore-missing-imports, --check-untyped-defs]
+        additional_dependencies: [ types-all ]
+        args: [ --ignore-missing-imports, --check-untyped-defs ]
 
   # Secrets detection
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.4.0
     hooks:
       - id: detect-secrets
-        args: ['--baseline', '.secrets.baseline']
+        args: [ '--baseline', '.secrets.baseline' ]
 
   # General hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -822,7 +850,7 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
-        args: ['--maxkb=500']
+        args: [ '--maxkb=500' ]
       - id: check-merge-conflict
       - id: check-json
 
@@ -888,9 +916,9 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [ main, develop ]
   pull_request:
-    branches: [main, develop]
+    branches: [ main, develop ]
 
 jobs:
   lint-backend:
@@ -1034,7 +1062,7 @@ jobs:
   build-push:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [lint-backend, test-backend, lint-frontend, security-scan]
+    needs: [ lint-backend, test-backend, lint-frontend, security-scan ]
     steps:
       - uses: actions/checkout@v4
 
@@ -1062,6 +1090,7 @@ jobs:
 ### Quality Gates
 
 **Gates obligatoires** :
+
 - [ ] Tous les tests passent
 - [ ] Coverage >= 30%
 - [ ] Linting (Ruff/Black) passe
@@ -1101,6 +1130,7 @@ logger.info(f"User {user_id} processed message in {duration}ms")
 ### Debug avec VS Code
 
 **launch.json** :
+
 ```json
 {
   "version": "0.2.0",
@@ -1113,8 +1143,10 @@ logger.info(f"User {user_id} processed message in {duration}ms")
       "args": [
         "src.main:app",
         "--reload",
-        "--port", "8000",
-        "--log-level", "debug"
+        "--port",
+        "8000",
+        "--log-level",
+        "debug"
       ],
       "jinja": true,
       "justMyCode": false,
@@ -1150,7 +1182,9 @@ logging.basicConfig(level=logging.DEBUG)
 logging.getLogger("langgraph").setLevel(logging.DEBUG)
 
 # Ajouter breakpoint
-import pdb; pdb.set_trace()
+import pdb;
+
+pdb.set_trace()
 
 # Ou utiliser VS Code breakpoints
 ```
@@ -1211,6 +1245,7 @@ py-spy record -o profile.svg -- python script.py
 # memory_profiler
 from memory_profiler import profile
 
+
 @profile
 def my_function():
     # Function code
@@ -1227,6 +1262,7 @@ def my_function():
 ### Docstrings Obligatoires
 
 Pour :
+
 - Toutes les fonctions publiques
 - Toutes les classes
 - Tous les modules (module-level docstring)
@@ -1234,11 +1270,13 @@ Pour :
 ### API Documentation (OpenAPI)
 
 FastAPI génère automatiquement :
+
 - Swagger UI : http://localhost:8000/docs
 - ReDoc : http://localhost:8000/redoc
 - OpenAPI JSON : http://localhost:8000/openapi.json
 
 **Améliorer docs API** :
+
 ```python
 @router.post(
     "/chat",
@@ -1253,8 +1291,8 @@ FastAPI génère automatiquement :
     tags=["chat"]
 )
 async def process_message(
-    request: ChatRequest,
-    current_user: User = Depends(get_current_user)
+        request: ChatRequest,
+        current_user: User = Depends(get_current_user)
 ):
     """
     Process user message with full context.
@@ -1304,11 +1342,13 @@ gh pr review <PR_NUMBER> --request-changes --body "Please add tests for the new 
 ## 🎓 Ressources
 
 ### Documentation Interne
+
 - [GETTING_STARTED.md](../GETTING_STARTED.md)
 - [ARCHITECTURE.md](../ARCHITECTURE.md)
 - [GUIDE_TESTING.md](./GUIDE_TESTING.md)
 
 ### Outils Externes
+
 - **Ruff** : https://docs.astral.sh/ruff/
 - **Black** : https://black.readthedocs.io/
 - **MyPy** : https://mypy.readthedocs.io/

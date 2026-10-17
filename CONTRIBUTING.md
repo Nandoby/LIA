@@ -2,9 +2,8 @@
 
 > Complete guide for contributing to the LIA project: code standards, Git workflow, review process, and best practices
 
-**Version**: 2.1
-**Date**: 2026-02-04
-**Last updated**: Google API Tracking, Consumption Exports, Skills System, FOR_EACH Pattern, Voice HD Mode
+**Version**: 2.1 **Date**: 2026-02-04 **Last updated**: Google API Tracking, Consumption Exports, Skills System,
+FOR_EACH Pattern, Voice HD Mode
 
 ---
 
@@ -30,20 +29,21 @@
 
 ## Welcome
 
-Thank you for your interest in contributing to **LIA**! This project is a multi-agent conversational platform built on **LangGraph 1.0**, **FastAPI 0.128**, and **Next.js 16**, with a complete DDD (Domain-Driven Design) architecture.
+Thank you for your interest in contributing to **LIA**! This project is a multi-agent conversational platform built on
+**LangGraph 1.0**, **FastAPI 0.135.1**, and **Next.js 16**, with a complete DDD (Domain-Driven Design) architecture.
 
 ### Accepted Contribution Types
 
-| Type | Description | GitHub Label |
-|------|-------------|--------------|
-| Bug fixes | Bug corrections | `bug` |
-| Features | New features | `enhancement` |
+| Type          | Description                | GitHub Label    |
+|---------------|----------------------------|-----------------|
+| Bug fixes     | Bug corrections            | `bug`           |
+| Features      | New features               | `enhancement`   |
 | Documentation | Documentation improvements | `documentation` |
-| Tests | Adding tests | `tests` |
-| UI/UX | Interface improvements | `ui/ux` |
-| Performance | Optimizations | `performance` |
-| Security | Security improvements | `security` |
-| i18n | Translations (6 languages) | `i18n` |
+| Tests         | Adding tests               | `tests`         |
+| UI/UX         | Interface improvements     | `ui/ux`         |
+| Performance   | Optimizations              | `performance`   |
+| Security      | Security improvements      | `security`      |
+| i18n          | Translations (6 languages) | `i18n`          |
 
 ### Especially Welcome Contributions
 
@@ -59,7 +59,8 @@ Thank you for your interest in contributing to **LIA**! This project is a multi-
 
 ## Code of Conduct
 
-This project adheres to the [Contributor Covenant Code of Conduct](./CODE_OF_CONDUCT.md). By participating, you agree to uphold this code.
+This project adheres to the [Contributor Covenant Code of Conduct](./CODE_OF_CONDUCT.md). By participating, you agree to
+uphold this code.
 
 **Key principles**:
 
@@ -76,58 +77,58 @@ This project adheres to the [Contributor Covenant Code of Conduct](./CODE_OF_CON
 
 ### Required Software
 
-| Software | Version | Usage |
-|----------|---------|-------|
-| **Python** | 3.12+ | Backend (modern type hints) |
-| **Node.js** | 20+ | Frontend (LTS) |
-| **pnpm** | 10+ | Frontend package manager |
-| **Docker** | 24+ | Infrastructure |
-| **Docker Compose** | v2+ | Service orchestration |
-| **Git** | 2.40+ | Version control |
-| **PostgreSQL** | 16+ | Database + pgvector |
-| **Redis** | 7+ | Cache + sessions |
+| Software           | Version | Usage                       |
+|--------------------|---------|-----------------------------|
+| **Python**         | 3.12+   | Backend (modern type hints) |
+| **Node.js**        | 20+     | Frontend (LTS)              |
+| **pnpm**           | 10+     | Frontend package manager    |
+| **Docker**         | 24+     | Infrastructure              |
+| **Docker Compose** | v2+     | Service orchestration       |
+| **Git**            | 2.40+   | Version control             |
+| **PostgreSQL**     | 16+     | Database + pgvector         |
+| **Redis**          | 7+      | Cache + sessions            |
 
 ### Recommended Software
 
-| Software | Usage |
-|----------|-------|
-| VS Code | IDE with Python, Ruff, ESLint extensions |
-| Taskfile | Automation (`task` CLI) |
-| pre-commit | Git hooks (installed automatically) |
+| Software   | Usage                                    |
+|------------|------------------------------------------|
+| VS Code    | IDE with Python, Ruff, ESLint extensions |
+| Taskfile   | Automation (`task` CLI)                  |
+| pre-commit | Git hooks (installed automatically)      |
 
 ### Recommended Technical Knowledge
 
 #### Backend
 
-| Technology | Level |
-|------------|-------|
-| Python async/await | Required |
-| FastAPI + Pydantic v2 | Required |
-| SQLAlchemy 2.0 async | Required |
+| Technology            | Level       |
+|-----------------------|-------------|
+| Python async/await    | Required    |
+| FastAPI + Pydantic v2 | Required    |
+| SQLAlchemy 2.0 async  | Required    |
 | LangGraph + LangChain | Recommended |
-| PostgreSQL + Alembic | Recommended |
-| Redis | Recommended |
-| Pytest async | Recommended |
-| Prometheus + Grafana | Optional |
+| PostgreSQL + Alembic  | Recommended |
+| Redis                 | Recommended |
+| Pytest async          | Recommended |
+| Prometheus + Grafana  | Optional    |
 
 #### Frontend
 
-| Technology | Level |
-|------------|-------|
-| React 19+ hooks | Required |
-| TypeScript 5+ | Required |
-| TailwindCSS 4+ | Required |
+| Technology            | Level       |
+|-----------------------|-------------|
+| React 19+ hooks       | Required    |
+| TypeScript 5+         | Required    |
+| TailwindCSS 4+        | Required    |
 | Next.js 16 App Router | Recommended |
-| TanStack Query | Recommended |
-| SSE Streaming | Optional |
+| TanStack Query        | Recommended |
+| SSE Streaming         | Optional    |
 
 #### Architecture
 
-| Concept | Level |
-|---------|-------|
+| Concept                    | Level       |
+|----------------------------|-------------|
 | Domain-Driven Design (DDD) | Recommended |
-| CQRS pattern | Optional |
-| Multi-agent orchestration | Optional |
+| CQRS pattern               | Optional    |
+| Multi-agent orchestration  | Optional    |
 
 ---
 
@@ -203,12 +204,12 @@ docker-compose ps
 
 **Available services**:
 
-| Service | URL |
-|---------|-----|
-| PostgreSQL | localhost:5432 |
-| Redis | localhost:6379 |
-| Prometheus | http://localhost:9090 |
-| Grafana | http://localhost:3001 (admin/admin) |
+| Service    | URL                                 |
+|------------|-------------------------------------|
+| PostgreSQL | localhost:5432                      |
+| Redis      | localhost:6379                      |
+| Prometheus | http://localhost:9090               |
+| Grafana    | http://localhost:3001 (admin/admin) |
 
 ### 5. Database Setup
 
@@ -256,11 +257,11 @@ cd apps/web && pnpm dev
 
 **Development URLs**:
 
-| Service | URL |
-|---------|-----|
-| API | http://localhost:8000 |
+| Service  | URL                        |
+|----------|----------------------------|
+| API      | http://localhost:8000      |
 | API Docs | http://localhost:8000/docs |
-| Frontend | http://localhost:3000 |
+| Frontend | http://localhost:3000      |
 
 ---
 
@@ -296,15 +297,15 @@ git push origin feature/new-feature
 
 **Format**: `<type>/<short-description>`
 
-| Type | Usage |
-|------|-------|
-| `feature/` | New feature |
-| `fix/` | Bug fix |
-| `docs/` | Documentation only |
+| Type        | Usage                               |
+|-------------|-------------------------------------|
+| `feature/`  | New feature                         |
+| `fix/`      | Bug fix                             |
+| `docs/`     | Documentation only                  |
 | `refactor/` | Refactoring without behavior change |
-| `perf/` | Performance optimization |
-| `test/` | Adding tests |
-| `chore/` | Maintenance (deps, config) |
+| `perf/`     | Performance optimization            |
+| `test/`     | Adding tests                        |
+| `chore/`    | Maintenance (deps, config)          |
 
 **Examples**:
 
@@ -324,34 +325,34 @@ We follow **Conventional Commits**: `<type>(<scope>): <description>`
 
 #### Commit Types
 
-| Type | Description | Version |
-|------|-------------|---------|
-| `feat` | New feature | MINOR |
-| `fix` | Bug fix | PATCH |
-| `docs` | Documentation | - |
-| `style` | Formatting | - |
-| `refactor` | Refactoring | - |
-| `perf` | Performance | - |
-| `test` | Tests | - |
-| `chore` | Maintenance | - |
-| `build` | Build system | - |
-| `ci` | CI/CD | - |
+| Type       | Description   | Version |
+|------------|---------------|---------|
+| `feat`     | New feature   | MINOR   |
+| `fix`      | Bug fix       | PATCH   |
+| `docs`     | Documentation | -       |
+| `style`    | Formatting    | -       |
+| `refactor` | Refactoring   | -       |
+| `perf`     | Performance   | -       |
+| `test`     | Tests         | -       |
+| `chore`    | Maintenance   | -       |
+| `build`    | Build system  | -       |
+| `ci`       | CI/CD         | -       |
 
 #### Scopes (DDD Domains)
 
-| Scope | Domain |
-|-------|--------|
-| `agents` | LangGraph agents |
-| `auth` | Authentication |
-| `connectors` | OAuth connectors |
+| Scope           | Domain                  |
+|-----------------|-------------------------|
+| `agents`        | LangGraph agents        |
+| `auth`          | Authentication          |
+| `connectors`    | OAuth connectors        |
 | `conversations` | Conversation management |
-| `llm` | LLM providers/pricing |
-| `users` | User management |
-| `hitl` | Human-in-the-Loop |
-| `voice` | Voice/TTS |
-| `interests` | Interest Learning |
-| `observability` | Metrics/Logs |
-| `security` | Security |
+| `llm`           | LLM providers/pricing   |
+| `users`         | User management         |
+| `hitl`          | Human-in-the-Loop       |
+| `voice`         | Voice/TTS               |
+| `interests`     | Interest Learning       |
+| `observability` | Metrics/Logs            |
+| `security`      | Security                |
 
 #### Examples
 
@@ -382,11 +383,11 @@ JWT tokens in Authorization headers. See MIGRATION.md for upgrade guide.
 
 #### Linters & Formatters
 
-| Tool | Role | Configuration |
-|------|------|---------------|
-| **Ruff** | Ultra-fast linter | `pyproject.toml` |
-| **Black** | Formatter | `pyproject.toml` |
-| **MyPy** | Type checker (strict) | `pyproject.toml` |
+| Tool      | Role                  | Configuration    |
+|-----------|-----------------------|------------------|
+| **Ruff**  | Ultra-fast linter     | `pyproject.toml` |
+| **Black** | Formatter             | `pyproject.toml` |
+| **MyPy**  | Type checker (strict) | `pyproject.toml` |
 
 #### Python Conventions
 
@@ -397,13 +398,15 @@ JWT tokens in Authorization headers. See MIGRATION.md for upgrade guide.
 from uuid import UUID
 from typing import Sequence
 
+
 async def get_user_conversations(
-    user_id: UUID,
-    limit: int = 10,
-    offset: int = 0
+        user_id: UUID,
+        limit: int = 10,
+        offset: int = 0
 ) -> Sequence[ConversationRead]:
     """Retrieve user conversations with pagination."""
     ...
+
 
 # BAD
 async def get_user_conversations(user_id, limit=10, offset=0):
@@ -414,9 +417,9 @@ async def get_user_conversations(user_id, limit=10, offset=0):
 
 ```python
 async def execute_plan_step(
-    state: MessagesState,
-    step: ExecutionStep,
-    config: RunnableConfig
+        state: MessagesState,
+        step: ExecutionStep,
+        config: RunnableConfig
 ) -> dict[str, Any]:
     """Execute a single step from the execution plan.
 
@@ -520,10 +523,10 @@ settings.redis_url
 
 #### Linters & Formatters
 
-| Tool | Role |
-|------|------|
-| **ESLint** | Linter |
-| **Prettier** | Formatter |
+| Tool           | Role         |
+|----------------|--------------|
+| **ESLint**     | Linter       |
+| **Prettier**   | Formatter    |
 | **TypeScript** | Type checker |
 
 #### TypeScript/React Conventions
@@ -652,6 +655,7 @@ import pytest
 from decimal import Decimal
 from src.domains.llm.pricing_service import AsyncPricingService
 
+
 @pytest.mark.asyncio
 async def test_calculate_cost_with_cached_tokens():
     """Test cost calculation excludes cached tokens."""
@@ -741,11 +745,13 @@ git commit --no-verify -m "WIP: work in progress"
 
 ```markdown
 ## Description
+
 <!-- Describe your changes -->
 
 Closes #<issue-number>
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
@@ -754,6 +760,7 @@ Closes #<issue-number>
 - [ ] Performance improvement
 
 ## Checklist
+
 - [ ] Code follows project conventions
 - [ ] Self-review completed
 - [ ] Documentation updated if necessary
@@ -762,26 +769,29 @@ Closes #<issue-number>
 - [ ] CHANGELOG.md updated (if applicable)
 
 ## Tests
+
 <!-- Describe the tests added/modified -->
 
 ## Screenshots (if applicable)
+
 <!-- Add screenshots for UI changes -->
 ```
 
 ### Acceptance Criteria
 
-| Criterion | Required |
-|-----------|----------|
-| CI checks pass | Yes |
-| Coverage >= 80% maintained | Yes |
-| >= 1 maintainer approval | Yes |
-| No conflicts with `main` | Yes |
-| Documentation up to date | If necessary |
-| No performance regression | Yes |
+| Criterion                  | Required     |
+|----------------------------|--------------|
+| CI checks pass             | Yes          |
+| Coverage >= 80% maintained | Yes          |
+| >= 1 maintainer approval   | Yes          |
+| No conflicts with `main`   | Yes          |
+| Documentation up to date   | If necessary |
+| No performance regression  | Yes          |
 
 ### Guidelines for Reviewers
 
 **Focus on**:
+
 - Business logic and edge cases
 - Security (OWASP Top 10, PII)
 - Performance (N+1, memory, latency)
@@ -790,6 +800,7 @@ Closes #<issue-number>
 - Architecture (DDD, SOLID)
 
 **Avoid**:
+
 - Style comments (handled by linters)
 - Non-constructive criticism
 - Blocking nitpicks
@@ -800,6 +811,7 @@ Closes #<issue-number>
 **Issue**: The `execute_tool` function does not handle the case where the tool does not exist.
 
 **Suggestion**:
+
 ```python
 if tool_name not in self.registry:
     raise ToolNotFoundError(f"Tool '{tool_name}' not found")
@@ -808,6 +820,7 @@ if tool_name not in self.registry:
 **Reason**: Avoid an unclear `KeyError`.
 
 **Priority**: Red: Blocking / Yellow: Suggested / Green: Nitpick
+
 ```
 
 ---
@@ -904,12 +917,14 @@ Implement a Redis cache for Router decisions with:
 **Email**: security@lia-assistant.dev
 
 **Include**:
+
 - Description of the vulnerability
 - Steps to reproduce
 - Potential impact
 - Your name (for credit) or "Anonymous"
 
 **Process**:
+
 1. Response within 48 hours
 2. Patch developed
 3. CVE published (if applicable)
@@ -919,18 +934,18 @@ Implement a Redis cache for Router decisions with:
 
 Before submitting a PR:
 
-| Check | Verified |
-|-------|----------|
-| No plaintext secrets | [ ] |
-| No PII logged | [ ] |
-| Input validation via Pydantic/Zod | [ ] |
-| SQL injection protection (ORM) | [ ] |
-| XSS protection | [ ] |
-| CSRF protection (SameSite cookies) | [ ] |
-| Rate limiting on public endpoints | [ ] |
-| AuthN/AuthZ verified | [ ] |
-| HTTPS only | [ ] |
-| Dependencies up to date (no CVEs) | [ ] |
+| Check                              | Verified |
+|------------------------------------|----------|
+| No plaintext secrets               | [ ]      |
+| No PII logged                      | [ ]      |
+| Input validation via Pydantic/Zod  | [ ]      |
+| SQL injection protection (ORM)     | [ ]      |
+| XSS protection                     | [ ]      |
+| CSRF protection (SameSite cookies) | [ ]      |
+| Rate limiting on public endpoints  | [ ]      |
+| AuthN/AuthZ verified               | [ ]      |
+| HTTPS only                         | [ ]      |
+| Dependencies up to date (no CVEs)  | [ ]      |
 
 ### OWASP Top 10 2024
 
@@ -942,13 +957,13 @@ See [docs/technical/SECURITY.md](docs/technical/SECURITY.md) for details.
 
 ### Channels
 
-| Channel | Usage |
-|---------|-------|
-| **GitHub Issues** | Bugs, feature requests |
-| **GitHub Discussions** | Ideas, help, show & tell |
-| **GitHub PRs** | Code review |
-| **contact@lia-assistant.dev** | General inquiries |
-| **security@lia-assistant.dev** | Security |
+| Channel                        | Usage                    |
+|--------------------------------|--------------------------|
+| **GitHub Issues**              | Bugs, feature requests   |
+| **GitHub Discussions**         | Ideas, help, show & tell |
+| **GitHub PRs**                 | Code review              |
+| **contact@lia-assistant.dev**  | General inquiries        |
+| **security@lia-assistant.dev** | Security                 |
 
 ### Bug Report Template
 
@@ -957,6 +972,7 @@ See [docs/technical/SECURITY.md](docs/technical/SECURITY.md) for details.
 Brief description of the bug.
 
 **To Reproduce**
+
 1. Go to '...'
 2. Click on '...'
 3. See the error
@@ -965,6 +981,7 @@ Brief description of the bug.
 What you expected to happen.
 
 **Environment**
+
 - OS: [e.g., Ubuntu 22.04]
 - Python: [e.g., 3.12.1]
 - API version: [e.g., 6.0.0]
@@ -1022,6 +1039,7 @@ with patch("src.domains.agents.nodes.planner.planner_llm", MockChatOpenAI()):
 **Q: Git conflict with `main`?**
 
 A:
+
 ```bash
 git checkout main
 git pull upstream main
@@ -1034,6 +1052,7 @@ git push origin my-branch --force-with-lease
 **Q: How do I add a Prometheus metric?**
 
 A: See [OBSERVABILITY_AGENTS.md](docs/technical/OBSERVABILITY_AGENTS.md):
+
 1. Define in `metrics_agents.py`
 2. Instrument with `@track_metrics`
 3. Add to Grafana dashboard
@@ -1042,6 +1061,7 @@ A: See [OBSERVABILITY_AGENTS.md](docs/technical/OBSERVABILITY_AGENTS.md):
 **Q: What is the versioning policy?**
 
 A: [Semantic Versioning 2.0.0](https://semver.org/):
+
 - **MAJOR**: Breaking changes
 - **MINOR**: New features (backward compatible)
 - **PATCH**: Bug fixes
@@ -1052,31 +1072,31 @@ A: [Semantic Versioning 2.0.0](https://semver.org/):
 
 ### Project Documentation
 
-| Document | Description |
-|----------|-------------|
-| [README.md](README.md) | Project overview |
-| [docs/INDEX.md](docs/INDEX.md) | Documentation index (115+ docs) |
-| [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) | Detailed installation guide |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture |
+| Document                                           | Description                     |
+|----------------------------------------------------|---------------------------------|
+| [README.md](README.md)                             | Project overview                |
+| [docs/INDEX.md](docs/INDEX.md)                     | Documentation index (115+ docs) |
+| [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) | Detailed installation guide     |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)       | System architecture             |
 
 ### Creation Guides
 
-| Guide | Description |
-|-------|-------------|
-| [GUIDE_AGENT_CREATION](docs/guides/GUIDE_AGENT_CREATION.md) | Creating an agent |
-| [GUIDE_TOOL_CREATION](docs/guides/GUIDE_TOOL_CREATION.md) | Creating a tool |
-| [HITL](docs/technical/HITL.md) | Human-in-the-Loop strategies |
-| [PLANNER](docs/technical/PLANNER.md) | ExecutionPlan DSL |
-| [GOOGLE_API_TRACKING](docs/technical/GOOGLE_API_TRACKING.md) | Google API consumption tracking |
+| Guide                                                              | Description                     |
+|--------------------------------------------------------------------|---------------------------------|
+| [GUIDE_AGENT_CREATION](docs/guides/GUIDE_AGENT_CREATION.md)        | Creating an agent               |
+| [GUIDE_TOOL_CREATION](docs/guides/GUIDE_TOOL_CREATION.md)          | Creating a tool                 |
+| [HITL](docs/technical/HITL.md)                                     | Human-in-the-Loop strategies    |
+| [PLANNER](docs/technical/PLANNER.md)                               | ExecutionPlan DSL               |
+| [GOOGLE_API_TRACKING](docs/technical/GOOGLE_API_TRACKING.md)       | Google API consumption tracking |
 | [LLM_PRICING_MANAGEMENT](docs/technical/LLM_PRICING_MANAGEMENT.md) | Pricing and consumption exports |
 
 ### External Standards
 
-| Standard | URL |
-|----------|-----|
-| Conventional Commits | https://www.conventionalcommits.org/ |
-| Google Python Style | https://google.github.io/styleguide/pyguide.html |
-| OWASP Top 10 | https://owasp.org/www-project-top-ten/ |
+| Standard             | URL                                              |
+|----------------------|--------------------------------------------------|
+| Conventional Commits | https://www.conventionalcommits.org/             |
+| Google Python Style  | https://google.github.io/styleguide/pyguide.html |
+| OWASP Top 10         | https://owasp.org/www-project-top-ten/           |
 
 ---
 
@@ -1085,17 +1105,18 @@ A: [Semantic Versioning 2.0.0](https://semver.org/):
 Thank you to all contributors who make LIA a quality project!
 
 **Maintainers**:
+
 - @maintainers - Lead maintainer
 
 ---
 
 ## Version History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| **2.1** | 2026-02-04 | Google API Tracking, Consumption Exports, new `google_api/` domain |
-| 2.0 | 2026-02-03 | Complete restructuring, Skills System, FOR_EACH, Voice HD, Modular Config |
-| 1.0 | 2025-11-14 | Initial version |
+| Version | Date       | Changes                                                                   |
+|---------|------------|---------------------------------------------------------------------------|
+| **2.1** | 2026-02-04 | Google API Tracking, Consumption Exports, new `google_api/` domain        |
+| 2.0     | 2026-02-03 | Complete restructuring, Skills System, FOR_EACH, Voice HD, Modular Config |
+| 1.0     | 2025-11-14 | Initial version                                                           |
 
 ---
 
