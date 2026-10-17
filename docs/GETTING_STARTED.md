@@ -389,6 +389,35 @@ python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().d
 openssl rand -base64 16
 ```
 
+#### 4.4 LAN Access & SSL Configuration (Development)
+
+If you need to access LIA from other devices on your local network (e.g., mobile testing), configure LAN access
+using [nip.io](https://nip.io):
+
+1. **Find your local IP address** (e.g., `192.168.1.100`)
+
+2. **Set SSL_DOMAIN in `.env`**:
+   ```bash
+   # Replace with your actual IP
+   SSL_DOMAIN=192.168.1.100.nip.io
+   ```
+
+3. **Update related variables in `.env`**:
+   ```bash
+   NEXT_PUBLIC_API_URL=https://192.168.1.100.nip.io:8000
+   NEXT_PUBLIC_APP_URL=https://192.168.1.100.nip.io:3000
+   NEXT_PUBLIC_ALLOWED_DEV_ORIGINS=192.168.1.100.nip.io
+   ```
+
+4. **Accept the self-signed certificate** — after starting Docker, navigate to `https://192.168.1.100.nip.io:8000` in
+   your browser and accept the certificate. This is required for the browser to make API calls.
+
+> **Important**: `NEXT_PUBLIC_ALLOWED_DEV_ORIGINS` must be a **hostname only** (e.g., `192.168.1.100.nip.io`), NOT a
+> full URL with protocol/port. Using `https://...` will cause WebSocket HMR failures and page refresh loops.
+
+The `ssl-init` Docker service automatically generates self-signed certificates covering the configured domain.
+Certificates are shared between the API and Web containers via a Docker volume.
+
 ### Step 5: Start Docker Infrastructure
 
 ```bash
@@ -406,29 +435,30 @@ docker compose -f docker-compose.dev.yml logs -f
 
 #### Launched Docker Services
 
-| Service                 | Port           | Description              | URL                   |
-|-------------------------|----------------|--------------------------|-----------------------|
-| **postgres**            | 5432           | PostgreSQL 16 + pgvector | -                     |
-| **pgadmin**             | 5050           | DB Administration        | http://localhost:5050 |
-| **redis**               | 6379           | Cache & Sessions         | -                     |
-| **api**                 | 8000/5678      | FastAPI Backend          | http://localhost:8000 |
-| **web**                 | 3000           | Next.js Frontend         | http://localhost:3000 |
-| **prometheus**          | 9090           | Metrics                  | http://localhost:9090 |
-| **alertmanager**        | 9094           | Alert management         | http://localhost:9094 |
-| **grafana**             | 3001           | Dashboards               | http://localhost:3001 |
-| **loki**                | 3100           | Log aggregation          | -                     |
-| **promtail**            | 9080           | Log collection           | -                     |
-| **tempo**               | 3200/4317/4318 | Distributed traces       | http://localhost:3200 |
-| **cadvisor**            | 8080           | Container metrics        | http://localhost:8080 |
-| **postgres-exporter**   | 9187           | PostgreSQL metrics       | -                     |
-| **redis-exporter**      | 9121           | Redis metrics            | -                     |
-| **node-exporter**       | 9100           | System metrics           | -                     |
-| **minio**               | 9092/9093      | S3 for Langfuse          | http://localhost:9093 |
-| **langfuse-db**         | -              | Langfuse PostgreSQL      | -                     |
-| **langfuse-clickhouse** | -              | ClickHouse analytics     | -                     |
-| **langfuse-redis**      | -              | Langfuse Redis           | -                     |
-| **langfuse-web**        | 3002           | LLM Observability        | http://localhost:3002 |
-| **langfuse-worker**     | 3030           | Langfuse Worker          | -                     |
+| Service                 | Port           | Description                           | URL                   |
+|-------------------------|----------------|---------------------------------------|-----------------------|
+| **ssl-init**            | -              | SSL certificate generator (runs once) | -                     |
+| **postgres**            | 5432           | PostgreSQL 16 + pgvector              | -                     |
+| **pgadmin**             | 5050           | DB Administration                     | http://localhost:5050 |
+| **redis**               | 6379           | Cache & Sessions                      | -                     |
+| **api**                 | 8000/5678      | FastAPI Backend                       | http://localhost:8000 |
+| **web**                 | 3000           | Next.js Frontend                      | http://localhost:3000 |
+| **prometheus**          | 9090           | Metrics                               | http://localhost:9090 |
+| **alertmanager**        | 9094           | Alert management                      | http://localhost:9094 |
+| **grafana**             | 3001           | Dashboards                            | http://localhost:3001 |
+| **loki**                | 3100           | Log aggregation                       | -                     |
+| **promtail**            | 9080           | Log collection                        | -                     |
+| **tempo**               | 3200/4317/4318 | Distributed traces                    | http://localhost:3200 |
+| **cadvisor**            | 8080           | Container metrics                     | http://localhost:8080 |
+| **postgres-exporter**   | 9187           | PostgreSQL metrics                    | -                     |
+| **redis-exporter**      | 9121           | Redis metrics                         | -                     |
+| **node-exporter**       | 9100           | System metrics                        | -                     |
+| **minio**               | 9092/9093      | S3 for Langfuse                       | http://localhost:9093 |
+| **langfuse-db**         | -              | Langfuse PostgreSQL                   | -                     |
+| **langfuse-clickhouse** | -              | ClickHouse analytics                  | -                     |
+| **langfuse-redis**      | -              | Langfuse Redis                        | -                     |
+| **langfuse-web**        | 3002           | LLM Observability                     | http://localhost:3002 |
+| **langfuse-worker**     | 3030           | Langfuse Worker                       | -                     |
 
 ### Step 6: Apply Migrations
 
