@@ -1,27 +1,10 @@
 import { initI18next } from '@/i18n';
 import {
-  Bot,
-  Mail,
-  Mic,
-  ShieldCheck,
-  BellRing,
-  Brain,
-  MessageCircle,
-  Puzzle,
-  Smile,
-  Lock,
-  LayoutGrid,
-  Globe,
-  Palette,
-  MessageSquareText,
-  Compass,
-  CalendarClock,
-  MousePointerClick,
-  Star,
-  AppWindow,
-  PenTool,
-  Paperclip,
-  Blocks,
+  Bot, Mail, Mic, ShieldCheck, BellRing, Brain,
+  MessageCircle, Puzzle, Smile, Lock, LayoutGrid,
+  Globe, Palette, MessageSquareText, Compass,
+  CalendarClock, MousePointerClick, Star,
+  AppWindow, PenTool, Paperclip, Blocks, Library,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -41,26 +24,11 @@ interface HeroFeatureItem extends FeatureItem {
   iconBg: string;
 }
 
-// Hero cards - main functional highlights with unique accent colors
+// Hero cards — main functional highlights with unique accent colors
 const HERO_FEATURES: HeroFeatureItem[] = [
-  {
-    key: 'connected_services',
-    icon: Mail,
-    accent: 'bg-gradient-to-r from-red-500 to-orange-500',
-    iconBg: 'bg-gradient-to-br from-red-500/15 to-orange-500/15',
-  },
-  {
-    key: 'web_intelligence',
-    icon: Compass,
-    accent: 'bg-gradient-to-r from-blue-500 to-cyan-500',
-    iconBg: 'bg-gradient-to-br from-blue-500/15 to-cyan-500/15',
-  },
-  {
-    key: 'voice_mode',
-    icon: Mic,
-    accent: 'bg-gradient-to-r from-violet-500 to-pink-500',
-    iconBg: 'bg-gradient-to-br from-violet-500/15 to-pink-500/15',
-  },
+  { key: 'connected_services', icon: Mail, accent: 'bg-gradient-to-r from-red-500 to-orange-500', iconBg: 'bg-gradient-to-br from-red-500/15 to-orange-500/15' },
+  { key: 'web_intelligence', icon: Compass, accent: 'bg-gradient-to-r from-blue-500 to-cyan-500', iconBg: 'bg-gradient-to-br from-blue-500/15 to-cyan-500/15' },
+  { key: 'voice_mode', icon: Mic, accent: 'bg-gradient-to-r from-violet-500 to-pink-500', iconBg: 'bg-gradient-to-br from-violet-500/15 to-pink-500/15' },
 ];
 
 // All functional capabilities
@@ -80,6 +48,7 @@ const FUNCTIONAL_FEATURES: FeatureItem[] = [
   { key: 'excalidraw', icon: PenTool },
   { key: 'attachments', icon: Paperclip },
   { key: 'skills', icon: Blocks },
+  { key: 'rag_spaces', icon: Library },
 ];
 
 // Responsible & simple
@@ -98,28 +67,31 @@ export async function FeaturesSection({ lng }: FeaturesSectionProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <FadeInOnScroll>
           <div className="text-center mb-16">
-            <h2
-              id="features-title"
-              className="text-3xl mobile:text-4xl font-bold tracking-tight mb-4"
-            >
+            <h2 id="features-title" className="text-3xl mobile:text-4xl font-bold tracking-tight mb-4">
               {t('landing.features.title')}
             </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              {t('landing.features.subtitle')}
+            </p>
           </div>
         </FadeInOnScroll>
 
-        {/* Hero features - connectors & tools with accent colors */}
+        {/* Hero features — connectors & tools with accent colors */}
         <div className="grid grid-cols-1 mobile:grid-cols-3 gap-6 mb-6">
           {HERO_FEATURES.map(({ key, icon: Icon, accent, iconBg }, i) => (
             <FadeInOnScroll key={key} delay={i * 100}>
-              <Card className="hover-lift hover-glow h-full boder-border/60 overflow-hidden">
+              <Card className="hover-lift hover-glow h-full border-border/60 overflow-hidden">
                 <div className={cn('h-1', accent)} aria-hidden="true" />
                 <CardHeader className="space-y-4">
-                  <div
-                    className={cn('w-14 h-14 rounded-xl flex items-center justify-center', iconBg)}
-                  >
+                  <div className={cn('w-14 h-14 rounded-xl flex items-center justify-center', iconBg)}>
                     <Icon className="w-7 h-7 text-primary" />
                   </div>
-                  <CardTitle className="text-xl">{t(`landing.features.${key}.title`)}</CardTitle>
+                  <CardTitle className="text-xl">
+                    {t(`landing.features.${key}.title`)}
+                  </CardTitle>
+                  <CardDescription className="text-sm leading-relaxed">
+                    {t(`landing.features.${key}.description`)}
+                  </CardDescription>
                 </CardHeader>
               </Card>
             </FadeInOnScroll>
@@ -151,18 +123,14 @@ export async function FeaturesSection({ lng }: FeaturesSectionProps) {
           ))}
         </div>
 
-        {/* Responsible & simple - prominent sub-section */}
+        {/* Responsible & simple — prominent sub-section */}
         <FadeInOnScroll>
-          <div className="mt-16 mb-6 flex flex-col items-center text-center">
+          <div className="mt-16 mb-8 flex flex-col items-center text-center">
             <div className="relative mb-4">
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
                 <ShieldCheck className="w-7 h-7 text-primary" />
               </div>
-              <div
-                className="absolute inset-0 rounded-full border-2 border-primary/20 motion-safe:animate-ping"
-                style={{ animationDuration: '3s' }}
-                aria-hidden="true"
-              />
+              <div className="absolute inset-0 rounded-full border-2 border-primary/20 motion-safe:animate-ping" style={{ animationDuration: '3s' }} aria-hidden="true" />
             </div>
             <h3 className="text-2xl font-bold tracking-tight mb-2">
               {t('landing.features.subtitle_responsible')}

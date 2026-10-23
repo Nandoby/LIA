@@ -1,8 +1,7 @@
 # Architecture LIA
 
 > Architecture complète du système multi-agents avec LangGraph, observabilité enterprise et sécurité GDPR
-> **Version**: 6.2 (Architecture v3.3 + evolution Features: Web Fetch, MCP Per-User, MCP Admin Per-Server, Multi-Channel
-> Telegram, Heartbeat Autonome) - 2026-03-04
+> **Version**: 6.2 (Architecture v3.4 + evolution Features: Web Fetch, MCP Per-User, MCP Admin Per-Server, Multi-Channel Telegram, Heartbeat Autonome, RAG Spaces) - 2026-03-14
 
 ## 📋 Table des Matières
 
@@ -19,31 +18,30 @@
 - [Patterns & Best Practices](#patterns--best-practices)
 - [Scalabilité & Performance](#scalabilité--performance)
 - [Infrastructure Avancée](#-infrastructure-avancée)
-    - [Background Jobs & Scheduler](#background-jobs--scheduler-apscheduler)
-    - [Reminder Notifications](#reminder-notification-job-adr-051)
+  - [Background Jobs & Scheduler](#background-jobs--scheduler-apscheduler)
+  - [Reminder Notifications](#reminder-notification-job-adr-051)
 - [Fonctionnalités v6.0](#-fonctionnalités-v60)
-    - [Skills System](#skills-system)
-    - [Voice Mode](#voice-mode)
-    - [Interest Learning](#interest-learning-system)
-    - [OAuth Health Check](#oauth-health-check)
-    - [Hybrid Memory Search](#hybrid-memory-search)
+  - [Skills System](#skills-system)
+  - [Voice Mode](#voice-mode)
+  - [Interest Learning](#interest-learning-system)
+  - [OAuth Health Check](#oauth-health-check)
+  - [Hybrid Memory Search](#hybrid-memory-search)
 - [Fonctionnalités v6.1](#-fonctionnalités-v61)
-    - [Google API Tracking](#google-api-tracking)
-    - [Consumption Exports](#consumption-exports)
+  - [Google API Tracking](#google-api-tracking)
+  - [Consumption Exports](#consumption-exports)
 - [Fonctionnalités v6.2 (evolution)](#-fonctionnalités-v62-evolution)
-    - [Web Fetch Tool](#web-fetch-tool-evolution-f1)
-    - [MCP Per-User](#mcp-per-user-evolution-f2)
-    - [Admin MCP Per-Server Routing](#admin-mcp-per-server-routing-evolution-f25)
-    - [Multi-Channel Telegram](#multi-channel-telegram-evolution-f3)
-    - [Heartbeat Autonome](#heartbeat-autonome-evolution-f5)
+  - [Web Fetch Tool](#web-fetch-tool-evolution-f1)
+  - [MCP Per-User](#mcp-per-user-evolution-f2)
+  - [Admin MCP Per-Server Routing](#admin-mcp-per-server-routing-evolution-f25)
+  - [Multi-Channel Telegram](#multi-channel-telegram-evolution-f3)
+  - [Heartbeat Autonome](#heartbeat-autonome-evolution-f5)
 - [Références](#références)
 
 ---
 
 ## 🎯 Vue d'Ensemble
 
-LIA est une **plateforme d'assistant conversationnel entreprise** construite sur une architecture micro-services
-modulaire avec orchestration multi-agents via LangGraph.
+LIA est une **plateforme d'assistant conversationnel entreprise** construite sur une architecture micro-services modulaire avec orchestration multi-agents via LangGraph.
 
 ### Caractéristiques Principales
 
@@ -57,20 +55,20 @@ modulaire avec orchestration multi-agents via LangGraph.
 
 ### Métriques Projet
 
-| Métrique                 | Valeur   |
-|--------------------------|----------|
-| **Lignes de Code**       | 150,000+ |
-| **Fichiers**             | 1,500+   |
-| **Modules Python**       | 300+     |
-| **Tests**                | 2,300+   |
-| **Métriques Prometheus** | 500+     |
-| **Dashboards Grafana**   | 15       |
-| **API Endpoints**        | 80+      |
-| **LLM Providers**        | 6        |
-| **Agents**               | 10       |
-| **Tools**                | 50+      |
-| **Fichiers Prompts**     | 45       |
-| **Langues i18n**         | 6        |
+| Métrique | Valeur |
+|----------|--------|
+| **Lignes de Code** | 150,000+ |
+| **Fichiers** | 1,500+ |
+| **Modules Python** | 300+ |
+| **Tests** | 2,300+ |
+| **Métriques Prometheus** | 500+ |
+| **Dashboards Grafana** | 15 |
+| **API Endpoints** | 80+ |
+| **LLM Providers** | 6 |
+| **Agents** | 10 |
+| **Tools** | 50+ |
+| **Fichiers Prompts** | 45 |
+| **Langues i18n** | 6 |
 
 ---
 
@@ -79,14 +77,12 @@ modulaire avec orchestration multi-agents via LangGraph.
 ### 1. Domain-Driven Design (DDD)
 
 Chaque domaine est un **bounded context** isolé avec :
-
 - Ses propres modèles (SQLAlchemy)
 - Son repository (CRUD)
 - Son service layer (business logic)
 - Ses schemas Pydantic (API contracts)
 
-**16 Domaines** :
-
+**17 Domaines** :
 1. **agents** - Orchestration multi-agents, 10 agents actifs, 50+ tools (cœur du système)
 2. **auth** - Authentification et autorisation
 3. **users** - Gestion utilisateurs
@@ -103,11 +99,11 @@ Chaque domaine est un **bounded context** isolé avec :
 14. **scheduled_actions** - Actions planifiées récurrentes (APScheduler CronTrigger)
 15. **user_mcp** - Serveurs MCP utilisateur (CRUD per-user, Model Context Protocol, auto-génération de description LLM)
 16. **channels** - Canaux de messagerie externes (Telegram) avec OTP linking, HITL inline keyboards, voice STT
+17. **rag_spaces** - Espaces de connaissances RAG (upload, embedding OpenAI, recherche hybride, injection Response Node)
 
 ### 2. Async-First
 
 **Tout est asynchrone** pour maximiser la concurrence :
-
 ```python
 # FastAPI routes
 @router.post("/chat")
@@ -116,11 +112,9 @@ async def process_message(...):
         result = await service.process_message(...)
     return result
 
-
 # SQLAlchemy queries
 async with AsyncSession() as session:
     users = await session.execute(select(User))
-
 
 # LangGraph nodes
 async def router_node(state: MessagesState) -> dict:
@@ -131,7 +125,6 @@ async def router_node(state: MessagesState) -> dict:
 ### 3. Separation of Concerns
 
 **Layered Architecture** :
-
 ```
 Presentation Layer (API Routes)
     ↓
@@ -212,27 +205,28 @@ sequenceDiagram
     participant DB as PostgreSQL
     participant R as Redis
     participant P as Prometheus
-    U ->> F: User message
-    F ->> B: POST /api/v1/chat (SSE)
-    B ->> R: Validate session
-    R -->> B: Session valid
-    B ->> DB: Load checkpoint
-    DB -->> B: Last state
-    B ->> LG: Invoke graph (astream)
+
+    U->>F: User message
+    F->>B: POST /api/v1/chat (SSE)
+    B->>R: Validate session
+    R-->>B: Session valid
+    B->>DB: Load checkpoint
+    DB-->>B: Last state
+    B->>LG: Invoke graph (astream)
 
     loop Agent Execution
-        LG ->> LLM: Router decision
-        LLM -->> LG: Response
-        LG ->> P: Record metrics
-        LG ->> B: SSE event (partial)
-        B ->> F: Stream chunk
-        F ->> U: Update UI
+        LG->>LLM: Router decision
+        LLM-->>LG: Response
+        LG->>P: Record metrics
+        LG->>B: SSE event (partial)
+        B->>F: Stream chunk
+        F->>U: Update UI
     end
 
-    LG ->> DB: Save checkpoint
-    LG -->> B: Final state
-    B ->> F: SSE complete
-    F ->> U: Display result
+    LG->>DB: Save checkpoint
+    LG-->>B: Final state
+    B->>F: SSE complete
+    F->>U: Display result
 ```
 
 ---
@@ -413,7 +407,6 @@ class BaseRepository(Generic[ModelType]):
         await self.session.refresh(obj)
         return obj
 
-
 # Usage in domain
 class UserRepository(BaseRepository[User]):
     async def get_by_email(self, email: str) -> User | None:
@@ -450,7 +443,6 @@ class UnitOfWork:
             await self.session.commit()
         await self.session.close()
 
-
 # Usage
 async with UnitOfWork(session_factory) as uow:
     user = await uow.users.get_by_id(user_id)
@@ -464,20 +456,20 @@ async with UnitOfWork(session_factory) as uow:
 # Domain service encapsulates business logic
 class AgentService:
     def __init__(
-            self,
-            uow: UnitOfWork,
-            graph: CompiledStateGraph,
-            checkpointer: AsyncPostgresSaver,
+        self,
+        uow: UnitOfWork,
+        graph: CompiledStateGraph,
+        checkpointer: AsyncPostgresSaver,
     ):
         self.uow = uow
         self.graph = graph
         self.checkpointer = checkpointer
 
     async def process_message(
-            self,
-            conversation_id: UUID,
-            user_message: str,
-            user_id: UUID,
+        self,
+        conversation_id: UUID,
+        user_message: str,
+        user_id: UUID,
     ) -> AsyncGenerator[ServerSentEvent, None]:
         """
         Business logic for processing a user message.
@@ -503,8 +495,7 @@ class AgentService:
 
 ### Configuration Modulaire (ADR-009)
 
-**Problème résolu** : Le fichier monolithique `config.py` (1782 lignes) était devenu difficile à maintenir, tester et
-naviguer.
+**Problème résolu** : Le fichier monolithique `config.py` (1782 lignes) était devenu difficile à maintenir, tester et naviguer.
 
 **Solution** : Split en **9 modules thématiques** via multiple inheritance pattern.
 
@@ -529,8 +520,6 @@ src/core/config/
 # src/core/config/__init__.py
 from .security import SecuritySettings
 from .database import DatabaseSettings
-
-
 # ... autres imports
 
 class Settings(
@@ -569,7 +558,6 @@ settings.router_confidence_high
 ```
 
 **Bénéfices** :
-
 - ✅ **Maintenabilité** : 9×~200 lignes vs 1782 lignes
 - ✅ **Testabilité** : Tests unitaires par module
 - ✅ **Performance IDE** : Autocomplétion 3× plus rapide
@@ -600,10 +588,10 @@ class RedisRateLimiter:
     """
 
     async def acquire(
-            self,
-            key: str,
-            max_calls: int,
-            window_seconds: int
+        self,
+        key: str,
+        max_calls: int,
+        window_seconds: int
     ) -> bool:
         """
         Acquire rate limit token.
@@ -673,10 +661,9 @@ class BaseGoogleClient:
 ```
 
 **Bénéfices** :
-
 - ✅ **Distributed** : Works across multiple backend instances
 - ✅ **Atomic** : Lua scripts prevent race conditions
-- ✅ **Scalable** : Redis O (log N) operations
+- ✅ **Scalable** : Redis O(log N) operations
 - ✅ **Configurable** : Per-endpoint, per-user limits
 
 **Tests** : 35 tests (unit + integration + multi-process)
@@ -687,8 +674,7 @@ class BaseGoogleClient:
 
 ### Local E5 Embeddings (ADR-049)
 
-**Problème résolu** : Remplacer OpenAI text-embedding-3-small ($0.02/1M tokens, 100-300ms latency) par embeddings 100%
-locaux.
+**Problème résolu** : Remplacer OpenAI text-embedding-3-small ($0.02/1M tokens, 100-300ms latency) par embeddings 100% locaux.
 
 **Solution** : `intfloat/multilingual-e5-small` via sentence-transformers.
 
@@ -716,16 +702,15 @@ class LocalE5Embeddings:
 
 #### Performance
 
-| Métrique     | OpenAI API      | Local E5        |
-|--------------|-----------------|-----------------|
-| Cost         | $0.02/1M tokens | **$0**          |
-| Latency      | 100-300ms       | **~50ms**       |
-| Q/A Accuracy | 0.61            | **0.90 (+48%)** |
-| Languages    | 100+            | 100+            |
-| Offline      | Non             | **Oui**         |
+| Métrique | OpenAI API | Local E5 |
+|----------|------------|----------|
+| Cost | $0.02/1M tokens | **$0** |
+| Latency | 100-300ms | **~50ms** |
+| Q/A Accuracy | 0.61 | **0.90 (+48%)** |
+| Languages | 100+ | 100+ |
+| Offline | Non | **Oui** |
 
 **Usages** :
-
 - Semantic Memory Store (mémoire long-terme)
 - Semantic Tool Router (sélection tools)
 - pgvector semantic search
@@ -736,8 +721,7 @@ class LocalE5Embeddings:
 
 ### Semantic Tool Router (ADR-048)
 
-**Problème résolu** : Le routing par mots-clés nécessitait maintenance i18n par langue et produisait des scores faibles
-(~0.60) par dilution sémantique.
+**Problème résolu** : Le routing par mots-clés nécessitait maintenance i18n par langue et produisait des scores faibles (~0.60) par dilution sémantique.
 
 **Solution** : Architecture à deux niveaux avec `SemanticDomainSelector` + `SemanticToolSelector`.
 
@@ -784,33 +768,32 @@ score = max(
 
 #### Double Threshold Strategy
 
-| Score       | Niveau    | Action                    |
-|-------------|-----------|---------------------------|
-| ≥ 0.75/0.70 | PRIMARY   | Sélection haute confiance |
+| Score | Niveau | Action |
+|-------|--------|--------|
+| ≥ 0.75/0.70 | PRIMARY | Sélection haute confiance |
 | ≥ 0.65/0.60 | SECONDARY | Fallback si aucun PRIMARY |
-| < 0.65/0.60 | -         | Non sélectionné           |
+| < 0.65/0.60 | - | Non sélectionné |
 
 #### Domain Taxonomy (11 domaines)
 
 ```python
 # src/domains/agents/domain_taxonomy.py
 DOMAINS = [
-    "weather",  # Météo et prévisions
-    "calendar",  # Événements et rendez-vous
-    "reminders",  # Rappels et notifications
-    "tasks",  # Tâches et to-do
-    "contacts",  # Contacts et communications
-    "notes",  # Notes et mémos
-    "search",  # Recherche d'informations
-    "memory",  # Mémoire conversationnelle
+    "weather",      # Météo et prévisions
+    "calendar",     # Événements et rendez-vous
+    "reminders",    # Rappels et notifications
+    "tasks",        # Tâches et to-do
+    "contacts",     # Contacts et communications
+    "notes",        # Notes et mémos
+    "search",       # Recherche d'informations
+    "memory",       # Mémoire conversationnelle
     "preferences",  # Préférences utilisateur
-    "location",  # Localisation et géographie
-    "general",  # Conversations générales (fallback)
+    "location",     # Localisation et géographie
+    "general",      # Conversations générales (fallback)
 ]
 ```
 
 **Bénéfices** :
-
 - ✅ **80-90% réduction tokens** : De 15K à 1.5-3K tokens/requête
 - ✅ **Zero i18n maintenance** : Embeddings multilingues natifs (E5)
 - ✅ **+48% accuracy** : 0.90 vs 0.61 baseline
@@ -822,8 +805,7 @@ DOMAINS = [
 
 ### Connecteurs Google (OAuth 2.1 + APIs)
 
-**Architecture multi-domaine** : 6 clients Google, 3 clients Apple iCloud, 4 clients Microsoft 365 avec clients séparés
-par API.
+**Architecture multi-domaine** : 6 clients Google, 3 clients Apple iCloud, 4 clients Microsoft 365 avec clients séparés par API.
 
 #### Clients Implémentés
 
@@ -926,13 +908,13 @@ class BaseGoogleClient(ABC):
 
     # Subclasses MUST define
     connector_type: ConnectorType  # GOOGLE_CONTACTS, GOOGLE_GMAIL
-    api_base_url: str  # https://people.googleapis.com/v1
+    api_base_url: str              # https://people.googleapis.com/v1
 
     async def _make_request(
-            self,
-            method: str,
-            endpoint: str,
-            **kwargs
+        self,
+        method: str,
+        endpoint: str,
+        **kwargs
     ) -> dict[str, Any]:
         """
         Template method - implémente le flow complet:
@@ -946,7 +928,6 @@ class BaseGoogleClient(ABC):
 ```
 
 **Bénéfices** :
-
 - ✅ **DRY** : -300 lignes de code dupliqué
 - ✅ **Consistency** : OAuth refresh identique pour tous clients
 - ✅ **Extensibility** : Nouveau client = override 2 properties
@@ -978,19 +959,16 @@ contact = await client.get_contact(
 ```
 
 **Cache Strategy** :
-
 - List operations : TTL 5min (données stables)
 - Search operations : TTL 3min (moins prévisible)
 - Cache key : includes `user_id` + `query` + `fields` (prevent collisions)
 
 **Pydantic Models** : 14+ types structurés
-
 - `ContactName`, `ContactEmail`, `ContactPhone`, `ContactAddress`
 - `ContactBasic` (minimal), `ContactDetailed` (complet)
 - `SearchContactsOutput`, `ListContactsOutput`, `GetContactDetailsOutput`
 
 **Tools LangChain** : 3 outils exposés
-
 - `search_contacts_tool` : Recherche intelligente
 - `list_contacts_tool` : Liste complète
 - `get_contact_details_tool` : Détails contact
@@ -1055,18 +1033,17 @@ if "label:" not in query and "in:" not in query:
 
 **Semantic Label Mapping** :
 
-| User Query (FR/EN)             | Gmail Query     |
-|--------------------------------|-----------------|
-| "boîte de réception" / "inbox" | `label:INBOX`   |
-| "envoyés" / "sent"             | `label:SENT`    |
-| "brouillons" / "drafts"        | `label:DRAFT`   |
-| "corbeille" / "trash"          | `label:TRASH`   |
-| "spam" / "indésirables"        | `label:SPAM`    |
-| "importants" / "starred"       | `label:STARRED` |
-| "non lus" / "unread"           | `is:unread`     |
+| User Query (FR/EN) | Gmail Query |
+|--------------------|-------------|
+| "boîte de réception" / "inbox" | `label:INBOX` |
+| "envoyés" / "sent" | `label:SENT` |
+| "brouillons" / "drafts" | `label:DRAFT` |
+| "corbeille" / "trash" | `label:TRASH` |
+| "spam" / "indésirables" | `label:SPAM` |
+| "importants" / "starred" | `label:STARRED` |
+| "non lus" / "unread" | `is:unread` |
 
 **Tools LangChain** : 3 outils exposés
-
 - `search_emails_tool` : Recherche intelligente
 - `get_email_details_tool` : Détails email + body parsing
 - `send_email_tool` : Envoi email (HITL approval obligatoire)
@@ -1117,7 +1094,6 @@ if datetime.now(UTC) >= credentials.expires_at - timedelta(minutes=5):
 ```
 
 **Security** :
-
 - ✅ PKCE obligatoire (S256)
 - ✅ State token single-use (CSRF protection)
 - ✅ Credentials encryption (Fernet)
@@ -1125,7 +1101,6 @@ if datetime.now(UTC) >= credentials.expires_at - timedelta(minutes=5):
 - ✅ Scopes validation (prevent scope creep)
 
 **Voir** :
-
 - [ADR-010: Email Domain Renaming](./architecture/ADR-010-Email-Domain-Renaming.md) - Architecture multi-provider
 - [EMAIL_FORMATTER.md](./technical/EMAIL_FORMATTER.md) - Formatage emails
 - [OAUTH.md](./technical/OAUTH.md) - OAuth 2.1 flow complet
@@ -1135,8 +1110,7 @@ if datetime.now(UTC) >= credentials.expires_at - timedelta(minutes=5):
 ### Orchestration Multi-Domaines
 
 > **IMPORTANT**: Cette section décrit l'architecture v1.0 **obsolète**. L'architecture actuelle (v2.0)
-> utilise `parallel_executor.py` avec `asyncio.gather()`.
-> Voir [MULTI_DOMAIN_ARCHITECTURE.md](technical/MULTI_DOMAIN_ARCHITECTURE.md).
+> utilise `parallel_executor.py` avec `asyncio.gather()`. Voir [MULTI_DOMAIN_ARCHITECTURE.md](technical/MULTI_DOMAIN_ARCHITECTURE.md).
 >
 > **Composants supprimés en v2.0**:
 > - `domain_handler.py`, `domain_registry.py`, `multi_domain_composer.py`, `relation_engine.py`, `plan_executor.py`
@@ -1162,9 +1136,9 @@ class MultiDomainComposer:
     """
 
     async def compose(
-            self,
-            agent_results: dict[str, Any],
-            current_turn_id: int
+        self,
+        agent_results: dict[str, Any],
+        current_turn_id: int
     ) -> ComposedResult:
         """
         Compose results from multiple domains.
@@ -1231,7 +1205,6 @@ enriched = relation_engine.resolve(composed)
 #### Composants
 
 **1. DomainRegistry** (singleton, thread-safe)
-
 ```python
 registry = DomainRegistry()
 registry.register(ContactsDomainHandler())
@@ -1243,7 +1216,6 @@ detected = registry.detect_domains(agent_results)
 ```
 
 **2. DomainDetector** (per domain)
-
 ```python
 class ContactsDomainDetector:
     def detect(self, data: dict) -> tuple[bool, float]:
@@ -1257,7 +1229,6 @@ class ContactsDomainDetector:
 ```
 
 **3. RelationEngine** (cross-domain linking)
-
 ```python
 class ContactsEmailsResolver:
     def resolve(self, contacts: list, emails: list) -> list[Relation]:
@@ -1290,7 +1261,6 @@ class ContactsEmailsResolver:
 ```
 
 **4. Partial Error Handling**
-
 ```python
 # Si 1 domaine échoue, les autres continuent
 try:
@@ -1322,12 +1292,12 @@ composed = composer.compose({
 
 #### Performance
 
-| Métrique   | Single Domain | Multi-Domain (2) | Gain                       |
-|------------|---------------|------------------|----------------------------|
-| Latency    | 1.8s          | 2.1s (+0.3s)     | Acceptable (parallel exec) |
-| Tokens     | 2,000         | 3,100 (+55%)     | Raisonnable (2 domaines)   |
-| API Calls  | 1             | 2                | Nécessaire                 |
-| User Value | Limité        | **Élevé**        | Queries impossibles avant  |
+| Métrique | Single Domain | Multi-Domain (2) | Gain |
+|----------|---------------|------------------|------|
+| Latency | 1.8s | 2.1s (+0.3s) | Acceptable (parallel exec) |
+| Tokens | 2,000 | 3,100 (+55%) | Raisonnable (2 domaines) |
+| API Calls | 1 | 2 | Nécessaire |
+| User Value | Limité | **Élevé** | Queries impossibles avant |
 
 **Voir** : [MULTI_DOMAIN_ARCHITECTURE.md](./technical/MULTI_DOMAIN_ARCHITECTURE.md) - Documentation complète
 
@@ -1406,7 +1376,6 @@ apps/web/
 ### State Management
 
 **Chat State** (Reducer Pattern) :
-
 ```typescript
 // src/reducers/chat-reducer.ts
 type ChatState = {
@@ -1658,11 +1627,9 @@ Pour les détails complets, voir [GRAPH_AND_AGENTS_ARCHITECTURE.md](./GRAPH_AND_
 
 **Version**: 1.1 (2025-12-06) | **Status**: Phase B+ ✅ Production Ready | Phase E ⚠️ Partiellement Implémenté
 
-INTELLIPLANNER est une amélioration architecturale majeure du système d'orchestration multi-agents qui résout deux
-problèmes critiques :
+INTELLIPLANNER est une amélioration architecturale majeure du système d'orchestration multi-agents qui résout deux problèmes critiques :
 
-> **Note**: La Phase E (AdaptiveRePlanner) est partiellement implémentée. Les décisions `RETRY_SAME`, `REPLAN_MODIFIED`
-> et `REPLAN_NEW` nécessitent une restructuration du graphe (voir détails ci-dessous).
+> **Note**: La Phase E (AdaptiveRePlanner) est partiellement implémentée. Les décisions `RETRY_SAME`, `REPLAN_MODIFIED` et `REPLAN_NEW` nécessitent une restructuration du graphe (voir détails ci-dessous).
 
 ### Composants
 
@@ -1697,8 +1664,7 @@ problèmes critiques :
 
 ### Phase B+: Données Structurées pour Templates
 
-**Problème**: Les templates Jinja2 `{{ steps.list_calendars.calendars[0].id }}` échouaient car `completed_steps`
-stockait uniquement `summary_for_llm` (texte).
+**Problème**: Les templates Jinja2 `{{ steps.list_calendars.calendars[0].id }}` échouaient car `completed_steps` stockait uniquement `summary_for_llm` (texte).
 
 **Solution**: Nouveau champ `structured_data` dans `StandardToolOutput` propagé à travers toute la chaîne d'exécution.
 
@@ -1721,16 +1687,16 @@ return StandardToolOutput(
 
 **Solution**: Service `AdaptiveRePlanner` analyse les résultats et décide de la stratégie.
 
-| Trigger             | Decision          | Strategy                |
-|---------------------|-------------------|-------------------------|
-| `EMPTY_RESULTS`     | `REPLAN_MODIFIED` | `BROADEN_SEARCH`        |
-| `PARTIAL_EMPTY`     | `REPLAN_MODIFIED` | `REDUCE_SCOPE`          |
-| `PARTIAL_FAILURE`   | `RETRY_SAME`      | Réexécuter              |
-| `SEMANTIC_MISMATCH` | `ESCALATE_USER`   | Clarifier l'intention   |
-| `REFERENCE_ERROR`   | `ESCALATE_USER`   | Demander clarification  |
-| `DEPENDENCY_ERROR`  | `REPLAN_NEW`      | Nouvelle stratégie      |
-| `TIMEOUT`           | `RETRY_SAME`      | Réessayer               |
-| Multiple échecs     | `ABORT`           | Expliquer et abandonner |
+| Trigger | Decision | Strategy |
+|---------|----------|----------|
+| `EMPTY_RESULTS` | `REPLAN_MODIFIED` | `BROADEN_SEARCH` |
+| `PARTIAL_EMPTY` | `REPLAN_MODIFIED` | `REDUCE_SCOPE` |
+| `PARTIAL_FAILURE` | `RETRY_SAME` | Réexécuter |
+| `SEMANTIC_MISMATCH` | `ESCALATE_USER` | Clarifier l'intention |
+| `REFERENCE_ERROR` | `ESCALATE_USER` | Demander clarification |
+| `DEPENDENCY_ERROR` | `REPLAN_NEW` | Nouvelle stratégie |
+| `TIMEOUT` | `RETRY_SAME` | Réessayer |
+| Multiple échecs | `ABORT` | Expliquer et abandonner |
 
 ### Configuration
 
@@ -1763,31 +1729,30 @@ adaptive_replanner_recovery_success_total{strategy="broaden_search|alternative_s
 
 ### Fichiers Clés
 
-| Module       | Fichier                               | Description                                                                         |
-|--------------|---------------------------------------|-------------------------------------------------------------------------------------|
-| **Phase B+** | `tools/output.py`                     | `StandardToolOutput.structured_data` + `get_step_output()` + `REGISTRY_TYPE_TO_KEY` |
-|              | `orchestration/parallel_executor.py`  | `StepResult.structured_data` + `_merge_single_step_result()`                        |
-|              | `orchestration/schemas.py`            | `StepResult` export pour orchestration                                              |
-|              | `orchestration/jinja_evaluator.py`    | `JinjaEvaluator` pour templates sécurisés                                           |
-| **Phase E**  | `orchestration/adaptive_replanner.py` | Service complet (~900 lignes)                                                       |
-|              | `orchestration/__init__.py`           | Exports publics (enums, fonctions)                                                  |
-|              | `nodes/task_orchestrator_node.py`     | Point d'intégration post-exécution                                                  |
-| **Config**   | `core/config/agents.py`               | `adaptive_replanning_*` settings                                                    |
-|              | `core/config/advanced.py`             | `jinja_max_recursion_depth` setting                                                 |
+| Module | Fichier | Description |
+|--------|---------|-------------|
+| **Phase B+** | `tools/output.py` | `StandardToolOutput.structured_data` + `get_step_output()` + `REGISTRY_TYPE_TO_KEY` |
+| | `orchestration/parallel_executor.py` | `StepResult.structured_data` + `_merge_single_step_result()` |
+| | `orchestration/schemas.py` | `StepResult` export pour orchestration |
+| | `orchestration/jinja_evaluator.py` | `JinjaEvaluator` pour templates sécurisés |
+| **Phase E** | `orchestration/adaptive_replanner.py` | Service complet (~900 lignes) |
+| | `orchestration/__init__.py` | Exports publics (enums, fonctions) |
+| | `nodes/task_orchestrator_node.py` | Point d'intégration post-exécution |
+| **Config** | `core/config/agents.py` | `adaptive_replanning_*` settings |
+| | `core/config/advanced.py` | `jinja_max_recursion_depth` setting |
 
 ### Status d'Implémentation Phase E
 
-| Décision          | Status | Notes                              |
-|-------------------|--------|------------------------------------|
-| `PROCEED`         | ✅     | Continue vers `response_node`      |
-| `ESCALATE_USER`   | ✅     | Message affiché à l'utilisateur    |
-| `ABORT`           | ✅     | Abandonne avec message explicatif  |
-| `RETRY_SAME`      | ⏳     | Requiert restructuration du graphe |
-| `REPLAN_MODIFIED` | ⏳     | Requiert appel au `planner_node`   |
-| `REPLAN_NEW`      | ⏳     | Stratégie complète nouvelle        |
+| Décision | Status | Notes |
+|----------|--------|-------|
+| `PROCEED` | ✅ | Continue vers `response_node` |
+| `ESCALATE_USER` | ✅ | Message affiché à l'utilisateur |
+| `ABORT` | ✅ | Abandonne avec message explicatif |
+| `RETRY_SAME` | ⏳ | Requiert restructuration du graphe |
+| `REPLAN_MODIFIED` | ⏳ | Requiert appel au `planner_node` |
+| `REPLAN_NEW` | ⏳ | Stratégie complète nouvelle |
 
 Pour les détails complets, voir:
-
 - [ARCHITECTURE_LANGRAPH.md - Section 13](./ARCHITECTURE_LANGRAPH.md#13-intelliplanner---orchestration-avancée)
 - [ARCHITECTURE_AGENT.md - Section 22](./ARCHITECTURE_AGENT.md#22-intelliplanner---orchestration-avancée)
 - [docs/INTELLIPLANNER/](./INTELLIPLANNER/)
@@ -1914,13 +1879,11 @@ User clicks "Connect Google"
 ### BFF Pattern (Backend for Frontend)
 
 **Problem avec JWT en LocalStorage** :
-
 - XSS vulnerable (JavaScript peut lire localStorage)
 - Refresh token exposure
 - No automatic expiration
 
 **Solution BFF** :
-
 ```
 Frontend                    Backend                 Redis
    │                           │                       │
@@ -1950,7 +1913,6 @@ Frontend                    Backend                 Redis
 ```
 
 **Benefits** :
-
 - XSS immune (JavaScript cannot access HttpOnly cookies)
 - CSRF protected (SameSite=Lax)
 - Automatic expiration (TTL in Redis)
@@ -1997,7 +1959,6 @@ Application Code
 ### Métriques Clés (500+)
 
 **Categories** :
-
 - **HTTP/API** (10) : Request rate, latency (P50/P95/P99), error rate
 - **LLM** (15) : Token consumption, API calls, latency, cost, cache hit rate
 - **Agents** (50+) : Node executions, SSE streaming, TTFT, context size
@@ -2031,11 +1992,10 @@ async def get_uow() -> AsyncGenerator[UnitOfWork, None]:
     async with UnitOfWork(session_factory) as uow:
         yield uow
 
-
 @router.post("/users")
 async def create_user(
-        data: UserCreate,
-        uow: UnitOfWork = Depends(get_uow),  # Injected
+    data: UserCreate,
+    uow: UnitOfWork = Depends(get_uow),  # Injected
 ):
     user = await uow.users.create(User(**data.dict()))
     return user
@@ -2045,8 +2005,8 @@ async def create_user(
 
 ```python
 def add_messages_with_truncate(
-        left: list[BaseMessage],
-        right: list[BaseMessage]
+    left: list[BaseMessage],
+    right: list[BaseMessage]
 ) -> list[BaseMessage]:
     """
     Reducer: Never mutate left, always return new list.
@@ -2097,18 +2057,15 @@ class ApprovalStrategy(Protocol):
     def evaluate(self, plan: ExecutionPlan) -> ApprovalEvaluation:
         ...
 
-
 class ManifestBasedStrategy(ApprovalStrategy):
     def evaluate(self, plan):
         # Check manifest.permissions.hitl_required
         ...
 
-
 class CostThresholdStrategy(ApprovalStrategy):
     def evaluate(self, plan):
         # Check plan.estimated_cost_usd > threshold
         ...
-
 
 # Compose strategies
 evaluator = ApprovalEvaluator(strategies=[
@@ -2123,42 +2080,37 @@ evaluator = ApprovalEvaluator(strategies=[
 
 ### Performance Actuelle (P95)
 
-| Métrique        | Valeur | Target  |
-|-----------------|--------|---------|
-| API Latency     | 450ms  | < 500ms |
-| TTFT            | 380ms  | < 500ms |
-| Router Latency  | 800ms  | < 2s    |
-| Planner Latency | 2.5s   | < 5s    |
-| Checkpoint Save | 15ms   | < 50ms  |
-| Token Reduction | 93%    | > 80%   |
+| Métrique | Valeur | Target |
+|----------|--------|--------|
+| API Latency | 450ms | < 500ms |
+| TTFT | 380ms | < 500ms |
+| Router Latency | 800ms | < 2s |
+| Planner Latency | 2.5s | < 5s |
+| Checkpoint Save | 15ms | < 50ms |
+| Token Reduction | 93% | > 80% |
 
 ### Optimisations Implémentées
 
 **1. Message Windowing**
-
 - Router: 5 turns (68% latency reduction)
 - Planner: 10 turns (42% latency reduction)
 - Response: 20 turns (52% TTFT improvement)
 
 **2. Prompt Caching**
-
 - OpenAI: >1024 tokens system message → 90% discount
 - Anthropic: Automatic caching for repeated prefixes
 
 **3. Parallel Execution**
-
-- asyncio.gather () for independent tools
+- asyncio.gather() for independent tools
 - Dependency graph prevents unnecessary sequencing
 - Wave-based execution (all ready steps in parallel)
 
 **4. Connection Pooling**
-
 - httpx: 100 max connections, 20 keepalive
 - PostgreSQL: SQLAlchemy pool_size=20
 - Redis: connection pool reused
 
 **5. Caching Strategies**
-
 - Tool context: 5-10 min TTL
 - LLM pricing: 1 hour TTL (LRU)
 - Prompts: LRU cache (maxsize=32)
@@ -2167,7 +2119,6 @@ evaluator = ApprovalEvaluator(strategies=[
 ### Scaling Strategy
 
 **Horizontal Scaling** :
-
 ```
 Load Balancer (AWS ALB / Cloudflare)
        ↓
@@ -2199,13 +2150,12 @@ Load Balancer (AWS ALB / Cloudflare)
 ```
 
 **Bottleneck Analysis** :
-
 1. **LLM API Calls** (dominant) : 80% du temps total
-    - Solution : Prompt optimization, caching, parallel calls
+   - Solution : Prompt optimization, caching, parallel calls
 2. **Database Queries** : 10% du temps
-    - Solution : Connection pooling, read replicas, indexes
+   - Solution : Connection pooling, read replicas, indexes
 3. **Redis Operations** : <5% du temps
-    - Solution : Pipelining, clustering
+   - Solution : Pipelining, clustering
 
 ---
 
@@ -2219,9 +2169,8 @@ Load Balancer (AWS ALB / Cloudflare)
 
 ```python
 # List all active pricing (with pagination)
-GET / admin / llm / pricing?search = gpt & page = 1 & page_size = 10 & sort_by = model_name & sort_order = asc
-Response: LLMPricingListResponse
-{
+GET /admin/llm/pricing?search=gpt&page=1&page_size=10&sort_by=model_name&sort_order=asc
+Response: LLMPricingListResponse {
     total: 42,
     page: 1,
     page_size: 10,
@@ -2242,7 +2191,7 @@ Response: LLMPricingListResponse
 }
 
 # Create new pricing
-POST / admin / llm / pricing
+POST /admin/llm/pricing
 Body: {
     model_name: "gpt-5",
     input_price_per_1m_tokens: 15.00,
@@ -2252,11 +2201,11 @@ Body: {
 # Audit log created automatically (AdminAuditLog)
 
 # Update pricing (versioned - deactivates old, creates new)
-PUT / admin / llm / pricing / {model_name}
+PUT /admin/llm/pricing/{model_name}
 # Maintains pricing history (all versions in DB)
 
 # Deactivate pricing (soft delete)
-DELETE / admin / llm / pricing / {pricing_id}
+DELETE /admin/llm/pricing/{pricing_id}
 # is_active = False (history preserved)
 ```
 
@@ -2264,27 +2213,26 @@ DELETE / admin / llm / pricing / {pricing_id}
 
 ```python
 # List active rates
-GET / admin / llm / currencies
+GET /admin/llm/currencies
 Response: {
     total: 2,
     rates: [
-        {from_currency: "USD", to_currency: "EUR", rate: 0.92, is_active: true},
-        {from_currency: "EUR", to_currency: "USD", rate: 1.09, is_active: true}
+        { from_currency: "USD", to_currency: "EUR", rate: 0.92, is_active: true },
+        { from_currency: "EUR", to_currency: "USD", rate: 1.09, is_active: true }
     ]
 }
 
 # Create/update rate (auto-deactivates old rate for pair)
-POST / admin / llm / currencies
-Body: {from_currency: "USD", to_currency: "EUR", rate: 0.93}
+POST /admin/llm/currencies
+Body: { from_currency: "USD", to_currency: "EUR", rate: 0.93 }
 ```
 
 **User Management** (`/admin/users`) :
 
 ```python
 # Search users (advanced filters + pagination)
-GET / admin / search?q = john & is_active = true & is_verified = true & page = 1 & page_size = 10 & sort_by = created_at & sort_order = desc
-Response: UserListResponse
-{
+GET /admin/search?q=john&is_active=true&is_verified=true&page=1&page_size=10&sort_by=created_at&sort_order=desc
+Response: UserListResponse {
     total: 156,
     page: 1,
     page_size: 10,
@@ -2294,7 +2242,7 @@ Response: UserListResponse
 # Optimization: Window function (single query count+data) → 40% faster
 
 # Activate/deactivate user
-PATCH / admin / {user_id} / activation
+PATCH /admin/{user_id}/activation
 Body: {
     is_active: false,
     reason: "Violation terms of service"  # Required if deactivating
@@ -2306,7 +2254,7 @@ Body: {
 # 4. Create audit log entry
 
 # RGPD deletion (CASCADE complete)
-DELETE / admin / {user_id} / gdpr
+DELETE /admin/{user_id}/gdpr
 # Cascade deletes:
 # - User account (users table)
 # - All connectors (connectors table)
@@ -2362,11 +2310,11 @@ class EmailService:
     """
 
     async def send_user_deactivated_notification(
-            self,
-            user_email: str,
-            user_name: str | None,
-            reason: str,
-            user_language: str = "fr"  # i18n support
+        self,
+        user_email: str,
+        user_name: str | None,
+        reason: str,
+        user_language: str = "fr"  # i18n support
     ) -> bool:
         """Send notification when admin deactivates user account."""
         # Internationalized email (6 languages: fr, en, es, de, it, zh-CN)
@@ -2395,7 +2343,6 @@ class EmailService:
 ```
 
 **Email Templates** :
-
 - **Deactivation** : Red theme, reason required, no action button
 - **Activation** : Green theme, login button with `frontend_url/login`
 - **Connector Disabled** : Orange theme, connector label mapping
@@ -2421,11 +2368,11 @@ class ContextResolutionService:
     """
 
     async def resolve_context(
-            self,
-            query: str,
-            state: MessagesState,
-            config: RunnableConfig,
-            run_id: str
+        self,
+        query: str,
+        state: MessagesState,
+        config: RunnableConfig,
+        run_id: str
     ) -> tuple[ResolvedContext, str]:
         """
         Resolve context for user query.
@@ -2470,17 +2417,16 @@ class ContextResolutionService:
 
 `src/domains/agents/utils/type_domain_mapping.py` is the **single source of truth** for all domain-related mappings:
 
-| Constant                       | Purpose                                        | Consumers                                          |
-|--------------------------------|------------------------------------------------|----------------------------------------------------|
-| `TYPE_TO_DOMAIN_MAP`           | RegistryItemType → (domain, items_key)         | response_node, SSE, formatters, context resolution |
-| `ALL_RESULT_KEYS`              | Auto-derived frozenset of all items_key values | adaptive_replanner (empty result detection)        |
-| `SKIP_FILTER_RESULT_KEYS`      | Domains where LLM filtering is skipped         | response_node (intelligent filtering)              |
-| `SKIP_ENRICHMENT_DOMAINS`      | Domains where Brave enrichment is skipped      | response_node (knowledge enrichment)               |
-| `TOOL_PATTERN_TO_DOMAIN_MAP`   | Tool name substring → domain                   | task_orchestrator, context resolution              |
-| `ITEMS_KEY_TO_REGISTRY_CONFIG` | items_key → (type, unique_field)               | FOR_EACH HITL filtering, entity resolution         |
+| Constant | Purpose | Consumers |
+|----------|---------|-----------|
+| `TYPE_TO_DOMAIN_MAP` | RegistryItemType → (domain, items_key) | response_node, SSE, formatters, context resolution |
+| `ALL_RESULT_KEYS` | Auto-derived frozenset of all items_key values | adaptive_replanner (empty result detection) |
+| `SKIP_FILTER_RESULT_KEYS` | Domains where LLM filtering is skipped | response_node (intelligent filtering) |
+| `SKIP_ENRICHMENT_DOMAINS` | Domains where Brave enrichment is skipped | response_node (knowledge enrichment) |
+| `TOOL_PATTERN_TO_DOMAIN_MAP` | Tool name substring → domain | task_orchestrator, context resolution |
+| `ITEMS_KEY_TO_REGISTRY_CONFIG` | items_key → (type, unique_field) | FOR_EACH HITL filtering, entity resolution |
 
-**When adding a new domain**: add to `TYPE_TO_DOMAIN_MAP` + update skip sets if needed → all consumers pick it up
-automatically.
+**When adding a new domain**: add to `TYPE_TO_DOMAIN_MAP` + update skip sets if needed → all consumers pick it up automatically.
 
 #### Reference Resolver (Linguistic Patterns)
 
@@ -2567,8 +2513,7 @@ context_resolution_duration_seconds = Histogram(
 
 #### Problematique & Solution
 
-**Probleme** : L'ancienne architecture 3-stage (HierarchicalPlannerService) provoquait ~14,100 tokens par requete
-multi-domaine.
+**Probleme** : L'ancienne architecture 3-stage (HierarchicalPlannerService) provoquait ~14,100 tokens par requete multi-domaine.
 
 **Solution** : Architecture v3 avec Smart Services :
 
@@ -2588,10 +2533,10 @@ class SmartPlannerService:
     """
 
     async def plan(
-            self,
-            intelligence: QueryIntelligence,
-            config: RunnableConfig,
-            validation_feedback: str | None = None,
+        self,
+        intelligence: QueryIntelligence,
+        config: RunnableConfig,
+        validation_feedback: str | None = None,
     ) -> PlanningResult:
         """Generate execution plan based on query intelligence."""
 
@@ -2685,15 +2630,13 @@ if await can_skip_validation(plan):
     return ValidationResult(is_valid=True)  # Skip LLM validation
 ```
 
-**Modele Bayesien Beta (2,1)** : Confiance initiale 67%, montee rapide
-
+**Modele Bayesien Beta(2,1)** : Confiance initiale 67%, montee rapide
 - **Suggerable** : ≥3 observations + ≥75% confiance
 - **Bypass** : ≥10 observations + ≥90% confiance
 
 **Training** : `task patterns:train:all` execute des requetes via API pour entrainer les patterns
 
-> Voir [PLAN_PATTERN_LEARNER.md](./technical/PLAN_PATTERN_LEARNER.md)
-> et [PATTERN_LEARNER_TRAINING.md](./technical/PATTERN_LEARNER_TRAINING.md)
+> Voir [PLAN_PATTERN_LEARNER.md](./technical/PLAN_PATTERN_LEARNER.md) et [PATTERN_LEARNER_TRAINING.md](./technical/PATTERN_LEARNER_TRAINING.md)
 
 > **Documentation complete** : Voir [SMART_SERVICES.md](./technical/SMART_SERVICES.md)
 
@@ -2729,10 +2672,10 @@ class BaseAPIKeyClient(ABC):
     auth_query_param: str = "api_key"
 
     def __init__(
-            self,
-            user_id: UUID,
-            credentials: APIKeyCredentials,
-            rate_limit_per_second: int = 10
+        self,
+        user_id: UUID,
+        credentials: APIKeyCredentials,
+        rate_limit_per_second: int = 10
     ):
         self.user_id = user_id
         self.credentials = credentials
@@ -2742,12 +2685,12 @@ class BaseAPIKeyClient(ABC):
         self._http_client: httpx.AsyncClient | None = None
 
     async def _make_request(
-            self,
-            method: str,
-            endpoint: str,
-            params: dict | None = None,
-            json_data: dict | None = None,
-            max_retries: int = 3
+        self,
+        method: str,
+        endpoint: str,
+        params: dict | None = None,
+        json_data: dict | None = None,
+        max_retries: int = 3
     ) -> dict[str, Any]:
         """
         Make HTTP request with API key auth and retry logic.
@@ -2773,12 +2716,12 @@ class BaseAPIKeyClient(ABC):
                 response = await client.request(method, url, headers=headers, ...)
 
                 if response.status_code == 429:  # Rate limited
-                    wait_time = int(response.headers.get("Retry-After", 2 ** attempt))
+                    wait_time = int(response.headers.get("Retry-After", 2**attempt))
                     await asyncio.sleep(wait_time)
                     continue
 
                 if response.status_code >= 500:  # Server error
-                    await asyncio.sleep(2 ** attempt)
+                    await asyncio.sleep(2**attempt)
                     continue
 
                 if response.status_code in (401, 403):  # Auth error → fail fast
@@ -2789,7 +2732,7 @@ class BaseAPIKeyClient(ABC):
             except httpx.RequestError as e:
                 if attempt == max_retries - 1:
                     raise HTTPException(503, "API unavailable")
-                await asyncio.sleep(2 ** attempt)
+                await asyncio.sleep(2**attempt)
 
     def _mask_api_key(self, key: str) -> str:
         """Mask API key for safe logging: sk-a...xyz"""
@@ -2849,7 +2792,6 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
     - Add to request.state for route access
     - Add to response headers (client correlation)
     """
-
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         # Generate or extract request ID
         request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
@@ -2890,7 +2832,6 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     - Conditional logging (skip excluded paths)
     - Error logging (always ERROR level, even if path excluded)
     """
-
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         start_time = time.time()
         path = request.url.path
@@ -2935,7 +2876,6 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
     - Exception logging (exc_info=True for Sentry integration)
     - Request ID propagation
     """
-
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         try:
             response = await call_next(request)
@@ -2947,8 +2887,7 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
                 status_code=500,
                 content={
                     "error": "Internal server error",
-                    "detail": str(exc) if settings.debug else "An unexpected error occurred",
-                    # Stack trace only in DEBUG
+                    "detail": str(exc) if settings.debug else "An unexpected error occurred",  # Stack trace only in DEBUG
                     "request_id": getattr(request.state, "request_id", None)
                 }
             )
@@ -3053,7 +2992,6 @@ async def process_due_reminders() -> None:
 ```
 
 **Bénéfices** :
-
 - ✅ **FOR UPDATE SKIP LOCKED** : Pas de conflits multi-process
 - ✅ **LLM Personalization** : Messages engageants (personality + memories)
 - ✅ **Multi-canal** : FCM + SSE simultanés
@@ -3084,7 +3022,6 @@ Token Usage Event → DB Persistence (authoritative source)
 ```
 
 **Solution Hybride** :
-
 - **Counters** : Real-time increments (traditional Prometheus) → monitoring/alerting
 - **Gauges** : Lifetime totals depuis DB (restart-safe) → billing/reports
 
@@ -3116,7 +3053,6 @@ lifetime_metrics_last_update_timestamp = Gauge(
     "lifetime_metrics_last_update_timestamp",
     "Unix timestamp of last successful update"
 )
-
 
 async def update_lifetime_metrics() -> None:
     """
@@ -3166,14 +3102,10 @@ async def update_lifetime_metrics() -> None:
                         continue
 
                     # Update gauges
-                    llm_tokens_consumed_lifetime.labels(model=row.model_name, node_name=row.node_name,
-                                                        token_type="prompt_tokens").set(row.total_input)
-                    llm_tokens_consumed_lifetime.labels(model=row.model_name, node_name=row.node_name,
-                                                        token_type="completion_tokens").set(row.total_output)
-                    llm_tokens_consumed_lifetime.labels(model=row.model_name, node_name=row.node_name,
-                                                        token_type="cached_tokens").set(row.total_cached)
-                    llm_cost_lifetime.labels(model=row.model_name, node_name=row.node_name, currency="EUR").set(
-                        float(row.total_cost))
+                    llm_tokens_consumed_lifetime.labels(model=row.model_name, node_name=row.node_name, token_type="prompt_tokens").set(row.total_input)
+                    llm_tokens_consumed_lifetime.labels(model=row.model_name, node_name=row.node_name, token_type="completion_tokens").set(row.total_output)
+                    llm_tokens_consumed_lifetime.labels(model=row.model_name, node_name=row.node_name, token_type="cached_tokens").set(row.total_cached)
+                    llm_cost_lifetime.labels(model=row.model_name, node_name=row.node_name, currency="EUR").set(float(row.total_cost))
 
                     _lifetime_cache[cache_key] = current_values
                     updated_count += 1
@@ -3254,11 +3186,11 @@ def validate_llm_configuration() -> None:
         )
 
     logger.info("llm_configuration_validated",
-                router_model=settings.router_llm_model,
-                response_model=settings.response_llm_model,
-                planner_model=settings.planner_llm_model,
-                ...
-                )
+        router_model=settings.router_llm_model,
+        response_model=settings.response_llm_model,
+        planner_model=settings.planner_llm_model,
+        ...
+    )
 ```
 
 #### Event Loop Configuration (Windows/psycopg Compatibility)
@@ -3292,15 +3224,14 @@ def log_event_loop_configuration() -> None:
         loop_type = "NotRunning"
 
     logger.info("event_loop_configured",
-                platform=sys.platform,
-                loop_type=loop_type,
-                policy_type=type(policy).__name__,
-                is_windows=sys.platform == "win32",
-                psycopg_compatible=(
-                    "Selector" in loop_type if sys.platform == "win32" and loop_type != "NotRunning" else True
-                )
-                )
-
+        platform=sys.platform,
+        loop_type=loop_type,
+        policy_type=type(policy).__name__,
+        is_windows=sys.platform == "win32",
+        psycopg_compatible=(
+            "Selector" in loop_type if sys.platform == "win32" and loop_type != "NotRunning" else True
+        )
+    )
 
 # In main.py (Windows-specific configuration):
 if sys.platform == "win32":
@@ -3314,10 +3245,7 @@ if sys.platform == "win32":
 
 ### Skills System
 
-**Architecture [agentskills.io](https://agentskills.io/)** : Implémentation du standard ouvert agentskills.io pour les
-skills — instructions spécialisées qui étendent les capacités de l'assistant. Skills stockés sous forme de fichiers
-`SKILL.md` sur disque (YAML frontmatter + corps markdown), chargés dans un cache en mémoire au démarrage. Pas de base de
-données requise.
+**Architecture [agentskills.io](https://agentskills.io/)** : Implémentation du standard ouvert agentskills.io pour les skills — instructions spécialisées qui étendent les capacités de l'assistant. Skills stockés sous forme de fichiers `SKILL.md` sur disque (YAML frontmatter + corps markdown), chargés dans un cache en mémoire au démarrage. Pas de base de données requise.
 
 **Feature flag** : `SKILLS_ENABLED=true` (défaut : `false`)
 
@@ -3337,40 +3265,37 @@ data/skills/
         └── assets/            # Optionnel : templates, icônes
 ```
 
-**Format SKILL.md** : Frontmatter YAML (champs requis : `name`, `description`) + corps markdown contenant les
-instructions. Extensions LIA : `category`, `priority`, `always_loaded`, `plan_template` (plan déterministe).
+**Format SKILL.md** : Frontmatter YAML (champs requis : `name`, `description`) + corps markdown contenant les instructions. Extensions LIA : `category`, `priority`, `always_loaded`, `plan_template` (plan déterministe).
 
 **Progressive Disclosure (3 niveaux)** :
 
-| Niveau          | Chargement        | Coût tokens   | Contenu                             |
-|-----------------|-------------------|---------------|-------------------------------------|
-| L1 Catalogue    | Démarrage session | ~50-100/skill | name + description + location       |
-| L2 Instructions | Skill activé      | <5000 tokens  | Corps SKILL.md + listing ressources |
-| L3 Resources    | À la demande      | Variable      | scripts/, references/, assets/      |
+| Niveau | Chargement | Coût tokens | Contenu |
+|--------|-----------|-------------|---------|
+| L1 Catalogue | Démarrage session | ~50-100/skill | name + description + location |
+| L2 Instructions | Skill activé | <5000 tokens | Corps SKILL.md + listing ressources |
+| L3 Resources | À la demande | Variable | scripts/, references/, assets/ |
 
 **Activation** : Modèle hybride avec 3 stratégies :
 
-1. **Planner pre-activation** (primaire) : Le LLM planner voit le catalogue L1 → inclut `"skill_name"` dans sa sortie
-   JSON → `response_node` charge les instructions L2
+1. **Planner pre-activation** (primaire) : Le LLM planner voit le catalogue L1 → inclut `"skill_name"` dans sa sortie JSON → `response_node` charge les instructions L2
 2. **Tool dédié** (fallback) : `activate_skill_tool(name)` disponible pour le LLM response pour activation à la demande
-3. **Bypass déterministe** (optimisation) : Skills avec `plan_template.deterministic: true` contournent le planner LLM
-   via `SkillBypassStrategy`
+3. **Bypass déterministe** (optimisation) : Skills avec `plan_template.deterministic: true` contournent le planner LLM via `SkillBypassStrategy`
 
 **Per-user toggle** : Champ `disabled_skills` sur le modèle User, configurable dans Settings > Features.
 
 **Fichiers clés** :
 
-| Fichier                                 | Rôle                                                                           |
-|-----------------------------------------|--------------------------------------------------------------------------------|
-| `domains/skills/loader.py`              | Parse SKILL.md, scan des répertoires                                           |
-| `domains/skills/cache.py`               | `SkillsCache` singleton en mémoire                                             |
-| `domains/skills/injection.py`           | Constructeur du catalogue L1 (XML)                                             |
-| `domains/skills/activation.py`          | Wrapping structuré L2                                                          |
-| `domains/skills/executor.py`            | Exécution scripts en subprocess sandboxé                                       |
-| `domains/skills/tools.py`               | Outils LangChain (`activate_skill`, `run_skill_script`, `read_skill_resource`) |
-| `domains/skills/catalogue_manifests.py` | Manifestes pour le catalogue sémantique                                        |
-| `domains/skills/router.py`              | Endpoints API (list, import, delete, toggle, reload)                           |
-| `core/config/skills.py`                 | `SkillsSettings`                                                               |
+| Fichier | Rôle |
+|---------|------|
+| `domains/skills/loader.py` | Parse SKILL.md, scan des répertoires |
+| `domains/skills/cache.py` | `SkillsCache` singleton en mémoire |
+| `domains/skills/injection.py` | Constructeur du catalogue L1 (XML) |
+| `domains/skills/activation.py` | Wrapping structuré L2 |
+| `domains/skills/executor.py` | Exécution scripts en subprocess sandboxé |
+| `domains/skills/tools.py` | Outils LangChain (`activate_skill`, `run_skill_script`, `read_skill_resource`) |
+| `domains/skills/catalogue_manifests.py` | Manifestes pour le catalogue sémantique |
+| `domains/skills/router.py` | Endpoints API (list, import, delete, toggle, reload) |
+| `core/config/skills.py` | `SkillsSettings` |
 
 > Voir [SKILLS_INTEGRATION.md](technical/SKILLS_INTEGRATION.md) pour le guide complet d'intégration.
 
@@ -3446,7 +3371,7 @@ VOICE_VAD_THRESHOLD=0.5
 # Modèle Bayesian Beta(2,1) - Confiance initiale 67%
 class InterestScore:
     alpha: float = 2  # Succès initiaux
-    beta: float = 1  # Échecs initiaux
+    beta: float = 1   # Échecs initiaux
 
     @property
     def confidence(self) -> float:
@@ -3483,18 +3408,17 @@ apps/api/src/domains/interests/
 
 **API Endpoints** :
 
-| Endpoint          | Method | Description                    |
-|-------------------|--------|--------------------------------|
-| `/interests`      | GET    | Liste des intérêts utilisateur |
-| `/interests/{id}` | DELETE | Suppression intérêt            |
-| `/interests/sync` | POST   | Synchronisation manuelle       |
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/interests` | GET | Liste des intérêts utilisateur |
+| `/interests/{id}` | DELETE | Suppression intérêt |
+| `/interests/sync` | POST | Synchronisation manuelle |
 
 > Voir [INTERESTS.md](./technical/INTERESTS.md) pour la documentation complète.
 
 ### Scheduled Actions (Actions Planifiees)
 
-**Systeme d'actions recurrentes** : L'utilisateur configure des taches executees automatiquement par l'assistant selon
-un calendrier (jours + heure). Le resultat est archive dans la conversation et notifie via FCM + SSE.
+**Systeme d'actions recurrentes** : L'utilisateur configure des taches executees automatiquement par l'assistant selon un calendrier (jours + heure). Le resultat est archive dans la conversation et notifie via FCM + SSE.
 
 **Composants** :
 
@@ -3513,14 +3437,14 @@ apps/api/src/infrastructure/scheduler/
 
 **API Endpoints** :
 
-| Endpoint                          | Method | Description                         |
-|-----------------------------------|--------|-------------------------------------|
-| `/scheduled-actions`              | GET    | Liste actions de l'utilisateur      |
-| `/scheduled-actions`              | POST   | Creer (verifie limite par user)     |
-| `/scheduled-actions/{id}`         | PATCH  | Modifier                            |
-| `/scheduled-actions/{id}`         | DELETE | Supprimer                           |
-| `/scheduled-actions/{id}/toggle`  | PATCH  | Toggle is_enabled                   |
-| `/scheduled-actions/{id}/execute` | POST   | Tester maintenant (fire-and-forget) |
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/scheduled-actions` | GET | Liste actions de l'utilisateur |
+| `/scheduled-actions` | POST | Creer (verifie limite par user) |
+| `/scheduled-actions/{id}` | PATCH | Modifier |
+| `/scheduled-actions/{id}` | DELETE | Supprimer |
+| `/scheduled-actions/{id}/toggle` | PATCH | Toggle is_enabled |
+| `/scheduled-actions/{id}/execute` | POST | Tester maintenant (fire-and-forget) |
 
 > Voir [SCHEDULED_ACTIONS.md](./technical/SCHEDULED_ACTIONS.md) pour la documentation complète.
 
@@ -3619,7 +3543,6 @@ class BM25Index:
         scores = self._compute_bm25_scores(tokens)
         return self._top_k(scores, k)
 
-
 # src/domains/memories/search/hybrid_search.py
 class HybridMemorySearch:
     """
@@ -3627,11 +3550,11 @@ class HybridMemorySearch:
     """
 
     async def search(
-            self,
-            query: str,
-            user_id: UUID,
-            k: int = 10,
-            alpha: float = 0.6  # Semantic weight
+        self,
+        query: str,
+        user_id: UUID,
+        k: int = 10,
+        alpha: float = 0.6  # Semantic weight
     ) -> list[Memory]:
         # Parallel execution
         bm25_results, semantic_results = await asyncio.gather(
@@ -3645,11 +3568,11 @@ class HybridMemorySearch:
 
 **Performance** :
 
-| Métrique  | BM25 Only | Semantic Only | Hybrid (α=0.6) |
-|-----------|-----------|---------------|----------------|
-| Recall@10 | 0.72      | 0.81          | **0.89**       |
-| Latency   | 5ms       | 45ms          | 50ms           |
-| Memory    | 10MB/user | 50MB/user     | 60MB/user      |
+| Métrique | BM25 Only | Semantic Only | Hybrid (α=0.6) |
+|----------|-----------|---------------|----------------|
+| Recall@10 | 0.72 | 0.81 | **0.89** |
+| Latency | 5ms | 45ms | 50ms |
+| Memory | 10MB/user | 50MB/user | 60MB/user |
 
 > Voir [HYBRID_SEARCH.md](./technical/HYBRID_SEARCH.md) pour la documentation complète.
 
@@ -3675,10 +3598,10 @@ async with TrackingContext(user_id, run_id) as tracker:
 
 **Tables** :
 
-| Table                   | Description                              |
-|-------------------------|------------------------------------------|
-| `google_api_pricing`    | Tarification par endpoint (USD/1000 req) |
-| `google_api_usage_logs` | Audit trail immutable des appels API     |
+| Table | Description |
+|-------|-------------|
+| `google_api_pricing` | Tarification par endpoint (USD/1000 req) |
+| `google_api_usage_logs` | Audit trail immutable des appels API |
 
 **Colonnes ajoutées à `user_statistics`** :
 
@@ -3691,11 +3614,11 @@ async with TrackingContext(user_id, run_id) as tracker:
 
 **Exports CSV pour facturation** (Admin only) :
 
-| Endpoint                                       | Description                |
-|------------------------------------------------|----------------------------|
-| `/admin/google-api/export/token-usage`         | Export détaillé LLM tokens |
-| `/admin/google-api/export/google-api-usage`    | Export détaillé Google API |
-| `/admin/google-api/export/consumption-summary` | Agrégation par user        |
+| Endpoint | Description |
+|----------|-------------|
+| `/admin/google-api/export/token-usage` | Export détaillé LLM tokens |
+| `/admin/google-api/export/google-api-usage` | Export détaillé Google API |
+| `/admin/google-api/export/consumption-summary` | Agrégation par user |
 
 **Composants Frontend** :
 
@@ -3708,13 +3631,11 @@ async with TrackingContext(user_id, run_id) as tracker:
 
 ## 🆕 Fonctionnalités v6.2 (evolution)
 
-> Features issues de l'analyse et intégration du projet evolution.
-> Voir [evolution_INTEGRATION_ROADMAP.md](./technical/evolution_INTEGRATION_ROADMAP.md) pour la roadmap complète.
+> Features issues de l'analyse et intégration du projet evolution. Voir [evolution_INTEGRATION_ROADMAP.md](./technical/evolution_INTEGRATION_ROADMAP.md) pour la roadmap complète.
 
 ### Web Fetch Tool (evolution F1)
 
-**Extraction de contenu web** : outil `web_fetch` permettant aux agents de récupérer et analyser le contenu de pages
-web.
+**Extraction de contenu web** : outil `web_fetch` permettant aux agents de récupérer et analyser le contenu de pages web.
 
 - Extraction Markdown via `readability` + `markdownify`
 - SSRF prevention (DNS resolution + IP blocklist RFC 1918/6598)
@@ -3725,8 +3646,7 @@ web.
 
 ### MCP Per-User (evolution F2)
 
-**Model Context Protocol** : chaque utilisateur connecte ses propres serveurs MCP exposant des outils tiers via le
-protocole `streamable_http`.
+**Model Context Protocol** : chaque utilisateur connecte ses propres serveurs MCP exposant des outils tiers via le protocole `streamable_http`.
 
 - Authentification flexible : None, API Key, Bearer, OAuth 2.1 (DCR + PKCE S256)
 - Credentials Fernet-encrypted, jamais exposées en API
@@ -3737,22 +3657,14 @@ protocole `streamable_http`.
 
 ### Admin MCP Per-Server Routing (evolution F2.5)
 
-**Admin MCP per-server** : les serveurs MCP configurés par l'admin (`.env`) obtiennent chacun un agent dédié avec domain
-routing ciblé.
+**Admin MCP per-server** : les serveurs MCP configurés par l'admin (`.env`) obtiennent chacun un agent dédié avec domain routing ciblé.
 
-- **Per-server agents** : chaque serveur admin MCP crée un agent `mcp_{slug}_agent` (ex: `mcp_google_flights_agent`) au
-  lieu d'un agent `mcp_agent` générique
-- **Domain routing unifié** : `collect_all_mcp_domains()` fusionne admin + user MCP en un seul path pour le query
-  analyzer — DRY
-- **Auto-description** : `auto_generate_server_description()` génère une description de domaine depuis les descriptions
-  d'outils si non fournie en config. Auto-génération persistée au `test_connection()` + endpoint
-  `POST /mcp/servers/{id}/generate-description` pour forcer la régénération
-- **Per-user toggle** : colonne JSONB `admin_mcp_disabled_servers` sur User, API
-  `PATCH /mcp/admin-servers/{key}/toggle`, ContextVar `admin_mcp_disabled_ctx`
-- **Docker-internal SSRF bypass** : champ `internal: true` sur `MCPServerConfig` pour les services Docker internes (skip
-  validation HTTPS + IPs privées)
-- **Suffix hallucination recovery** : `strip_hallucinated_mcp_suffix()` partagé entre admin et user MCP — le planner
-  ajoute parfois `_tool` aux noms MCP
+- **Per-server agents** : chaque serveur admin MCP crée un agent `mcp_{slug}_agent` (ex: `mcp_google_flights_agent`) au lieu d'un agent `mcp_agent` générique
+- **Domain routing unifié** : `collect_all_mcp_domains()` fusionne admin + user MCP en un seul path pour le query analyzer — DRY
+- **Auto-description** : `auto_generate_server_description()` génère une description de domaine depuis les descriptions d'outils si non fournie en config. Auto-génération persistée au `test_connection()` + endpoint `POST /mcp/servers/{id}/generate-description` pour forcer la régénération
+- **Per-user toggle** : colonne JSONB `admin_mcp_disabled_servers` sur User, API `PATCH /mcp/admin-servers/{key}/toggle`, ContextVar `admin_mcp_disabled_ctx`
+- **Docker-internal SSRF bypass** : champ `internal: true` sur `MCPServerConfig` pour les services Docker internes (skip validation HTTPS + IPs privées)
+- **Suffix hallucination recovery** : `strip_hallucinated_mcp_suffix()` partagé entre admin et user MCP — le planner ajoute parfois `_tool` aux noms MCP
 
 > Voir [MCP_INTEGRATION.md](./technical/MCP_INTEGRATION.md) pour la documentation complète.
 
@@ -3762,11 +3674,11 @@ routing ciblé.
 
 **Architecture** :
 
-| Couche         | Composant                           | Rôle                                         |
-|----------------|-------------------------------------|----------------------------------------------|
-| Domain         | `domains/channels/`                 | Service, Repository, Schemas, OTP linking    |
+| Couche | Composant | Rôle |
+|--------|-----------|------|
+| Domain | `domains/channels/` | Service, Repository, Schemas, OTP linking |
 | Infrastructure | `infrastructure/channels/telegram/` | Sender, WebhookHandler, Formatter, Voice STT |
-| Observabilité  | `metrics_channels.py`               | 12 métriques Prometheus RED                  |
+| Observabilité | `metrics_channels.py` | 12 métriques Prometheus RED |
 
 **Fonctionnalités** :
 
@@ -3786,12 +3698,12 @@ routing ciblé.
 
 **Architecture "Reference + Late Resolution"** :
 
-| Couche        | Composant                            | Rôle                                                            |
-|---------------|--------------------------------------|-----------------------------------------------------------------|
-| Domain        | `domains/attachments/`               | Service, Repository, Schemas, Router (upload/download/delete)   |
-| LLM           | `domains/attachments/llm_content.py` | Construction HumanMessage multimodal (base64 images, texte PDF) |
-| Pipeline      | `response_node.py`                   | Switch `get_llm("vision_analysis")` + substitution éphémère     |
-| Observabilité | `metrics_attachments.py`             | 7 métriques Prometheus (upload RED + vision LLM + cleanup)      |
+| Couche | Composant | Rôle |
+|--------|-----------|------|
+| Domain | `domains/attachments/` | Service, Repository, Schemas, Router (upload/download/delete) |
+| LLM | `domains/attachments/llm_content.py` | Construction HumanMessage multimodal (base64 images, texte PDF) |
+| Pipeline | `response_node.py` | Switch `get_llm("vision_analysis")` + substitution éphémère |
+| Observabilité | `metrics_attachments.py` | 7 métriques Prometheus (upload RED + vision LLM + cleanup) |
 
 **Fonctionnalités** :
 
@@ -3807,28 +3719,27 @@ routing ciblé.
 
 ### Heartbeat Autonome (evolution F5)
 
-**Notifications proactives LLM-driven** : LIA prend l'initiative de contacter l'utilisateur avec des informations
-pertinentes, sans attendre de requête.
+**Notifications proactives LLM-driven** : LIA prend l'initiative de contacter l'utilisateur avec des informations pertinentes, sans attendre de requête.
 
 **Architecture 2-phase LLM** :
 
-| Phase    | Modèle               | Rôle                               |
-|----------|----------------------|------------------------------------|
+| Phase | Modèle | Rôle |
+|-------|--------|------|
 | Decision | gpt-4.1-mini (T=0.3) | Structured output → skip \| notify |
-| Message  | gpt-4.1-mini (T=0.7) | Réécriture personnalité + langue   |
+| Message | gpt-4.1-mini (T=0.7) | Réécriture personnalité + langue |
 
 **Context Aggregator** (fetch parallèle `asyncio.gather`) :
 
-| Source                        | Dépendance                      | Fallback |
-|-------------------------------|---------------------------------|----------|
-| Calendar                      | Google Calendar connector       | None     |
-| Weather + Changes             | OpenWeatherMap + home_location  | None     |
-| Tasks                         | Google Tasks connector          | None     |
-| Interests                     | Au moins 1 intérêt ACTIVE       | None     |
-| Memories                      | LangGraph Store                 | None     |
-| Activity                      | Dernière interaction            | None     |
-| Recent heartbeats             | `heartbeat_notifications` table | []       |
-| Recent interest notifications | `interest_notifications` JOIN   | []       |
+| Source | Dépendance | Fallback |
+|--------|------------|----------|
+| Calendar | Google Calendar connector | None |
+| Weather + Changes | OpenWeatherMap + home_location | None |
+| Tasks | Google Tasks connector | None |
+| Interests | Au moins 1 intérêt ACTIVE | None |
+| Memories | LangGraph Store | None |
+| Activity | Dernière interaction | None |
+| Recent heartbeats | `heartbeat_notifications` table | [] |
+| Recent interest notifications | `interest_notifications` JOIN | [] |
 
 **Fonctionnalités** :
 
@@ -3839,13 +3750,38 @@ pertinentes, sans attendre de requête.
 - **Early-exit** : skip si utilisateur inactif > N jours (économie tokens)
 - **Continuité conversationnelle** : résumé stocké dans LangGraph Store (write-only v1)
 
-**Infrastructure réutilisée** : `ProactiveTask` Protocol, `EligibilityChecker`, `ProactiveTaskRunner`,
-`NotificationDispatcher`, `SchedulerLock`, `get_structured_output()`, `PersonalityService`.
+**Infrastructure réutilisée** : `ProactiveTask` Protocol, `EligibilityChecker`, `ProactiveTaskRunner`, `NotificationDispatcher`, `SchedulerLock`, `get_structured_output()`, `PersonalityService`.
 
-**Table** : `heartbeat_notifications` (audit trail immuable) + 5 colonnes User (heartbeat_enabled,
-heartbeat_max_per_day, heartbeat_push_enabled, heartbeat_notify_start_hour, heartbeat_notify_end_hour).
+**Table** : `heartbeat_notifications` (audit trail immuable) + 5 colonnes User (heartbeat_enabled, heartbeat_max_per_day, heartbeat_push_enabled, heartbeat_notify_start_hour, heartbeat_notify_end_hour).
 
 > Voir [HEARTBEAT_AUTONOME.md](./technical/HEARTBEAT_AUTONOME.md) pour la documentation complète.
+
+### RAG Knowledge Spaces (evolution F6)
+
+**Espaces de connaissances personnels** : les utilisateurs créent des espaces, importent des documents (PDF, TXT, MD, DOCX), et LIA enrichit automatiquement ses réponses avec le contenu pertinent.
+
+**Architecture** :
+
+| Couche | Composant | Rôle |
+|--------|-----------|------|
+| Domain | `domains/rag_spaces/` | Models, Repository, Service, Schemas, Router (CRUD spaces + documents) |
+| Processing | `domains/rag_spaces/processing.py` | Pipeline background : extraction texte → chunking → embedding OpenAI → bulk insert pgvector |
+| Retrieval | `domains/rag_spaces/retrieval.py` | Recherche hybride sémantique (pgvector cosine) + BM25 avec fusion alpha configurable |
+| Injection | `response_node.py` | Contexte RAG injecté dans le prompt de réponse (après mémoire, avant enrichment) |
+| Embedding | `infrastructure/llm/tracked_embeddings.py` | `TrackedOpenAIEmbeddings` avec tracking automatique tokens/coûts |
+| Observabilité | `metrics_rag_spaces.py` | 14 métriques Prometheus (processing RED, retrieval, lifecycle Gauges, reindex) |
+
+**Fonctionnalités** :
+
+- **Table dédiée `rag_chunks`** : colonne pgvector `Vector(1536)` avec index HNSW — séparée de `store_vectors` (dimensions incompatibles E5 384 vs OpenAI 1536)
+- **Recherche hybride** : `final_score = alpha * semantic + (1 - alpha) * bm25`, BM25 via `BM25IndexManager` existant
+- **Tracking coûts** : intégré dans `TokenUsageLog`, `MessageTokenSummary`, `UserStatistics` via `EmbeddingTrackingContext`
+- **Ré-indexation admin** : `POST /rag-spaces/admin/reindex` avec Redis mutex, ALTER TABLE dynamique des dimensions, flag `rag_reindex_in_progress`
+- **Feature flag** : `RAG_SPACES_ENABLED=true` (default: true)
+
+**Tables** : `rag_spaces`, `rag_documents`, `rag_chunks` avec FKs cascade et indexes optimisés.
+
+> Voir [GUIDE_RAG_SPACES.md](./guides/GUIDE_RAG_SPACES.md) et [ADR-055](./architecture/ADR-055-RAG-Spaces-Architecture.md) pour la documentation complète.
 
 ---
 
@@ -3854,48 +3790,41 @@ heartbeat_max_per_day, heartbeat_push_enabled, heartbeat_notify_start_hour, hear
 ### Documentation Interne
 
 **Architecture Core** :
-
 - [GRAPH_AND_AGENTS_ARCHITECTURE.md](./technical/GRAPH_AND_AGENTS_ARCHITECTURE.md)
 - [STATE_AND_CHECKPOINT.md](./technical/STATE_AND_CHECKPOINT.md)
 - [SMART_SERVICES.md](./technical/SMART_SERVICES.md)
 - [PLANNER.md](./technical/PLANNER.md)
 
 **Sécurité & Auth** :
-
 - [OAUTH.md](./technical/OAUTH.md)
 - [SECURITY.md](./technical/SECURITY.md)
 - [AUTHENTICATION.md](./technical/AUTHENTICATION.md)
 
 **Observabilité** :
-
 - [OBSERVABILITY_AGENTS.md](./technical/OBSERVABILITY_AGENTS.md)
 - [LLM_PRICING_MANAGEMENT.md](./technical/LLM_PRICING_MANAGEMENT.md)
 
 **HITL & Tools** :
-
 - [HITL.md](./technical/HITL.md)
 - [TOOLS.md](./technical/TOOLS.md)
 - [PROMPTS.md](./technical/PROMPTS.md)
 
 **Fonctionnalités v6.0** :
-
 - [VOICE_MODE.md](./technical/VOICE_MODE.md)
 - [INTERESTS.md](./technical/INTERESTS.md)
 - [OAUTH_HEALTH_CHECK.md](./technical/OAUTH_HEALTH_CHECK.md)
 - [HYBRID_SEARCH.md](./technical/HYBRID_SEARCH.md)
 
 **Fonctionnalités v6.1** :
-
 - [GOOGLE_API_TRACKING.md](./technical/GOOGLE_API_TRACKING.md)
 - [LLM_PRICING_MANAGEMENT.md](./technical/LLM_PRICING_MANAGEMENT.md)
 
 **Fonctionnalités v6.2 (evolution)** :
-
 - [WEB_FETCH.md](./technical/WEB_FETCH.md) — Web Fetch Tool (evolution F1)
-- [MCP_INTEGRATION.md](./technical/MCP_INTEGRATION.md) — MCP Per-User (evolution F2/F2.1) + Admin Per-Server Routing
-  (F2.5)
+- [MCP_INTEGRATION.md](./technical/MCP_INTEGRATION.md) — MCP Per-User (evolution F2/F2.1) + Admin Per-Server Routing (F2.5)
 - [CHANNELS_INTEGRATION.md](./technical/CHANNELS_INTEGRATION.md) — Multi-Channel Telegram (evolution F3)
 - [HEARTBEAT_AUTONOME.md](./technical/HEARTBEAT_AUTONOME.md) — Heartbeat Autonome (evolution F5)
+- [GUIDE_RAG_SPACES.md](./guides/GUIDE_RAG_SPACES.md) — RAG Knowledge Spaces (evolution F6)
 
 ### Documentation Externe
 

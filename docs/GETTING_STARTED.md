@@ -2,8 +2,9 @@
 
 > Complete guide to install, configure, and get started with LIA - Multi-Agent AI Assistant v6.2
 
-**Version**: 3.0 **Last Updated**: 2026-03-13 **Compatibility**: LIA v6.2.x (+ evolution Features: Web Fetch, MCP
-Per-User, Multi-Channel Telegram, Heartbeat Autonome)
+**Version**: 3.1
+**Last Updated**: 2026-03-14
+**Compatibility**: LIA v6.2.x (+ evolution Features: Web Fetch, MCP Per-User, Multi-Channel Telegram, Heartbeat Autonome, RAG Spaces)
 
 ## Table of Contents
 
@@ -22,55 +23,54 @@ Per-User, Multi-Channel Telegram, Heartbeat Autonome)
 
 ## Project Overview
 
-**LIA** is a multi-agent conversational AI assistant built with LangGraph. It orchestrates multiple specialized agents
-to interact with Google services (Contacts, Gmail, Calendar, Drive, Tasks), Places, Weather, Wikipedia, Perplexity, and
-Routes.
+**LIA** is a multi-agent conversational AI assistant built with LangGraph. It orchestrates multiple specialized agents to interact with Google services (Contacts, Gmail, Calendar, Drive, Tasks), Places, Weather, Wikipedia, Perplexity, and Routes.
 
 ### v6.2 Highlights
 
-| Feature                    | Description                                                                                                        |
-|----------------------------|--------------------------------------------------------------------------------------------------------------------|
-| **Multi-Channel Telegram** | Bidirectional chat via Telegram with HITL inline keyboards and voice STT (v6.2)                                    |
-| **MCP Per-User**           | External per-user MCP servers with OAuth 2.1, structured parsing, and LLM-based description auto-generation (v6.2) |
-| **Web Fetch Tool**         | Web page content extraction for agents (v6.2)                                                                      |
-| **Heartbeat Autonome**     | LLM-driven proactive notifications: weather, calendar, interests (v6.2)                                            |
-| **Google API Tracking**    | Automatic Google Maps Platform cost tracking (v6.1)                                                                |
-| **Consumption Exports**    | CSV exports for LLM + Google API billing (v6.1)                                                                    |
-| **Skills System**          | 10 specialized Claude skills (debugging, architecture, code review, etc.)                                          |
-| **FOR_EACH Pattern**       | Smart iteration with HITL confirmation for bulk operations                                                         |
-| **Voice Mode**             | Voice input with wake word, Push-to-Talk, and VAD                                                                  |
-| **Voice TTS Dual**         | Standard (free Edge TTS) or HD (paid OpenAI)                                                                       |
-| **Interest Learning**      | Automatic interest extraction via LLM                                                                              |
-| **OAuth Health Check**     | Proactive connector monitoring with notifications                                                                  |
-| **Hybrid Search**          | Combined BM25 + semantic search (alpha=0.6)                                                                        |
+| Feature | Description |
+|---------|-------------|
+| **Multi-Channel Telegram** | Bidirectional chat via Telegram with HITL inline keyboards and voice STT (v6.2) |
+| **MCP Per-User** | External per-user MCP servers with OAuth 2.1, structured parsing, and LLM-based description auto-generation (v6.2) |
+| **Web Fetch Tool** | Web page content extraction for agents (v6.2) |
+| **Heartbeat Autonome** | LLM-driven proactive notifications: weather, calendar, interests (v6.2) |
+| **Google API Tracking** | Automatic Google Maps Platform cost tracking (v6.1) |
+| **Consumption Exports** | CSV exports for LLM + Google API billing (v6.1) |
+| **Skills System** | 10 specialized Claude skills (debugging, architecture, code review, etc.) |
+| **FOR_EACH Pattern** | Smart iteration with HITL confirmation for bulk operations |
+| **Voice Mode** | Voice input with wake word, Push-to-Talk, and VAD |
+| **Voice TTS Dual** | Standard (free Edge TTS) or HD (paid OpenAI) |
+| **Interest Learning** | Automatic interest extraction via LLM |
+| **OAuth Health Check** | Proactive connector monitoring with notifications |
+| **RAG Knowledge Spaces** | Personal document spaces (PDF, TXT, MD, DOCX) with hybrid search enrichment (v1.4) |
+| **Hybrid Search** | Combined BM25 + semantic search (alpha=0.6) |
 
 ### Technical Architecture
 
-| Layer              | Technologies                                       | Versions                          |
-|--------------------|----------------------------------------------------|-----------------------------------|
-| **Backend**        | FastAPI + LangGraph + SQLAlchemy                   | FastAPI 0.135.1, LangGraph 1.0.10 |
-| **Frontend**       | Next.js + React + TailwindCSS                      | Next.js 16.1.1, React 19.2.3      |
-| **Database**       | PostgreSQL + pgvector                              | PostgreSQL 16                     |
-| **Cache/Sessions** | Redis                                              | Redis 7.4                         |
-| **Observability**  | Prometheus + Grafana + Loki + Tempo + Langfuse     | Grafana 11.3.0                    |
-| **LLM Providers**  | OpenAI, Anthropic, DeepSeek, Google Gemini, Ollama | Multi-provider                    |
+| Layer | Technologies | Versions |
+|-------|--------------|----------|
+| **Backend** | FastAPI + LangGraph + SQLAlchemy | FastAPI 0.135.1, LangGraph 1.0.10 |
+| **Frontend** | Next.js + React + TailwindCSS | Next.js 16.1.1, React 19.2.3 |
+| **Database** | PostgreSQL + pgvector | PostgreSQL 16 |
+| **Cache/Sessions** | Redis | Redis 7.4 |
+| **Observability** | Prometheus + Grafana + Loki + Tempo + Langfuse | Grafana 11.3.0 |
+| **LLM Providers** | OpenAI, Anthropic, DeepSeek, Google Gemini, Ollama | Multi-provider |
 
 ### Supported Domains
 
-| Domain           | Description                | Connector               |
-|------------------|----------------------------|-------------------------|
-| **Contacts**     | Google contact management  | Google People API       |
-| **Emails**       | Read/send emails           | Gmail API               |
-| **Calendar**     | Event management           | Google Calendar API     |
-| **Drive**        | File search                | Google Drive API        |
-| **Tasks**        | Task management            | Google Tasks API        |
-| **Places**       | Location search            | Google Places API (New) |
-| **Weather**      | Real-time weather          | OpenWeatherMap API      |
-| **Wikipedia**    | Encyclopedia search        | Wikipedia API           |
-| **Perplexity**   | AI-powered web search      | Perplexity API          |
-| **Routes**       | Directions and itineraries | Google Routes API       |
-| **Brave Search** | AI web search              | Per-user API key        |
-| **Web Fetch**    | Web page extraction        | Built-in                |
+| Domain | Description | Connector |
+|--------|-------------|-----------|
+| **Contacts** | Google contact management | Google People API |
+| **Emails** | Read/send emails | Gmail API |
+| **Calendar** | Event management | Google Calendar API |
+| **Drive** | File search | Google Drive API |
+| **Tasks** | Task management | Google Tasks API |
+| **Places** | Location search | Google Places API (New) |
+| **Weather** | Real-time weather | OpenWeatherMap API |
+| **Wikipedia** | Encyclopedia search | Wikipedia API |
+| **Perplexity** | AI-powered web search | Perplexity API |
+| **Routes** | Directions and itineraries | Google Routes API |
+| **Brave Search** | AI web search | Per-user API key |
+| **Web Fetch** | Web page extraction | Built-in |
 
 ---
 
@@ -82,18 +82,18 @@ This version introduces several transformative features.
 
 10 specialized skills integrated via `.claude/skills/`:
 
-| Skill                    | Trigger                 | Description                 |
-|--------------------------|-------------------------|-----------------------------|
-| `analyzing-bugs`         | Bug, crash, error       | Fact-based diagnosis        |
+| Skill | Trigger | Description |
+|-------|---------|-------------|
+| `analyzing-bugs` | Bug, crash, error | Fact-based diagnosis |
 | `designing-architecture` | Architecture, structure | Design patterns and modules |
-| `developing-code`        | Code, implement         | Production-ready code       |
-| `reviewing-code`         | Review, audit, validate | Gold Grade validation       |
-| `optimizing-performance` | Slow, performance, cost | Bottleneck analysis         |
-| `monitoring-systems`     | Monitoring, alerting    | SRE and observability       |
-| `innovating-products`    | Idea, improve, UX       | Product strategy            |
-| `specifying-features`    | Behavior, workflow      | Functional specifications   |
-| `upgrading-dependencies` | Update, upgrade         | Safe migrations             |
-| `writing-documentation`  | Document, README        | Technical documentation     |
+| `developing-code` | Code, implement | Production-ready code |
+| `reviewing-code` | Review, audit, validate | Gold Grade validation |
+| `optimizing-performance` | Slow, performance, cost | Bottleneck analysis |
+| `monitoring-systems` | Monitoring, alerting | SRE and observability |
+| `innovating-products` | Idea, improve, UX | Product strategy |
+| `specifying-features` | Behavior, workflow | Functional specifications |
+| `upgrading-dependencies` | Update, upgrade | Safe migrations |
+| `writing-documentation` | Document, README | Technical documentation |
 
 ### FOR_EACH Iteration Pattern
 
@@ -114,19 +114,18 @@ ExecutionStep(
 
 ### Voice Mode
 
-| Mode             | Description               | Technology              |
-|------------------|---------------------------|-------------------------|
-| **Wake Word**    | Activation by saying "OK" | Sherpa-onnx WASM (KWS)  |
-| **Push-to-Talk** | Hold to speak             | WebRTC MediaRecorder    |
-| **VAD**          | End-of-speech detection   | Silero VAD WASM         |
-| **STT**          | Transcription             | Whisper Small (OpenAI)  |
-| **TTS Standard** | Free synthesis            | Edge TTS                |
-| **TTS HD**       | Premium synthesis         | OpenAI TTS (nova/alloy) |
+| Mode | Description | Technology |
+|------|-------------|------------|
+| **Wake Word** | Activation by saying "OK" | Sherpa-onnx WASM (KWS) |
+| **Push-to-Talk** | Hold to speak | WebRTC MediaRecorder |
+| **VAD** | End-of-speech detection | Silero VAD WASM |
+| **STT** | Transcription | Whisper Small (OpenAI) |
+| **TTS Standard** | Free synthesis | Edge TTS |
+| **TTS HD** | Premium synthesis | OpenAI TTS (nova/alloy) |
 
 ### OAuth Health Check
 
 Proactive connector monitoring with:
-
 - Periodic verification (5 min by default)
 - FCM notification on error
 - Automatic reconnection modal
@@ -138,33 +137,33 @@ Proactive connector monitoring with:
 
 ### Operating System
 
-| OS          | Version                               | Notes                              |
-|-------------|---------------------------------------|------------------------------------|
-| **Linux**   | Ubuntu 22.04+, Debian 11+, Fedora 38+ | Native, best performance           |
-| **macOS**   | 12 (Monterey)+                        | Docker Desktop required            |
-| **Windows** | 10/11                                 | WSL2 recommended or Docker Desktop |
+| OS | Version | Notes |
+|----|---------|-------|
+| **Linux** | Ubuntu 22.04+, Debian 11+, Fedora 38+ | Native, best performance |
+| **macOS** | 12 (Monterey)+ | Docker Desktop required |
+| **Windows** | 10/11 | WSL2 recommended or Docker Desktop |
 
 ### Required Tools
 
-| Tool               | Minimum Version | Installation                          | Verification             |
-|--------------------|-----------------|---------------------------------------|--------------------------|
-| **Python**         | 3.12+           | [python.org](https://www.python.org/) | `python --version`       |
-| **Node.js**        | 22.x+ (LTS)     | [nodejs.org](https://nodejs.org/)     | `node --version`         |
-| **pnpm**           | 10.x+           | `npm install -g pnpm`                 | `pnpm --version`         |
-| **Docker**         | 24.x+           | [docker.com](https://www.docker.com/) | `docker --version`       |
-| **Docker Compose** | 2.x+            | Included with Docker Desktop          | `docker compose version` |
-| **Git**            | 2.40+           | [git-scm.com](https://git-scm.com/)   | `git --version`          |
+| Tool | Minimum Version | Installation | Verification |
+|------|-----------------|--------------|--------------|
+| **Python** | 3.12+ | [python.org](https://www.python.org/) | `python --version` |
+| **Node.js** | 22.x+ (LTS) | [nodejs.org](https://nodejs.org/) | `node --version` |
+| **pnpm** | 10.x+ | `npm install -g pnpm` | `pnpm --version` |
+| **Docker** | 24.x+ | [docker.com](https://www.docker.com/) | `docker --version` |
+| **Docker Compose** | 2.x+ | Included with Docker Desktop | `docker compose version` |
+| **Git** | 2.40+ | [git-scm.com](https://git-scm.com/) | `git --version` |
 
 ### Recommended Tools (Optional)
 
-| Tool            | Usage                           | Installation                                           |
-|-----------------|---------------------------------|--------------------------------------------------------|
-| **pyenv**       | Python version management       | `brew install pyenv` (macOS)                           |
-| **nvm**         | Node.js version management      | [nvm-sh/nvm](https://github.com/nvm-sh/nvm)            |
-| **direnv**      | Auto-load environment variables | `brew install direnv`                                  |
-| **jq**          | JSON parsing (logs)             | `apt install jq` / `brew install jq`                   |
-| **Redis CLI**   | Debug cache & sessions          | `apt install redis-tools`                              |
-| **Claude Code** | AI development assistant        | [claude.ai/claude-code](https://claude.ai/claude-code) |
+| Tool | Usage | Installation |
+|------|-------|--------------|
+| **pyenv** | Python version management | `brew install pyenv` (macOS) |
+| **nvm** | Node.js version management | [nvm-sh/nvm](https://github.com/nvm-sh/nvm) |
+| **direnv** | Auto-load environment variables | `brew install direnv` |
+| **jq** | JSON parsing (logs) | `apt install jq` / `brew install jq` |
+| **Redis CLI** | Debug cache & sessions | `apt install redis-tools` |
+| **Claude Code** | AI development assistant | [claude.ai/claude-code](https://claude.ai/claude-code) |
 
 ### Verifying Prerequisites
 
@@ -182,20 +181,20 @@ git --version       # >= 2.40
 
 #### Mandatory
 
-| Service          | Usage                                    | Sign Up                                                       |
-|------------------|------------------------------------------|---------------------------------------------------------------|
-| **OpenAI**       | Primary LLM (gpt-4.1-mini, gpt-4.1-nano) | [platform.openai.com](https://platform.openai.com/api-keys)   |
-| **Google Cloud** | OAuth + Google APIs                      | [console.cloud.google.com](https://console.cloud.google.com/) |
+| Service | Usage | Sign Up |
+|---------|-------|---------|
+| **OpenAI** | Primary LLM (gpt-4.1-mini, gpt-4.1-nano) | [platform.openai.com](https://platform.openai.com/api-keys) |
+| **Google Cloud** | OAuth + Google APIs | [console.cloud.google.com](https://console.cloud.google.com/) |
 
 #### Optional (Depending on Connectors)
 
-| Service            | Usage                    | Sign Up                                                              |
-|--------------------|--------------------------|----------------------------------------------------------------------|
-| **Anthropic**      | Claude (alternative LLM) | [console.anthropic.com](https://console.anthropic.com/)              |
-| **DeepSeek**       | Budget-friendly LLM      | [platform.deepseek.com](https://platform.deepseek.com/)              |
-| **Google Gemini**  | Google LLM               | [aistudio.google.com](https://aistudio.google.com/app/apikey)        |
-| **Perplexity**     | AI-powered web search    | [perplexity.ai/settings/api](https://www.perplexity.ai/settings/api) |
-| **OpenWeatherMap** | Weather (free)           | [openweathermap.org/api](https://openweathermap.org/api)             |
+| Service | Usage | Sign Up |
+|---------|-------|---------|
+| **Anthropic** | Claude (alternative LLM) | [console.anthropic.com](https://console.anthropic.com/) |
+| **DeepSeek** | Budget-friendly LLM | [platform.deepseek.com](https://platform.deepseek.com/) |
+| **Google Gemini** | Google LLM | [aistudio.google.com](https://aistudio.google.com/app/apikey) |
+| **Perplexity** | AI-powered web search | [perplexity.ai/settings/api](https://www.perplexity.ai/settings/api) |
+| **OpenWeatherMap** | Weather (free) | [openweathermap.org/api](https://openweathermap.org/api) |
 
 ---
 
@@ -241,8 +240,7 @@ pip list | grep langgraph   # langgraph 1.0.10
 pre-commit install
 ```
 
-> **Tip**: If you have [Task](https://taskfile.dev/) installed, you can use `task setup:backend` instead of manual steps
-> above. Similarly, use `task setup:frontend` for Step 3.
+> **Tip**: If you have [Task](https://taskfile.dev/) installed, you can use `task setup:backend` instead of manual steps above. Similarly, use `task setup:frontend` for Step 3.
 
 **Estimated time**: 3-5 minutes depending on connection speed.
 
@@ -391,8 +389,7 @@ openssl rand -base64 16
 
 #### 4.4 LAN Access & SSL Configuration (Development)
 
-If you need to access LIA from other devices on your local network (e.g., mobile testing), configure LAN access
-using [nip.io](https://nip.io):
+If you need to access LIA from other devices on your local network (e.g., mobile testing), configure LAN access using [nip.io](https://nip.io):
 
 1. **Find your local IP address** (e.g., `192.168.1.100`)
 
@@ -409,14 +406,11 @@ using [nip.io](https://nip.io):
    NEXT_PUBLIC_ALLOWED_DEV_ORIGINS=192.168.1.100.nip.io
    ```
 
-4. **Accept the self-signed certificate** — after starting Docker, navigate to `https://192.168.1.100.nip.io:8000` in
-   your browser and accept the certificate. This is required for the browser to make API calls.
+4. **Accept the self-signed certificate** — after starting Docker, navigate to `https://192.168.1.100.nip.io:8000` in your browser and accept the certificate. This is required for the browser to make API calls.
 
-> **Important**: `NEXT_PUBLIC_ALLOWED_DEV_ORIGINS` must be a **hostname only** (e.g., `192.168.1.100.nip.io`), NOT a
-> full URL with protocol/port. Using `https://...` will cause WebSocket HMR failures and page refresh loops.
+> **Important**: `NEXT_PUBLIC_ALLOWED_DEV_ORIGINS` must be a **hostname only** (e.g., `192.168.1.100.nip.io`), NOT a full URL with protocol/port. Using `https://...` will cause WebSocket HMR failures and page refresh loops.
 
-The `ssl-init` Docker service automatically generates self-signed certificates covering the configured domain.
-Certificates are shared between the API and Web containers via a Docker volume.
+The `ssl-init` Docker service automatically generates self-signed certificates covering the configured domain. Certificates are shared between the API and Web containers via a Docker volume.
 
 ### Step 5: Start Docker Infrastructure
 
@@ -435,30 +429,30 @@ docker compose -f docker-compose.dev.yml logs -f
 
 #### Launched Docker Services
 
-| Service                 | Port           | Description                           | URL                   |
-|-------------------------|----------------|---------------------------------------|-----------------------|
-| **ssl-init**            | -              | SSL certificate generator (runs once) | -                     |
-| **postgres**            | 5432           | PostgreSQL 16 + pgvector              | -                     |
-| **pgadmin**             | 5050           | DB Administration                     | http://localhost:5050 |
-| **redis**               | 6379           | Cache & Sessions                      | -                     |
-| **api**                 | 8000/5678      | FastAPI Backend                       | http://localhost:8000 |
-| **web**                 | 3000           | Next.js Frontend                      | http://localhost:3000 |
-| **prometheus**          | 9090           | Metrics                               | http://localhost:9090 |
-| **alertmanager**        | 9094           | Alert management                      | http://localhost:9094 |
-| **grafana**             | 3001           | Dashboards                            | http://localhost:3001 |
-| **loki**                | 3100           | Log aggregation                       | -                     |
-| **promtail**            | 9080           | Log collection                        | -                     |
-| **tempo**               | 3200/4317/4318 | Distributed traces                    | http://localhost:3200 |
-| **cadvisor**            | 8080           | Container metrics                     | http://localhost:8080 |
-| **postgres-exporter**   | 9187           | PostgreSQL metrics                    | -                     |
-| **redis-exporter**      | 9121           | Redis metrics                         | -                     |
-| **node-exporter**       | 9100           | System metrics                        | -                     |
-| **minio**               | 9092/9093      | S3 for Langfuse                       | http://localhost:9093 |
-| **langfuse-db**         | -              | Langfuse PostgreSQL                   | -                     |
-| **langfuse-clickhouse** | -              | ClickHouse analytics                  | -                     |
-| **langfuse-redis**      | -              | Langfuse Redis                        | -                     |
-| **langfuse-web**        | 3002           | LLM Observability                     | http://localhost:3002 |
-| **langfuse-worker**     | 3030           | Langfuse Worker                       | -                     |
+| Service | Port | Description | URL |
+|---------|------|-------------|-----|
+| **ssl-init** | - | SSL certificate generator (runs once) | - |
+| **postgres** | 5432 | PostgreSQL 16 + pgvector | - |
+| **pgadmin** | 5050 | DB Administration | http://localhost:5050 |
+| **redis** | 6379 | Cache & Sessions | - |
+| **api** | 8000/5678 | FastAPI Backend | http://localhost:8000 |
+| **web** | 3000 | Next.js Frontend | http://localhost:3000 |
+| **prometheus** | 9090 | Metrics | http://localhost:9090 |
+| **alertmanager** | 9094 | Alert management | http://localhost:9094 |
+| **grafana** | 3001 | Dashboards | http://localhost:3001 |
+| **loki** | 3100 | Log aggregation | - |
+| **promtail** | 9080 | Log collection | - |
+| **tempo** | 3200/4317/4318 | Distributed traces | http://localhost:3200 |
+| **cadvisor** | 8080 | Container metrics | http://localhost:8080 |
+| **postgres-exporter** | 9187 | PostgreSQL metrics | - |
+| **redis-exporter** | 9121 | Redis metrics | - |
+| **node-exporter** | 9100 | System metrics | - |
+| **minio** | 9092/9093 | S3 for Langfuse | http://localhost:9093 |
+| **langfuse-db** | - | Langfuse PostgreSQL | - |
+| **langfuse-clickhouse** | - | ClickHouse analytics | - |
+| **langfuse-redis** | - | Langfuse Redis | - |
+| **langfuse-web** | 3002 | LLM Observability | http://localhost:3002 |
+| **langfuse-worker** | 3030 | Langfuse Worker | - |
 
 ### Step 6: Apply Migrations
 
@@ -493,23 +487,21 @@ task db:create-admin -- --email you@example.com --password YourSecurePassword123
 
 **Default admin account** (created by `task db:create-admin`):
 
-| Field    | Value                         |
-|----------|-------------------------------|
-| Email    | `admin@example.com`           |
-| Password | `admin123`                    |
-| Role     | Superuser (full admin access) |
+| Field | Value |
+|-------|-------|
+| Email | `admin@example.com` |
+| Password | `admin123` |
+| Role | Superuser (full admin access) |
 
 > **Important**: Change the default admin password after first login! Go to Settings > Account to update it.
 
-> **Note**: `task db:seed:sql` populates assistant personalities and LLM pricing data. Without it, the assistant won't
-> have a personality and cost tracking won't work.
+> **Note**: `task db:seed:sql` populates assistant personalities and LLM pricing data. Without it, the assistant won't have a personality and cost tracking won't work.
 
 #### Created Tables
 
 Migrations automatically create:
 
 **Main Tables**:
-
 - `users` - User accounts
 - `conversations`, `conversation_messages` - Conversation history
 - `connectors` - User OAuth connections
@@ -517,15 +509,12 @@ Migrations automatically create:
 - `connector_preferences` - Per-connector user preferences
 
 **LangGraph Tables**:
-
 - `checkpoints`, `checkpoint_blobs`, `checkpoint_writes` - State persistence
 
 **HITL Tables**:
-
 - `plan_approvals` - Plan approvals (Human-in-the-Loop)
 
 **Pricing Tables**:
-
 - `llm_model_pricing` - Per-model LLM pricing
 - `currency_exchange_rates` - USD/EUR exchange rates
 - `token_usage_logs` - Token consumption tracking
@@ -624,8 +613,7 @@ If you ran `task db:reset` or `task db:create-admin` in Step 7, an admin account
 2. Log in with `admin@example.com` / `admin123`
 3. **Change your password** in Settings > Account
 
-> The admin account has superuser privileges: access to the Administration panel (LLM configuration, user management,
-> system settings).
+> The admin account has superuser privileges: access to the Administration panel (LLM configuration, user management, system settings).
 
 ### 2. Create Additional User Accounts (Optional)
 
@@ -634,11 +622,11 @@ If you ran `task db:reset` or `task db:create-admin` in Step 7, an admin account
 1. Open http://localhost:3000
 2. Click "Sign Up"
 3. Fill in the form:
-    - Email
-    - Password (8+ characters)
-    - Full name
-    - Language (fr, en, es, de, it, zh-CN)
-    - Timezone
+   - Email
+   - Password (8+ characters)
+   - Full name
+   - Language (fr, en, es, de, it, zh-CN)
+   - Timezone
 
 #### Via API
 
@@ -664,7 +652,6 @@ curl -X POST http://localhost:8000/api/v1/auth/register \
 #### 2.2 Enable APIs
 
 In "APIs & Services" > "Library", enable:
-
 - **People API** (Google Contacts)
 - **Gmail API**
 - **Google Calendar API**
@@ -709,8 +696,7 @@ LIA supports Apple Email (IMAP), Calendar (CalDAV), and Contacts (CardDAV):
 
 > See [APPLE_ICLOUD_INTEGRATION.md](./technical/APPLE_ICLOUD_INTEGRATION.md) for details.
 
-> **Note**: Only one provider per functional category (email, calendar, contacts) can be active at a time. Google,
-> Apple, and Microsoft are mutually exclusive per category.
+> **Note**: Only one provider per functional category (email, calendar, contacts) can be active at a time. Google, Apple, and Microsoft are mutually exclusive per category.
 
 ### 4. First Conversation
 
@@ -754,22 +740,22 @@ What's the distance between my office and the airport?
 
 **Available Dashboards**:
 
-| Dashboard                       | Description                             |
-|---------------------------------|-----------------------------------------|
-| **01-app-performance**          | API performance (latency, errors)       |
-| **02-infra-resources**          | System resources (CPU, RAM)             |
-| **03-business-metrics**         | Business metrics (conversations, users) |
-| **04-agents-langgraph**         | LangGraph agent flow                    |
-| **05-llm-tokens-cost**          | Token consumption and LLM costs         |
-| **06-conversations**            | Conversation analytics                  |
-| **08-oauth-security**           | OAuth security                          |
-| **09-logs-traces**              | Logs and distributed traces             |
-| **10-redis-rate-limiting**      | Redis rate limiting                     |
-| **11-langgraph-framework**      | Detailed LangGraph metrics              |
-| **12-recording-rules-health**   | Recording rules health                  |
-| **13-slo-tracking**             | SLO tracking (Service Level Objectives) |
-| **14-data-registry**            | Agent Data Registry                     |
-| **15-checkpoint-observability** | Checkpoint observability                |
+| Dashboard | Description |
+|-----------|-------------|
+| **01-app-performance** | API performance (latency, errors) |
+| **02-infra-resources** | System resources (CPU, RAM) |
+| **03-business-metrics** | Business metrics (conversations, users) |
+| **04-agents-langgraph** | LangGraph agent flow |
+| **05-llm-tokens-cost** | Token consumption and LLM costs |
+| **06-conversations** | Conversation analytics |
+| **08-oauth-security** | OAuth security |
+| **09-logs-traces** | Logs and distributed traces |
+| **10-redis-rate-limiting** | Redis rate limiting |
+| **11-langgraph-framework** | Detailed LangGraph metrics |
+| **12-recording-rules-health** | Recording rules health |
+| **13-slo-tracking** | SLO tracking (Service Level Objectives) |
+| **14-data-registry** | Agent Data Registry |
+| **15-checkpoint-observability** | Checkpoint observability |
 
 ### 6. Explore Langfuse (LLM Observability)
 
@@ -778,7 +764,6 @@ What's the distance between my office and the airport?
 3. Explore LLM traces
 
 **Langfuse Metrics**:
-
 - Traces for each LLM call
 - Response time per model
 - Tokens used (input/output)
@@ -823,8 +808,8 @@ VOICE_VAD_THRESHOLD=0.5
 1. Open the chat: http://localhost:3000/chat
 2. Click the microphone icon
 3. Choose the mode:
-    - **Wake Word**: Say "OK" to activate
-    - **Push-to-Talk**: Hold the button
+   - **Wake Word**: Say "OK" to activate
+   - **Push-to-Talk**: Hold the button
 4. Speak naturally
 5. The transcription appears automatically
 
@@ -866,8 +851,7 @@ FCM_NOTIFICATIONS_ENABLED=true
 
 ### Configure Scheduled Actions
 
-Scheduled actions allow you to program recurring actions executed automatically (email sending, verifications,
-reminders).
+Scheduled actions allow you to program recurring actions executed automatically (email sending, verifications, reminders).
 
 ```bash
 # In .env
@@ -876,8 +860,7 @@ reminders).
 SCHEDULED_ACTIONS_ENABLED=true
 ```
 
-> See [SCHEDULED_ACTIONS.md](./technical/SCHEDULED_ACTIONS.md)
-> and [GUIDE_SCHEDULED_ACTIONS.md](./guides/GUIDE_SCHEDULED_ACTIONS.md) for complete documentation.
+> See [SCHEDULED_ACTIONS.md](./technical/SCHEDULED_ACTIONS.md) and [GUIDE_SCHEDULED_ACTIONS.md](./guides/GUIDE_SCHEDULED_ACTIONS.md) for complete documentation.
 
 ### Configure MCP (Model Context Protocol)
 
@@ -908,8 +891,7 @@ MCP_EXCALIDRAW_LLM_PROVIDER=openai
 MCP_EXCALIDRAW_LLM_MODEL=gpt-4.1-mini
 ```
 
-> See [MCP_INTEGRATION.md](./technical/MCP_INTEGRATION.md)
-> and [GUIDE_MCP_INTEGRATION.md](./guides/GUIDE_MCP_INTEGRATION.md) for complete documentation.
+> See [MCP_INTEGRATION.md](./technical/MCP_INTEGRATION.md) and [GUIDE_MCP_INTEGRATION.md](./guides/GUIDE_MCP_INTEGRATION.md) for complete documentation.
 
 ### Configure Telegram (Multi-Channel Messaging)
 
@@ -929,13 +911,11 @@ TELEGRAM_WEBHOOK_SECRET=your-secret-here
 ```
 
 **Webhook configuration**:
-
 1. Create a bot via [@BotFather](https://t.me/BotFather) on Telegram
 2. Configure the webhook: `https://api.your-domain.com/api/v1/channels/telegram/webhook`
 3. Users link their account via an OTP code in Settings > Telegram
 
-> See [CHANNELS_INTEGRATION.md](./technical/CHANNELS_INTEGRATION.md)
-> and [GUIDE_TELEGRAM_INTEGRATION.md](./guides/GUIDE_TELEGRAM_INTEGRATION.md) for complete documentation.
+> See [CHANNELS_INTEGRATION.md](./technical/CHANNELS_INTEGRATION.md) and [GUIDE_TELEGRAM_INTEGRATION.md](./guides/GUIDE_TELEGRAM_INTEGRATION.md) for complete documentation.
 
 ### Configure Heartbeat Autonome (Proactive Notifications)
 
@@ -967,8 +947,7 @@ HEARTBEAT_WEATHER_TEMP_CHANGE_THRESHOLD=5.0
 HEARTBEAT_WEATHER_WIND_THRESHOLD=14.0
 ```
 
-**User side**: Settings > Proactive Notifications > Enable, choose max/day, enable/disable push, configure time windows
-(independent from interests).
+**User side**: Settings > Proactive Notifications > Enable, choose max/day, enable/disable push, configure time windows (independent from interests).
 
 > See [HEARTBEAT_AUTONOME.md](./technical/HEARTBEAT_AUTONOME.md) for complete technical documentation.
 
@@ -976,18 +955,18 @@ HEARTBEAT_WEATHER_WIND_THRESHOLD=14.0
 
 All optional features are disabled by default. Enable them in `.env`:
 
-| Flag                         | Feature                            | Dependencies         |
-|------------------------------|------------------------------------|----------------------|
-| `HEARTBEAT_ENABLED`          | Autonomous proactive notifications | —                    |
-| `CHANNELS_ENABLED`           | Multi-channel messaging (Telegram) | `TELEGRAM_BOT_TOKEN` |
-| `MCP_ENABLED`                | Admin MCP servers                  | —                    |
-| `MCP_USER_ENABLED`           | Per-user MCP connections           | `MCP_ENABLED=true`   |
-| `FCM_NOTIFICATIONS_ENABLED`  | Firebase push notifications        | FCM credentials      |
-| `SCHEDULED_ACTIONS_ENABLED`  | User-scheduled deferred actions    | —                    |
-| `SKILLS_ENABLED`             | Skills system (SKILL.md)           | —                    |
-| `GEOIP_ENABLED`              | IP geolocation in logs             | DB-IP Lite MMDB file |
-| `INTEREST_LEARNING_ENABLED`  | Automatic interest extraction      | —                    |
-| `OAUTH_HEALTH_CHECK_ENABLED` | Proactive connector monitoring     | —                    |
+| Flag | Feature | Dependencies |
+|------|---------|-------------|
+| `HEARTBEAT_ENABLED` | Autonomous proactive notifications | — |
+| `CHANNELS_ENABLED` | Multi-channel messaging (Telegram) | `TELEGRAM_BOT_TOKEN` |
+| `MCP_ENABLED` | Admin MCP servers | — |
+| `MCP_USER_ENABLED` | Per-user MCP connections | `MCP_ENABLED=true` |
+| `FCM_NOTIFICATIONS_ENABLED` | Firebase push notifications | FCM credentials |
+| `SCHEDULED_ACTIONS_ENABLED` | User-scheduled deferred actions | — |
+| `SKILLS_ENABLED` | Skills system (SKILL.md) | — |
+| `GEOIP_ENABLED` | IP geolocation in logs | DB-IP Lite MMDB file |
+| `INTEREST_LEARNING_ENABLED` | Automatic interest extraction | — |
+| `OAUTH_HEALTH_CHECK_ENABLED` | Proactive connector monitoring | — |
 
 ### Running Tests
 
@@ -1026,7 +1005,6 @@ cd apps/web && pnpm test:coverage
 #### Pre-commit Hooks
 
 Pre-commit hooks run automatically on `git commit` and check:
-
 - **Security**: detects `.bak` files, hardcoded secrets
 - **Backend**: Ruff + Black + MyPy + fast unit tests
 - **Frontend**: ESLint + TypeScript type-check
@@ -1046,9 +1024,9 @@ The 10 skills are auto-discovered via `.claude/skills/`. To use them:
 
 1. Open Claude Code in the project
 2. Formulate a request matching the skill:
-    - "I have a bug in the router" -> `analyzing-bugs`
-    - "Review this code" -> `reviewing-code`
-    - "How to structure this feature" -> `designing-architecture`
+   - "I have a bug in the router" -> `analyzing-bugs`
+   - "Review this code" -> `reviewing-code`
+   - "How to structure this feature" -> `designing-architecture`
 
 See [CLAUDE.md](../CLAUDE.md) for the complete list.
 
@@ -1153,11 +1131,9 @@ curl https://api.openai.com/v1/models \
 
 #### Symptom: API inaccessible from the local network
 
-On **Windows with Docker Desktop**, exposed ports are only accessible on `localhost` by default, not on the local
-network IP (e.g., `192.168.0.x`).
+On **Windows with Docker Desktop**, exposed ports are only accessible on `localhost` by default, not on the local network IP (e.g., `192.168.0.x`).
 
 **Diagnosis**:
-
 ```bash
 # From the Windows machine
 curl -k https://localhost:8000/docs     # Works
@@ -1168,8 +1144,7 @@ docker exec lia-api-dev python -c "import httpx; print(httpx.get('https://127.0.
 # Output: 200
 ```
 
-**Cause**: Docker Desktop on Windows uses WSL2 with a NAT that does not automatically expose ports on all network
-interfaces.
+**Cause**: Docker Desktop on Windows uses WSL2 with a NAT that does not automatically expose ports on all network interfaces.
 
 **Solution 1: Windows Port Forwarding (netsh)**
 
@@ -1234,8 +1209,7 @@ docker compose -f docker-compose.dev.yml up -d
 
 ### Production Deployment
 
-LIA supports multi-architecture Docker builds (`linux/amd64` + `linux/arm64`) for deployment on standard servers and
-Raspberry Pi.
+LIA supports multi-architecture Docker builds (`linux/amd64` + `linux/arm64`) for deployment on standard servers and Raspberry Pi.
 
 #### Build Production Images
 
@@ -1255,8 +1229,7 @@ docker compose -f docker-compose.prod.yml build
 
 #### SOPS Secrets Encryption
 
-LIA uses [SOPS](https://github.com/getsops/sops) with [Age](https://github.com/FiloSottile/age) for encrypting sensitive
-environment variables at rest.
+LIA uses [SOPS](https://github.com/getsops/sops) with [Age](https://github.com/FiloSottile/age) for encrypting sensitive environment variables at rest.
 
 ```bash
 # Install SOPS and Age
@@ -1275,8 +1248,7 @@ sops --encrypt --input-type dotenv --output-type dotenv .env.prod > .env.prod.en
 sops --decrypt --input-type dotenv --output-type dotenv .env.prod.encrypted > .env.prod
 ```
 
-> **Important**: The `keys/` directory is gitignored. Never commit Age private keys to the repository. Only the
-> `.sops.yaml` configuration (with public keys) is tracked.
+> **Important**: The `keys/` directory is gitignored. Never commit Age private keys to the repository. Only the `.sops.yaml` configuration (with public keys) is tracked.
 
 #### Deploy Script
 
@@ -1307,12 +1279,12 @@ docker stats
 
 #### Solutions
 
-| Symptom        | Diagnosis        | Solution                           |
-|----------------|------------------|------------------------------------|
-| **Slow LLM**   | Model too heavy  | Use gpt-4.1-nano vs gpt-4.1-mini   |
-| **Slow DB**    | Missing indexes  | Check `EXPLAIN ANALYZE` on queries |
-| **Slow Redis** | Saturated memory | Increase `maxmemory` or cleanup    |
-| **Slow API**   | N+1 queries      | Enable SQLAlchemy eager loading    |
+| Symptom | Diagnosis | Solution |
+|---------|-----------|----------|
+| **Slow LLM** | Model too heavy | Use gpt-4.1-nano vs gpt-4.1-mini |
+| **Slow DB** | Missing indexes | Check `EXPLAIN ANALYZE` on queries |
+| **Slow Redis** | Saturated memory | Increase `maxmemory` or cleanup |
+| **Slow API** | N+1 queries | Enable SQLAlchemy eager loading |
 
 ### Problem: Voice Mode
 
@@ -1343,32 +1315,32 @@ grep VOICE_TTS_DEFAULT_MODE .env
 
 ### Recommended Reading
 
-| Priority | Document                                                                                   | Description                  |
-|----------|--------------------------------------------------------------------------------------------|------------------------------|
-| **1**    | [ARCHITECTURE.md](./ARCHITECTURE.md)                                                       | Overall system architecture  |
-| **2**    | [technical/GRAPH_AND_AGENTS_ARCHITECTURE.md](./technical/GRAPH_AND_AGENTS_ARCHITECTURE.md) | LangGraph multi-agent system |
-| **3**    | [technical/HITL.md](./technical/HITL.md)                                                   | Human-in-the-Loop v6.0       |
-| **4**    | [technical/PLANNER.md](./technical/PLANNER.md)                                             | ExecutionPlan DSL + FOR_EACH |
-| **5**    | [technical/VOICE_MODE.md](./technical/VOICE_MODE.md)                                       | Voice Mode (STT + Wake Word) |
+| Priority | Document | Description |
+|----------|----------|-------------|
+| **1** | [ARCHITECTURE.md](./ARCHITECTURE.md) | Overall system architecture |
+| **2** | [technical/GRAPH_AND_AGENTS_ARCHITECTURE.md](./technical/GRAPH_AND_AGENTS_ARCHITECTURE.md) | LangGraph multi-agent system |
+| **3** | [technical/HITL.md](./technical/HITL.md) | Human-in-the-Loop v6.0 |
+| **4** | [technical/PLANNER.md](./technical/PLANNER.md) | ExecutionPlan DSL + FOR_EACH |
+| **5** | [technical/VOICE_MODE.md](./technical/VOICE_MODE.md) | Voice Mode (STT + Wake Word) |
 
 ### v6.2 Specific Documentation
 
-| Document                                                             | Feature                  |
-|----------------------------------------------------------------------|--------------------------|
-| [technical/INTERESTS.md](./technical/INTERESTS.md)                   | Interest Learning System |
-| [technical/OAUTH_HEALTH_CHECK.md](./technical/OAUTH_HEALTH_CHECK.md) | OAuth Health Check       |
-| [technical/HYBRID_SEARCH.md](./technical/HYBRID_SEARCH.md)           | BM25 hybrid search       |
-| [technical/SMART_SERVICES.md](./technical/SMART_SERVICES.md)         | Smart Services v3        |
+| Document | Feature |
+|----------|---------|
+| [technical/INTERESTS.md](./technical/INTERESTS.md) | Interest Learning System |
+| [technical/OAUTH_HEALTH_CHECK.md](./technical/OAUTH_HEALTH_CHECK.md) | OAuth Health Check |
+| [technical/HYBRID_SEARCH.md](./technical/HYBRID_SEARCH.md) | BM25 hybrid search |
+| [technical/SMART_SERVICES.md](./technical/SMART_SERVICES.md) | Smart Services v3 |
 
 ### Practical Tutorials
 
-| Tutorial             | Document                                                           |
-|----------------------|--------------------------------------------------------------------|
-| Create a New Agent   | [guides/GUIDE_AGENT_CREATION.md](./guides/GUIDE_AGENT_CREATION.md) |
-| Add a Tool           | [technical/TOOLS.md](./technical/TOOLS.md)                         |
-| Configure Monitoring | [guides/GUIDE_OBSERVABILITE.md](./guides/GUIDE_OBSERVABILITE.md)   |
-| Optimize Prompts     | [technical/PROMPTS.md](./technical/PROMPTS.md)                     |
-| Develop with Skills  | [../CLAUDE.md](../CLAUDE.md)                                       |
+| Tutorial | Document |
+|----------|----------|
+| Create a New Agent | [guides/GUIDE_AGENT_CREATION.md](./guides/GUIDE_AGENT_CREATION.md) |
+| Add a Tool | [technical/TOOLS.md](./technical/TOOLS.md) |
+| Configure Monitoring | [guides/GUIDE_OBSERVABILITE.md](./guides/GUIDE_OBSERVABILITE.md) |
+| Optimize Prompts | [technical/PROMPTS.md](./technical/PROMPTS.md) |
+| Develop with Skills | [../CLAUDE.md](../CLAUDE.md) |
 
 ### Experimentation
 
@@ -1389,15 +1361,15 @@ ls .claude/skills/
 
 ### External Resources
 
-| Resource               | Description            | Link                                                                          |
-|------------------------|------------------------|-------------------------------------------------------------------------------|
-| **LangGraph Docs**     | Official documentation | [langchain-ai.github.io/langgraph](https://langchain-ai.github.io/langgraph/) |
-| **FastAPI Docs**       | FastAPI reference      | [fastapi.tiangolo.com](https://fastapi.tiangolo.com/)                         |
-| **Next.js Docs**       | Next.js reference      | [nextjs.org/docs](https://nextjs.org/docs)                                    |
-| **Grafana Dashboards** | Dashboard examples     | [grafana.com/grafana/dashboards](https://grafana.com/grafana/dashboards/)     |
-| **Langfuse Docs**      | LLM Observability      | [langfuse.com/docs](https://langfuse.com/docs)                                |
-| **Claude Code**        | AI CLI assistant       | [claude.ai/claude-code](https://claude.ai/claude-code)                        |
-| **Sherpa-onnx**        | Wake word / KWS        | [k2-fsa.github.io/sherpa](https://k2-fsa.github.io/sherpa/)                   |
+| Resource | Description | Link |
+|----------|-------------|------|
+| **LangGraph Docs** | Official documentation | [langchain-ai.github.io/langgraph](https://langchain-ai.github.io/langgraph/) |
+| **FastAPI Docs** | FastAPI reference | [fastapi.tiangolo.com](https://fastapi.tiangolo.com/) |
+| **Next.js Docs** | Next.js reference | [nextjs.org/docs](https://nextjs.org/docs) |
+| **Grafana Dashboards** | Dashboard examples | [grafana.com/grafana/dashboards](https://grafana.com/grafana/dashboards/) |
+| **Langfuse Docs** | LLM Observability | [langfuse.com/docs](https://langfuse.com/docs) |
+| **Claude Code** | AI CLI assistant | [claude.ai/claude-code](https://claude.ai/claude-code) |
+| **Sherpa-onnx** | Wake word / KWS | [k2-fsa.github.io/sherpa](https://k2-fsa.github.io/sherpa/) |
 
 ---
 
@@ -1452,17 +1424,16 @@ Before considering your installation complete, verify:
 
 If you encounter issues not covered by this guide:
 
-| Resource           | Description                                                   |
-|--------------------|---------------------------------------------------------------|
-| **GitHub Issues**  | Documented common problems                                    |
-| **docs/runbooks/** | Resolution procedures                                         |
-| **ADR Index**      | [docs/architecture/ADR_INDEX.md](./architecture/ADR_INDEX.md) |
-| **Security**       | [../SECURITY.md](../SECURITY.md)                              |
+| Resource | Description |
+|----------|-------------|
+| **GitHub Issues** | Documented common problems |
+| **docs/runbooks/** | Resolution procedures |
+| **ADR Index** | [docs/architecture/ADR_INDEX.md](./architecture/ADR_INDEX.md) |
+| **Security** | [../SECURITY.md](../SECURITY.md) |
 
 ### Creating an Issue
 
 Include:
-
 1. LIA version (`git describe --tags`)
 2. OS and versions (Docker, Python, Node)
 3. Complete logs (sanitized of secrets)
@@ -1472,12 +1443,12 @@ Include:
 
 ## Version History
 
-| Version | Date       | Changes                                                                                               |
-|---------|------------|-------------------------------------------------------------------------------------------------------|
+| Version | Date | Changes |
+|---------|------|---------|
 | **3.0** | 2026-03-13 | Added v6.2 features (Telegram, MCP, Heartbeat, Skills, SOPS, Testing, Production Deployment sections) |
-| **2.0** | 2026-02-03 | Added v6.0 (Skills, FOR_EACH, Voice Mode, Interest Learning)                                          |
-| **1.5** | 2025-12-15 | Added Routes API, OAuth Health Check                                                                  |
-| **1.0** | 2025-10-01 | Initial version                                                                                       |
+| **2.0** | 2026-02-03 | Added v6.0 (Skills, FOR_EACH, Voice Mode, Interest Learning) |
+| **1.5** | 2025-12-15 | Added Routes API, OAuth Health Check |
+| **1.0** | 2025-10-01 | Initial version |
 
 ---
 

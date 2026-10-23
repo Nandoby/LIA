@@ -1,7 +1,8 @@
 import type { NextConfig } from 'next';
 import { readFileSync } from 'fs';
 
-const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
+// Read version from monorepo root package.json (single source of truth)
+const pkg = JSON.parse(readFileSync('../../package.json', 'utf-8'));
 
 // Allow self-signed certificates for internal Docker HTTPS communication
 // Required because API uses HTTPS for Google OAuth callbacks (redirect URI)
@@ -16,7 +17,13 @@ const envOrigins = process.env.NEXT_PUBLIC_ALLOWED_DEV_ORIGINS
   ? process.env.NEXT_PUBLIC_ALLOWED_DEV_ORIGINS.split(',').map(o => o.trim())
   : [];
 // Note: Wildcard patterns may not work in Next.js 16, use explicit origins
-const allowedDevOrigins = [...new Set([...envOrigins, 'localhost', '127.0.0.1'])];
+const allowedDevOrigins = [
+  ...new Set([
+    ...envOrigins,
+    'localhost',
+    '127.0.0.1',
+  ]),
+];
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -35,6 +42,12 @@ const nextConfig: NextConfig = {
   // Turbopack configuration (default in Next.js 16)
   turbopack: {},
 
+  experimental: {
+    // Increase proxy body size limit for RAG document uploads (default: 10MB)
+    // Must match RAG_SPACES_MAX_FILE_SIZE_MB (20MB) + overhead for multipart encoding
+    proxyClientMaxBodySize: '25mb',
+  },
+
   // Environment variables
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
@@ -42,7 +55,7 @@ const nextConfig: NextConfig = {
   },
 
   // Enable WASM async for Sherpa-onnx KWS
-  webpack: config => {
+  webpack: (config) => {
     config.experiments = { ...config.experiments, asyncWebAssembly: true };
     return config;
   },
@@ -55,19 +68,19 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'X-DNS-Prefetch-Control',
-            value: 'on',
+            value: 'on'
           },
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
+            value: 'SAMEORIGIN'
           },
           {
             key: 'X-Content-Type-Options',
-            value: 'nosniff',
+            value: 'nosniff'
           },
           {
             key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
+            value: 'origin-when-cross-origin'
           },
           // COOP/COEP headers for WASM SharedArrayBuffer (Sherpa-onnx voice mode)
           // Note: OAuth uses redirect flow (not popups), so COOP won't break auth
@@ -78,14 +91,14 @@ const nextConfig: NextConfig = {
           // Chrome/Firefox/Edge: both MCP Apps and SharedArrayBuffer work fine.
           {
             key: 'Cross-Origin-Embedder-Policy',
-            value: 'credentialless',
+            value: 'credentialless'
           },
           {
             key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin',
-          },
-        ],
-      },
+            value: 'same-origin'
+          }
+        ]
+      }
     ];
   },
 
@@ -97,8 +110,7 @@ const nextConfig: NextConfig = {
     // Use HTTP for rewrites to avoid self-signed cert issues
     // Next.js rewrites don't honor NODE_TLS_REJECT_UNAUTHORIZED
     // API_URL_SERVER_HTTP is HTTP variant, API_URL_SERVER may be HTTPS
-    const apiUrl =
-      process.env.API_URL_SERVER_HTTP || process.env.API_URL_SERVER || 'http://api:8000';
+    const apiUrl = process.env.API_URL_SERVER_HTTP || process.env.API_URL_SERVER || 'http://api:8000';
 
     return [
       {

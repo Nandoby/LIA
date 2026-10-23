@@ -50,6 +50,8 @@ import {
   KnowledgeEnrichmentSection,
   // Memory Injection (debug tuning)
   MemoryInjectionSection,
+  // RAG Injection (Knowledge Spaces)
+  RAGInjectionSection,
   // Skills activation
   SkillsSection,
 } from './components/sections';
@@ -129,11 +131,16 @@ function MetricsSections({ metrics }: { metrics: DebugMetrics }) {
     interest_profile,
     knowledge_enrichment,
     memory_injection,
+    rag_injection,
     skills,
   } = metrics;
 
   return (
-    <Accordion type="multiple" defaultValue={DEFAULT_OPEN_SECTIONS} className="px-3">
+    <Accordion
+      type="multiple"
+      defaultValue={DEFAULT_OPEN_SECTIONS}
+      className="px-3"
+    >
       <IntentSection data={intent_detection} mechanisms={intelligent_mechanisms} />
       <DomainSection data={domain_selection} mechanisms={intelligent_mechanisms} />
       <RoutingSection data={routing_decision} />
@@ -144,6 +151,7 @@ function MetricsSections({ metrics }: { metrics: DebugMetrics }) {
       <MemoryInjectionSection data={memory_injection} />
       <InterestProfileSection data={interest_profile} />
       <KnowledgeEnrichmentSection data={knowledge_enrichment} />
+      <RAGInjectionSection data={rag_injection} />
       <TokenBudgetSection data={token_budget} />
       <PlannerSection data={planner_intelligence} />
       <ExecutionSection data={execution_timeline} />
@@ -173,8 +181,10 @@ function DebugPanelContent({ metrics, history = [], className }: DebugPanelProps
 
   // Toggle expansion of a history entry
   const toggleEntry = (entryId: string) => {
-    setExpandedEntries(prev =>
-      prev.includes(entryId) ? prev.filter(id => id !== entryId) : [...prev, entryId]
+    setExpandedEntries((prev) =>
+      prev.includes(entryId)
+        ? prev.filter((id) => id !== entryId)
+        : [...prev, entryId]
     );
   };
 
@@ -183,7 +193,9 @@ function DebugPanelContent({ metrics, history = [], className }: DebugPanelProps
     return (
       <div className={cn('p-4 text-center text-muted-foreground text-sm', className)}>
         <p className="mb-1">No debug metrics available</p>
-        <p className="text-xs">Metrics will appear here after the next conversation turn.</p>
+        <p className="text-xs">
+          Metrics will appear here after the next conversation turn.
+        </p>
       </div>
     );
   }
@@ -216,7 +228,10 @@ function DebugPanelContent({ metrics, history = [], className }: DebugPanelProps
             return (
               <div
                 key={entry.id}
-                className={cn('border-b border-border/50', isLatest && 'bg-primary/5')}
+                className={cn(
+                  'border-b border-border/50',
+                  isLatest && 'bg-primary/5'
+                )}
               >
                 {/* Collapsible header for request */}
                 <button
@@ -241,11 +256,7 @@ function DebugPanelContent({ metrics, history = [], className }: DebugPanelProps
                       )}
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        {formatTime(
-                          entry.timestamp instanceof Date
-                            ? entry.timestamp
-                            : new Date(entry.timestamp)
-                        )}
+                        {formatTime(entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp))}
                       </span>
                     </div>
                     <div className="flex items-center gap-1 mt-0.5">

@@ -27,6 +27,8 @@ export interface AppConfig {
   features: {
     tool_approval_enabled: boolean;
     attachments_enabled: boolean;
+    rag_spaces_enabled: boolean;
+    rag_spaces_embedding_model: string;
   };
   api_version: string;
 }
@@ -38,10 +40,13 @@ export interface AppConfig {
  * @returns `{ config, loading, error }`
  */
 export function useAppConfig(enabled = true) {
-  const { data, loading, error } = useApiQuery<AppConfig>('/config', {
-    componentName: 'useAppConfig',
-    enabled,
-  });
+  const { data, loading, error } = useApiQuery<AppConfig>(
+    '/config',
+    {
+      componentName: 'useAppConfig',
+      enabled,
+    },
+  );
 
   return { config: data ?? null, loading, error };
 }

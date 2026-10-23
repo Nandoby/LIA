@@ -54,6 +54,7 @@ import {
   BadgeCheck,
   Paperclip,
   Blocks,
+  Library,
 } from 'lucide-react';
 
 interface FAQContentProps {
@@ -84,6 +85,7 @@ const sectionIcons = {
   scheduled_actions: CalendarClock,
   mcp_servers: Plug,
   skills: Blocks,
+  rag_spaces: Library,
   privacy: Shield,
   other: HelpCircle,
 };
@@ -101,6 +103,7 @@ const sections = [
   'scheduled_actions',
   'mcp_servers',
   'skills',
+  'rag_spaces',
   'privacy',
   'other',
 ];
@@ -246,37 +249,10 @@ const featureIcons = {
   qualityAssurance: BadgeCheck,
   attachments: Paperclip,
   skills: Blocks,
+  ragSpaces: Library,
 };
 
-const featureKeys = [
-  'architecture',
-  'queryAnalyzer',
-  'planning',
-  'semanticTypes',
-  'semanticValidation',
-  'memory',
-  'interests',
-  'security',
-  'llm',
-  'i18n',
-  'observability',
-  'voice',
-  'costTransparency',
-  'scheduledActions',
-  'mcp',
-  'mcpApps',
-  'excalidraw',
-  'multichannel',
-  'heartbeatAutonome',
-  'webFetch',
-  'knowledgeEnrichment',
-  'adaptiveReplanner',
-  'parallelExecution',
-  'dataRegistry',
-  'qualityAssurance',
-  'attachments',
-  'skills',
-];
+const featureKeys = ['architecture', 'queryAnalyzer', 'planning', 'semanticTypes', 'semanticValidation', 'memory', 'interests', 'security', 'llm', 'i18n', 'observability', 'voice', 'costTransparency', 'scheduledActions', 'mcp', 'mcpApps', 'excalidraw', 'multichannel', 'heartbeatAutonome', 'webFetch', 'knowledgeEnrichment', 'adaptiveReplanner', 'parallelExecution', 'dataRegistry', 'qualityAssurance', 'attachments', 'skills', 'ragSpaces'];
 
 export function FAQContent({ lng, onShowWelcome, showWelcomeButton = false }: FAQContentProps) {
   const { t } = useTranslation(lng);
@@ -338,12 +314,14 @@ export function FAQContent({ lng, onShowWelcome, showWelcomeButton = false }: FA
     <div className="space-y-6">
       {/* Search Bar with optional Welcome Button */}
       <Card className="p-4">
-        <div
-          className={`flex gap-3 ${showWelcomeButton && onShowWelcome ? 'flex-col sm:flex-row' : ''}`}
-        >
+        <div className={`flex gap-3 ${showWelcomeButton && onShowWelcome ? 'flex-col sm:flex-row' : ''}`}>
           {/* Show Welcome Button - only if user has dismissed onboarding */}
           {showWelcomeButton && onShowWelcome && (
-            <Button variant="outline" onClick={onShowWelcome} className="h-10 shrink-0 gap-2">
+            <Button
+              variant="outline"
+              onClick={onShowWelcome}
+              className="h-10 shrink-0 gap-2"
+            >
               <Sparkles className="h-4 w-4" />
               <span>{t('faq.show_welcome')}</span>
             </Button>

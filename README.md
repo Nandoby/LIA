@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.12%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.12+"></a>
-  <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-0.128-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"></a>
+  <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-0.135.1-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"></a>
   <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js"></a>
   <a href="https://langchain-ai.github.io/langgraph/"><img src="https://img.shields.io/badge/LangGraph-1.0.10-FF6F00?style=flat-square" alt="LangGraph"></a>
   <a href="https://python.langchain.com/"><img src="https://img.shields.io/badge/LangChain-1.2.17-4B8BBE?style=flat-square" alt="LangChain"></a>
@@ -19,6 +19,7 @@
 
 <p align="center">
   <a href="#-features">Features</a> •
+  <a href="#-administration--monitoring">Admin & Monitoring</a> •
   <a href="#-quick-start">Quick Start</a> •
   <a href="#-architecture">Architecture</a> •
   <a href="#-documentation">Documentation</a> •
@@ -26,7 +27,7 @@
 </p>
 
 <p align="center">
-  <strong>Version 1.0.0</strong> — First public open-source release — March 2026
+  <strong>Version 1.4.0</strong> — RAG Knowledge Spaces — March 2026
 </p>
 
 ---
@@ -35,6 +36,7 @@
 
 - [Why LIA?](#-why-lia)
 - [Features](#-features)
+- [Administration & Monitoring](#-administration--monitoring)
 - [Quick Start](#-quick-start)
 - [Architecture](#-architecture)
 - [Technologies](#-technologies)
@@ -58,7 +60,7 @@
 | **Unpredictable LLM costs** | Real-time token tracking, budget alerts, 93% optimization |
 | **Uncontrolled hallucinations** | Human-in-the-Loop (HITL) with 6 approval levels |
 | **Fragmented integrations** | Unified multi-domain orchestration (16 agents + MCP) |
-| **Limited observability** | 500+ Prometheus metrics, 17 Grafana dashboards, GeoIP analytics |
+| **Limited observability** | 500+ Prometheus metrics, 18 Grafana dashboards, GeoIP analytics |
 | **Inconsistent performance** | Local E5 embeddings (~50ms), semantic routing +48% accuracy |
 
 ### Primary Use Cases
@@ -226,6 +228,16 @@ ExecutionStep(
 - **Multi-channel integration**: Result notifications via FCM, SSE, and Telegram
 - **Feature flag**: `SCHEDULED_ACTIONS_ENABLED=true` to enable
 
+### RAG Knowledge Spaces (v1.4)
+
+- **Personal knowledge bases**: Create spaces, upload documents (PDF, TXT, MD, DOCX), automatic chunking and embedding
+- **Hybrid search**: Semantic similarity (pgvector cosine) + BM25 keyword matching with configurable alpha fusion
+- **Response enrichment**: RAG context automatically injected into assistant responses when active spaces exist
+- **Full cost transparency**: Embedding costs tracked per document and per query, visible in chat bubbles and dashboard
+- **Admin reindexation**: Full reindex when embedding model changes, with Redis mutual exclusion and automatic dimension ALTER
+- **Observability**: 14 Prometheus metrics, dedicated Grafana dashboard
+- **Feature flag**: `RAG_SPACES_ENABLED=true` to enable (default: true)
+
 ### MCP Apps — Interactive Widgets (F2.6)
 
 - **Sandboxed iframes**: MCP applications rendered in secure iframes (CSP + COEP `credentialless`)
@@ -241,6 +253,46 @@ ExecutionStep(
 - **SEO & OpenGraph**: Dynamically generated OG image for social media previews
 - **Authenticated redirect**: Automatic redirect to dashboard if already logged in
 - **i18n**: Landing page translated in 6 languages
+
+---
+
+## Administration & Monitoring
+
+LIA includes a **full-featured administration interface** — giving operators complete control and real-time visibility over the system without touching configuration files or the database.
+
+### Admin Dashboard
+
+A web-based administration panel covering every operational aspect:
+
+| Section | Capabilities |
+|---------|-------------|
+| **LLM Configuration** | Model selection per node, provider parameters, temperature/token limits, prompt versions |
+| **Personalities** | Create and manage assistant personalities (tone, language, behavior rules) |
+| **User Management** | User accounts, roles, permissions, connector status overview |
+| **Connector Management** | Google/Apple/Microsoft OAuth status, token health, per-user provider activation |
+| **Skills Management** | Enable/disable skills, edit descriptions, translate in 6 languages, delete |
+| **MCP Servers** | Admin-level MCP server configuration, tool discovery, domain descriptions |
+| **LLM Pricing** | CRUD for per-model pricing (input/output/cache tokens), used for cost tracking |
+| **Google API Pricing** | Per-endpoint pricing configuration for Google Maps Platform services |
+| **Voice Settings** | TTS mode selection (Standard/HD), provider configuration |
+| **Broadcasting** | Send system-wide notifications to all users or targeted groups |
+| **Debug Settings** | Toggle debug panel visibility, configure diagnostic verbosity per user |
+| **Consumption Export** | CSV export of token usage, Google API usage, and aggregated consumption per user/period |
+
+### Real-Time Debug Panel
+
+A multi-section debug panel embedded in the chat interface, providing real-time introspection into every aspect of a conversation turn:
+
+| Category | Sections |
+|----------|----------|
+| **Intent Analysis** | Intent classification, Domain detection, Routing decision (with confidence scores) |
+| **Execution Pipeline** | Planner output, Execution waves, Tool calls (inputs/outputs), ForEach analysis |
+| **LLM Internals** | LLM call details (model, tokens, latency), Token budget tracking, Google API calls |
+| **Context & Memory** | Context resolution, Memory injection, Knowledge enrichment, Interest profile |
+| **Intelligence** | Intelligent mechanisms (cache hits, pattern learning, semantic expansion) |
+| **Lifecycle** | Full request lifecycle with timing breakdown per phase |
+
+> The debug panel is designed for **developers and operators** to diagnose issues, optimize prompts, and understand the agent's decision-making process in real time — without needing external tools or log access.
 
 ---
 
@@ -322,6 +374,7 @@ CHANNELS_ENABLED=false         # Multi-channel messaging (Telegram)
 HEARTBEAT_ENABLED=false        # Autonomous proactive notifications
 SCHEDULED_ACTIONS_ENABLED=false # Recurring scheduled actions
 SKILLS_ENABLED=false           # Skills system (agentskills.io standard)
+RAG_SPACES_ENABLED=true        # RAG Knowledge Spaces (document upload & retrieval)
 FCM_NOTIFICATIONS_ENABLED=false # Firebase push notifications
 ```
 
@@ -405,6 +458,7 @@ apps/api/src/
 │   ├── auth/                # JWT, sessions, OAuth
 │   ├── connectors/          # Google + Apple + Microsoft clients, provider resolver
 │   ├── google_api/          # Google API pricing & usage tracking (v6.1)
+│   ├── rag_spaces/          # RAG Knowledge Spaces (upload, embed, retrieve)
 │   ├── user_mcp/            # Per-user MCP servers (CRUD, OAuth, domain routing)
 │   ├── voice/               # TTS factory, STT, Wake Word
 │   ├── interests/           # Interest Learning System
@@ -427,7 +481,7 @@ apps/api/src/
 | Technology | Version | Role |
 |------------|---------|------|
 | Python | 3.12+ | Primary runtime |
-| FastAPI | 0.128 | REST API + SSE framework |
+| FastAPI | 0.135.1 | REST API + SSE framework |
 | LangGraph | 1.0.10 | Multi-agent orchestration |
 | LangChain | 1.2.10 | LLM abstraction + tools |
 | SQLAlchemy | 2.0.45 | Async ORM |
@@ -497,6 +551,7 @@ apps/api/src/
 | **Channels** | [CHANNELS_INTEGRATION](./docs/technical/CHANNELS_INTEGRATION.md) • [GUIDE_TELEGRAM](./docs/guides/GUIDE_TELEGRAM_INTEGRATION.md) |
 | **Scheduled Actions** | [SCHEDULED_ACTIONS](./docs/technical/SCHEDULED_ACTIONS.md) • [GUIDE_SCHEDULED_ACTIONS](./docs/guides/GUIDE_SCHEDULED_ACTIONS.md) |
 | **Skills** | [SKILLS_INTEGRATION](./docs/technical/SKILLS_INTEGRATION.md) |
+| **RAG Spaces** | [GUIDE_RAG_SPACES](./docs/guides/GUIDE_RAG_SPACES.md) • [ADR-055](./docs/architecture/ADR-055-RAG-Spaces-Architecture.md) |
 | **LLM Providers** | [LLM_PROVIDERS](./docs/technical/LLM_PROVIDERS.md) |
 | **Security** | [SECURITY](./docs/technical/SECURITY.md) • [OAUTH](./docs/technical/OAUTH.md) • [RATE_LIMITING](./docs/technical/RATE_LIMITING.md) |
 | **Observability** | [OBSERVABILITY_AGENTS](./docs/technical/OBSERVABILITY_AGENTS.md) • [METRICS_REFERENCE](./docs/technical/METRICS_REFERENCE.md) |
@@ -514,7 +569,7 @@ apps/api/src/
 
 ### Architecture Decision Records (ADR)
 
-55+ ADRs documenting major architectural decisions:
+56+ ADRs documenting major architectural decisions:
 
 - [ADR-001: LangGraph Multi-Agent System](./docs/architecture/ADR-001-LangGraph-Multi-Agent-System.md)
 - [ADR-048: Semantic Tool Router](./docs/architecture/ADR-048-Semantic-Tool-Router.md)
