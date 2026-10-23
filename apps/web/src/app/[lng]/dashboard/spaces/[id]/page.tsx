@@ -189,7 +189,48 @@ export default function SpaceDetailPage({ params }: SpaceDetailPageProps) {
             </div>
           </CardHeader>
         </Card>
+
+        {/* Upload Zone */}
+        <DocumentUploadZone
+          onUpload={handleUpload}
+          uploads={uploads}
+          onDismissUpload={dismissUpload}
+        />
+
+        {/* Documents list */}
+        {space.documents.length === 0 ? (
+          <div className="rounded-lg border border-dashed p-8 text-center">
+            <p className="text-sm text-muted-foreground">{t('spaces.documents.empty')}</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {space.documents.map((doc) => (
+              <DocumentRow
+                key={doc.id}
+                document={doc}
+                onDelete={handleDeleteDocument}
+                deleting={deleting}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Dialogs */}
+        <EditSpaceDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          space={space}
+          onSubmit={handleUpdate}
+          isLoading={updateMutation.loading}
+        />
+
+        <DeleteSpaceConfirm
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
+          spaceName={space.name}
+          onConfirm={handleDelete}
+        />
       </div>
     </FeatureErrorBoundary>
-  )
+  );
 }
