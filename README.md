@@ -18,9 +18,9 @@
   <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-0.135.1-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"></a>
   <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js 16"></a>
   <a href="https://langchain-ai.github.io/langgraph/"><img src="https://img.shields.io/badge/LangGraph-1.0.10-FF6F00?style=flat-square" alt="LangGraph"></a>
-  <a href="https://python.langchain.com/"><img src="https://img.shields.io/badge/LangChain-1.2.17-4B8BBE?style=flat-square" alt="LangChain"></a>
+  <a href="https://python.langchain.com/"><img src="https://img.shields.io/badge/LangChain-1.2.10-4B8BBE?style=flat-square" alt="LangChain"></a>
   <a href="#internationalization-i18n--6-languages"><img src="https://img.shields.io/badge/i18n-6%20languages-E040FB?style=flat-square" alt="6 languages"></a>
-  <a href="#"><img src="https://img.shields.io/badge/License-AGPL--3.0-blue?style=flat-square" alt="License"></a>
+  <a href="#license"><img src="https://img.shields.io/badge/License-AGPL--3.0-blue?style=flat-square" alt="License"></a>
 </p>
 
 <p align="center">
@@ -41,6 +41,7 @@
 ## Table of Contents
 
 - [Why LIA?](#why-lia)
+- [Try LIA Online](#try-lia-online)
 - [Screenshots](#screenshots)
 - [Features](#features)
 - [Administration & Monitoring](#administration--monitoring)
@@ -78,6 +79,18 @@
 👥 "Update the companies of my contacts who work at startups"
 🔔 "Remind me tomorrow at 9am to call Marie for her birthday"
 ```
+
+---
+
+## Try LIA Online
+
+<p align="center">
+  <a href="https://lia.jeyswork.com/"><img src="https://img.shields.io/badge/🚀_Try_LIA-lia.jeyswork.com-0EA5E9?style=for-the-badge" alt="Try LIA"></a>
+</p>
+
+LIA is available as a hosted service at **https://lia.jeyswork.com/** — no installation required.
+
+> **Closed beta**: Access is currently limited to a restricted number of users, at the administrator's discretion. To request an invitation, contact **liamyassistant@gmail.com**.
 
 ---
 
@@ -137,7 +150,7 @@
 - **Multi-Step Planning**: ExecutionPlan DSL with dependencies and conditions
 - **Parallel Execution**: asyncio.gather for independent domains
 
-### Voice TTS Dual-Mode (v6.0)
+### Voice TTS Dual-Mode
 
 | Mode | Provider | Cost | Quality |
 |------|----------|------|---------|
@@ -149,7 +162,7 @@
 - **Admin Control**: Mode controlled via System Settings
 - **Graceful Degradation**: Automatic HD to Standard fallback
 
-### FOR_EACH Iteration Pattern (v6.0)
+### FOR_EACH Iteration Pattern
 
 ```python
 # DSL Syntax
@@ -219,7 +232,7 @@ ExecutionStep(
 - **Loki**: Structured JSON logs with PII filtering
 - **Tempo**: Distributed cross-service tracing
 
-### Cost Tracking & Billing (v6.1)
+### Cost Tracking & Billing
 
 | Type | Tracking | Export |
 |------|----------|--------|
@@ -279,7 +292,7 @@ ExecutionStep(
 - **Multi-channel integration**: Result notifications via FCM, SSE, and Telegram
 - **Feature flag**: `SCHEDULED_ACTIONS_ENABLED=true` to enable
 
-### RAG Knowledge Spaces (v1.4)
+### RAG Knowledge Spaces
 
 - **Personal knowledge bases**: Create spaces, upload documents (PDF, TXT, MD, DOCX), automatic chunking and embedding
 - **Hybrid search**: Semantic similarity (pgvector cosine) + BM25 keyword matching with configurable alpha fusion
@@ -289,7 +302,7 @@ ExecutionStep(
 - **Observability**: 14 Prometheus metrics, dedicated Grafana dashboard
 - **Feature flag**: `RAG_SPACES_ENABLED=true` to enable (default: true)
 
-### MCP Apps — Interactive Widgets (F2.6)
+### MCP Apps — Interactive Widgets
 
 - **Sandboxed iframes**: MCP applications rendered in secure iframes (CSP + COEP `credentialless`)
 - **JSON-RPC Bridge**: Bidirectional communication between iframe app and chat via PostMessage JSON-RPC 2.0
@@ -328,6 +341,7 @@ A web-based administration panel covering every operational aspect:
 | Section | Capabilities |
 |---------|-------------|
 | **LLM Configuration** | Model selection per node, provider parameters, temperature/token limits, prompt versions |
+| **RAG Knowledge Spaces** | Manage document spaces and embedding configuration, reindex operations |
 | **Personalities** | Create and manage assistant personalities (tone, language, behavior rules) |
 | **User Management** | User accounts, roles, permissions, connector status overview |
 | **Connector Management** | Google/Apple/Microsoft OAuth status, token health, per-user provider activation |
@@ -349,7 +363,7 @@ A multi-section debug panel embedded in the chat interface, providing real-time 
 | **Intent Analysis** | Intent classification, Domain detection, Routing decision (with confidence scores) |
 | **Execution Pipeline** | Planner output, Execution waves, Tool calls (inputs/outputs), ForEach analysis |
 | **LLM Internals** | LLM call details (model, tokens, latency), Token budget tracking, Google API calls |
-| **Context & Memory** | Context resolution, Memory injection, Knowledge enrichment, Interest profile |
+| **Context & Memory** | Context resolution, Memory injection, Knowledge enrichment, RAG injection (scores), Interest profile |
 | **Intelligence** | Intelligent mechanisms (cache hits, pattern learning, semantic expansion) |
 | **Lifecycle** | Full request lifecycle with timing breakdown per phase |
 
@@ -359,24 +373,17 @@ A multi-section debug panel embedded in the chat interface, providing real-time 
 
 ## Quick Start
 
-### Try LIA Online (SaaS)
-
-LIA is available as a hosted service — no installation required:
-
-> **https://lia.jeyswork.com/**
-
-Create an account and start chatting immediately.
-
-### Self-Hosted Prerequisites
+### Prerequisites
 
 | Software | Version | Required |
 |----------|---------|----------|
 | Python | 3.12+ | Yes |
-| Node.js | 22+ | Yes |
+| Node.js | 22 LTS | Yes |
 | Docker | 24+ | Yes |
 | pnpm | 10+ | Yes |
+| [Task](https://taskfile.dev/) | 3+ | Yes (build tool) |
 
-This project uses [Task](https://taskfile.dev/) as its build tool. See `Taskfile.yml` for all available commands. Quick start: `task setup` then `task dev`.
+All commands are defined in `Taskfile.yml`. Quick start: `task setup` then `task dev`.
 
 ### Express Setup (5 minutes)
 
@@ -385,29 +392,45 @@ This project uses [Task](https://taskfile.dev/) as its build tool. See `Taskfile
 git clone https://github.com/jgouviergmail/LIA-Assistant.git
 cd LIA-Assistant
 
-# 2. Start the infrastructure
-docker-compose up -d postgres redis prometheus grafana
+# 2. Configure environment
+cp .env.example .env  # Edit with your API keys
 
-# 3. Backend setup
+# 3. Full setup (backend + frontend + git hooks)
+task setup
+
+# 4. Start all services (API + Web + PostgreSQL + Redis + observability)
+task dev
+```
+
+<details>
+<summary><strong>Manual setup (without Task)</strong></summary>
+
+```bash
+# 1. Start the infrastructure
+docker compose up -d postgres redis prometheus grafana
+
+# 2. Backend setup
 cd apps/api
 python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -e ".[dev]"
+pip install -r requirements.txt
 cp ../../.env.example .env  # Configure your API keys
 
-# 4. Database migrations
+# 3. Database migrations
 alembic upgrade head
 
-# 5. Frontend setup
+# 4. Frontend setup
 cd ../web
 pnpm install
 
-# 6. Start the services
+# 5. Start the services
 # Terminal 1 - Backend:
 cd apps/api && uvicorn src.main:app --reload --port 8000
 
 # Terminal 2 - Frontend:
 cd apps/web && pnpm dev
 ```
+
+</details>
 
 ### Development URLs
 
@@ -481,7 +504,7 @@ Production targets include Raspberry Pi (ARM64) via multi-arch Docker builds (`l
 │  └────────────────────────────────────────────────────────────────────┘ │
 │                                                                          │
 │  ┌─────────────────────────────────────────────────────────────────────┐│
-│  │  Domain Services: Auth, Users, Connectors, LLM Pricing, Voice       ││
+│  │  Domain Services: Auth, Users, Connectors, RAG, Voice, Skills...    ││
 │  └─────────────────────────────────────────────────────────────────────┘│
 │                                                                          │
 │  ┌─────────────────────────────────────────────────────────────────────┐│
@@ -503,7 +526,7 @@ graph TD
     F -->|approved| G[Task Orchestrator]
     F -->|rejected| C
     G --> H[Domain Agents]
-    H --> I[Google APIs]
+    H --> I[External APIs\nGoogle • Apple • Microsoft • MCP]
     I --> H
     H --> G
     G --> C
@@ -526,12 +549,17 @@ apps/api/src/
 │   │   └── orchestration/   # ExecutionPlan, parallel executor
 │   ├── auth/                # JWT, sessions, OAuth
 │   ├── connectors/          # Google + Apple + Microsoft clients, provider resolver
-│   ├── google_api/          # Google API pricing & usage tracking (v6.1)
+│   ├── conversations/       # Conversation CRUD & history
+│   ├── google_api/          # Google API pricing & usage tracking
 │   ├── rag_spaces/          # RAG Knowledge Spaces (upload, embed, retrieve)
 │   ├── user_mcp/            # Per-user MCP servers (CRUD, OAuth, domain routing)
 │   ├── voice/               # TTS factory, STT, Wake Word
+│   ├── skills/              # Skills system (agentskills.io standard)
 │   ├── interests/           # Interest Learning System
 │   ├── heartbeat/           # Autonomous Heartbeat (Proactive Notifications)
+│   ├── channels/            # Multi-channel messaging (Telegram)
+│   ├── reminders/           # Reminder & notification scheduling
+│   ├── scheduled_actions/   # Recurring scheduled actions
 │   └── users/               # User management
 └── infrastructure/          # Cross-cutting concerns
     ├── cache/               # Redis sessions, LLM cache
@@ -554,12 +582,15 @@ apps/api/src/
 | LangGraph | 1.0.10 | Multi-agent orchestration |
 | LangChain | 1.2.10 | LLM abstraction + tools |
 | SQLAlchemy | 2.0.45 | Async ORM |
+| Alembic | latest | Database migrations |
 | PostgreSQL | 16 + pgvector | Database + vector search |
 | Redis | 7.1.0 | Cache, sessions, rate limiting |
 | Pydantic | 2.12.5 | Validation + serialization |
+| structlog | latest | Structured JSON logging |
 | sentence-transformers | 5.0+ | Local E5 embeddings |
 | Edge TTS | 6.1+ | Voice synthesis (free) |
 | mcp | 1.9+ | Model Context Protocol SDK (Streamable HTTP) |
+| Docker | 24+ | Containerization (multi-arch amd64/arm64) |
 
 ### Frontend
 
@@ -718,7 +749,7 @@ pytest --cov=src --cov-report=html -v
 
 **DO NOT create a GitHub Issue for security vulnerabilities.**
 
-Send an email to **security@lia-assistant.dev** with:
+Send an email to **liamyassistant@gmail.com** with:
 - Description of the vulnerability
 - Steps to reproduce
 - Potential impact
@@ -741,11 +772,11 @@ cd LIA-Assistant
 # 2. Create a branch
 git checkout -b feature/my-feature
 
-# 3. Install pre-commit hooks
-pre-commit install
+# 3. Full setup (backend + frontend + git hooks)
+task setup
 
 # 4. Develop and test
-pytest tests/unit -v
+task test:backend:unit:fast
 
 # 5. Commit (Conventional Commits)
 git commit -m "feat(agents): add weather forecast agent"
@@ -780,7 +811,7 @@ git push origin feature/my-feature
 |---------|-------|
 | [GitHub Issues](https://github.com/jgouviergmail/LIA-Assistant/issues) | Bugs, feature requests |
 | [GitHub Discussions](https://github.com/jgouviergmail/LIA-Assistant/discussions) | Questions, ideas |
-| contact@lia-assistant.dev | General inquiries |
+| liamyassistant@gmail.com | General inquiries |
 
 ### Resources
 
