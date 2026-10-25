@@ -34,6 +34,7 @@ from src.core.constants import (
     FOR_EACH_WARNING_THRESHOLD,
     HEARTBEAT_ACTIVITY_COOLDOWN_MINUTES_DEFAULT,
     HEARTBEAT_CONTEXT_CALENDAR_HOURS_DEFAULT,
+    HEARTBEAT_CONTEXT_EMAILS_MAX_DEFAULT,
     HEARTBEAT_CONTEXT_MEMORY_LIMIT_DEFAULT,
     HEARTBEAT_CONTEXT_TASKS_DAYS_DEFAULT,
     HEARTBEAT_GLOBAL_COOLDOWN_HOURS_DEFAULT,
@@ -1002,7 +1003,7 @@ class AgentsSettings(BaseSettings):
             description=(
                 "Reasoning effort for planner LLM (OpenAI o-series/GPT-5 only). "
                 "Controls reasoning depth: minimal=sub-second (GPT-5), low=1-3s, medium=5-15s, high=30+s. "
-                "Recommended: 'medium' for planner (multi-agent orchestration, prioritize speed over deep reasoning)."
+                "Recommended: 'medium' for planner (thorough multi-agent orchestration)."
             ),
         )
     )
@@ -2233,6 +2234,12 @@ class AgentsSettings(BaseSettings):
         ge=1,
         le=20,
         description="Maximum number of user memories to include in context.",
+    )
+    heartbeat_context_emails_max: int = Field(
+        default=HEARTBEAT_CONTEXT_EMAILS_MAX_DEFAULT,
+        ge=1,
+        le=10,
+        description="Maximum number of unread emails to include in heartbeat context.",
     )
 
     # Weather change detection thresholds
