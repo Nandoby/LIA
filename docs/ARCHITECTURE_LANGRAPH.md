@@ -1,14 +1,14 @@
 # Architecture LangGraph - LIA
 
 **Version**: 5.5 (INTELLIPLANNER + INTELLIA v10.1 + SEMANTIC + REMINDERS + Architecture v3)
-**Date**: 2026-01-12 **Status**: Production
+**Date**: 2026-01-12
+**Status**: Production
 
 ---
 
 ## Vue d'Ensemble
 
-LIA utilise **LangGraph v1.0.10** avec exécution parallèle native **asyncio** pour orchestrer un assistant intelligent
-multi-domaines. L'architecture supporte:
+LIA utilise **LangGraph v1.0.10** avec exécution parallèle native **asyncio** pour orchestrer un assistant intelligent multi-domaines. L'architecture supporte:
 
 **Domaines actifs**: Contacts, Emails, Calendar, Drive, Tasks, Weather, Wikipedia, Perplexity, Places
 
@@ -31,6 +31,13 @@ multi-domaines. L'architecture supporte:
 │                              ENTRÉE UTILISATEUR                                  │
 │                                      │                                           │
 │                                      ▼                                           │
+│                         ┌────────────────────────┐                              │
+│                         │   compaction_node (F4) │                              │
+│                         │  (Context summarization │                              │
+│                         │   if > threshold)       │                              │
+│                         └──────────┬─────────────┘                              │
+│                                    │ (always)                                    │
+│                                    ▼                                           │
 │                         ┌────────────────────────┐                              │
 │                         │      router_node       │                              │
 │                         │  (Classification 0-1)  │                              │
@@ -400,7 +407,6 @@ multi-domaines. L'architecture supporte:
 ### 3.1 Principe JSON + Few-Shot
 
 **INTELLIA v10** utilise une architecture où:
-
 1. Les données sont passées au LLM en **blocs JSON structurés**
 2. Le LLM formate ces données en **Markdown conversationnel** grâce aux **few-shot examples**
 3. Cette approche permet un formatage **naturel et contextuel** par le LLM
@@ -460,18 +466,8 @@ Chaque type de données est converti en JSON avec cette structure:
       "id": "contact_abc123",
       "name": "Jean Dupont",
       "url": "https://contacts.google.com/person/abc123",
-      "emails": [
-        {
-          "type": "Travail",
-          "value": "jean@company.com"
-        }
-      ],
-      "phones": [
-        {
-          "type": "Mobile",
-          "value": "+33 6 12 34 56 78"
-        }
-      ],
+      "emails": [{"type": "Travail", "value": "jean@company.com"}],
+      "phones": [{"type": "Mobile", "value": "+33 6 12 34 56 78"}],
       "organization": "Tech Lead @ Acme Corp"
     }
   ]
@@ -480,24 +476,23 @@ Chaque type de données est converti en JSON avec cette structure:
 
 ### 3.3 Mapping Types → Domaines
 
-| Registry Type       | Domain    | Items Key | Few-Shot (search)      | Few-Shot (details)     |
-|---------------------|-----------|-----------|------------------------|------------------------|
-| `CONTACT`           | contacts  | contacts  | `contacts_search.txt`  | `contacts_details.txt` |
-| `EMAIL`             | emails    | emails    | `emails_search.txt`    | `emails_details.txt`   |
-| `EVENT`             | calendar  | events    | `calendar_search.txt`  | `calendar_details.txt` |
-| `TASK`              | tasks     | tasks     | `tasks_search.txt`     | `tasks_details.txt`    |
-| `FILE`              | drive     | files     | `drive_search.txt`     | —                      |
-| `PLACE`             | places    | places    | `places_search.txt`    | `places_details.txt`   |
-| `WEATHER`           | weather   | forecasts | `weather_search.txt`   | —                      |
-| `WIKIPEDIA_ARTICLE` | wikipedia | articles  | `wikipedia_search.txt` | —                      |
-| `SEARCH_RESULT`     | search    | results   | `search_search.txt`    | —                      |
+| Registry Type | Domain | Items Key | Few-Shot (search) | Few-Shot (details) |
+|---------------|--------|-----------|-------------------|---------------------|
+| `CONTACT` | contacts | contacts | `contacts_search.txt` | `contacts_details.txt` |
+| `EMAIL` | emails | emails | `emails_search.txt` | `emails_details.txt` |
+| `EVENT` | calendar | events | `calendar_search.txt` | `calendar_details.txt` |
+| `TASK` | tasks | tasks | `tasks_search.txt` | `tasks_details.txt` |
+| `FILE` | drive | files | `drive_search.txt` | — |
+| `PLACE` | places | places | `places_search.txt` | `places_details.txt` |
+| `WEATHER` | weather | forecasts | `weather_search.txt` | — |
+| `WIKIPEDIA_ARTICLE` | wikipedia | articles | `wikipedia_search.txt` | — |
+| `SEARCH_RESULT` | search | results | `search_search.txt` | — |
 
 ### 3.4 Détection Automatique d'Action (search vs details)
 
 **Fonction**: `_detect_action_from_items(type_name, items)`
 
 La détection d'action utilise des heuristiques basées sur:
-
 1. **Nombre d'items**: Multiple items → toujours "search"
 2. **Indicateurs de détails**: Présence de champs riches spécifiques par domaine
 
@@ -513,7 +508,6 @@ detail_indicators_by_type = {
 ```
 
 **Flux de détection**:
-
 ```
 Items count > 1? ────► YES ────► action = "search"
      │
@@ -533,12 +527,10 @@ action = "search" (default)
 **Fichiers**: `prompts/v1/fewshot/*.txt`
 
 Chaque fichier few-shot contient:
-
 1. Les données JSON d'entrée (format attendu)
 2. La présentation Markdown attendue
 
 Exemple (`contacts_search.txt`):
-
 ```
 ### Exemple: Contacts Google (resultats)
 
@@ -556,13 +548,10 @@ Presentation attendue:
 
 ---
 👤 **[Jean Dupont](https://contacts.google.com/person/abc123)**
-
 - 📧 Email (Travail): jean@example.com
 - 📱 Mobile: +33 6 12 34 56 78
 - 🏢 Tech Lead @ Acme Corp
-
 ---
-
 ```
 
 ### 3.6 Fonctions Clés
@@ -718,18 +707,10 @@ class MessagesState(TypedDict):
 "contact_id": "$steps.0.contacts[0].resource_name"
 
 # Résolution via ReferenceResolver:
-1.
-Parser
-"$steps.0.contacts[0].resource_name"
-2.
-Lookup
-completed_steps["0"].result
-3.
-Navigate: result["contacts"][0]["resource_name"]
-4.
-Retourner
-valeur
-réelle: "people/c123456"
+1. Parser "$steps.0.contacts[0].resource_name"
+2. Lookup completed_steps["0"].result
+3. Navigate: result["contacts"][0]["resource_name"]
+4. Retourner valeur réelle: "people/c123456"
 ```
 
 ---
@@ -809,7 +790,7 @@ réelle: "people/c123456"
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Pattern interrupt ()
+### Pattern interrupt()
 
 ```python
 # Dans un node HITL:
@@ -917,18 +898,18 @@ async def node_function(state: MessagesState) -> dict:
 
 ### Types d'Événements
 
-| Event Type                | Source            | Contenu                       |
-|---------------------------|-------------------|-------------------------------|
-| `token`                   | response_node     | Token LLM pour streaming      |
-| `router_decision`         | router_node       | Décision routing + confidence |
-| `execution_step`          | graph transitions | Entrée/sortie node            |
-| `planner_metadata`        | planner_node      | Structure plan + coût         |
-| `registry_update`         | tools             | Data Registry items           |
-| `hitl_interrupt_metadata` | HITL nodes        | Payload interrupt             |
-| `content_replacement`     | response_node     | Contenu post-traité (rare)    |
-| `planner_error`           | planner_node      | Erreur génération             |
-| `error`                   | Any node          | Message exception             |
-| `done`                    | Graph completion  | Chunk final                   |
+| Event Type | Source | Contenu |
+|-----------|--------|---------|
+| `token` | response_node | Token LLM pour streaming |
+| `router_decision` | router_node | Décision routing + confidence |
+| `execution_step` | graph transitions | Entrée/sortie node |
+| `planner_metadata` | planner_node | Structure plan + coût |
+| `registry_update` | tools | Data Registry items |
+| `hitl_interrupt_metadata` | HITL nodes | Payload interrupt |
+| `content_replacement` | response_node | Contenu post-traité (rare) |
+| `planner_error` | planner_node | Erreur génération |
+| `error` | Any node | Message exception |
+| `done` | Graph completion | Chunk final |
 
 ### Flux Streaming
 
@@ -970,39 +951,39 @@ async def node_function(state: MessagesState) -> dict:
 
 ### Router
 
-| Setting                    | Default      | Description                  |
-|----------------------------|--------------|------------------------------|
-| `router_llm_model`         | gpt-4.1-nano | Modèle classification rapide |
-| `router_confidence_high`   | 0.85         | Seuil haute confiance        |
-| `router_confidence_medium` | 0.65         | Seuil moyenne confiance      |
-| `router_confidence_low`    | 0.45         | Seuil basse confiance        |
-| `llm_cache_enabled`        | True         | Cache réponses router        |
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `router_llm_model` | gpt-4.1-nano | Modèle classification rapide |
+| `router_confidence_high` | 0.85 | Seuil haute confiance |
+| `router_confidence_medium` | 0.65 | Seuil moyenne confiance |
+| `router_confidence_low` | 0.45 | Seuil basse confiance |
+| `llm_cache_enabled` | True | Cache réponses router |
 
 ### Planner
 
-| Setting                   | Default | Description                  |
-|---------------------------|---------|------------------------------|
-| `planner_llm_model`       | gpt-4   | Modèle génération plan       |
-| `planner_timeout_seconds` | 30      | Timeout génération           |
-| `planner_max_retries`     | 2       | Retries validation échec     |
-| `planner_max_cost_usd`    | 5.0     | Budget exécution             |
-| `planner_max_steps`       | 20      | Max steps dans plan          |
-| `planner_max_replans`     | 2       | Max itérations clarification |
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `planner_llm_model` | gpt-4 | Modèle génération plan |
+| `planner_timeout_seconds` | 30 | Timeout génération |
+| `planner_max_retries` | 2 | Retries validation échec |
+| `planner_max_cost_usd` | 5.0 | Budget exécution |
+| `planner_max_steps` | 20 | Max steps dans plan |
+| `planner_max_replans` | 2 | Max itérations clarification |
 
 ### HITL
 
-| Setting                       | Default | Description                   |
-|-------------------------------|---------|-------------------------------|
-| `tool_approval_enabled`       | True    | Activer approval gate         |
-| `hitl_plan_approval_enabled`  | True    | Activer approbation plan      |
-| `semantic_validation_enabled` | True    | Activer validation sémantique |
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `tool_approval_enabled` | True | Activer approval gate |
+| `hitl_plan_approval_enabled` | True | Activer approbation plan |
+| `semantic_validation_enabled` | True | Activer validation sémantique |
 
 ### Messages
 
-| Setting                | Default | Description           |
-|------------------------|---------|-----------------------|
-| `max_tokens_history`   | 100000  | Max tokens historique |
-| `max_messages_history` | 50      | Max messages fallback |
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `max_tokens_history` | 100000 | Max tokens historique |
+| `max_messages_history` | 50 | Max messages fallback |
 
 ---
 
@@ -1111,20 +1092,19 @@ class ConnectorTool[ClientType](ABC):
     """Base class for OAuth-based connector tools."""
 
     # Subclasses must define:
-    connector_type: ConnectorType  # e.g., GOOGLE_CONTACTS
-    client_class: type[ClientType]  # e.g., GooglePeopleClient
+    connector_type: ConnectorType       # e.g., GOOGLE_CONTACTS
+    client_class: type[ClientType]      # e.g., GooglePeopleClient
 
     # Optional:
-    registry_enabled: bool = False  # Enable Data Registry mode
+    registry_enabled: bool = False      # Enable Data Registry mode
 
     async def execute(self, runtime: ToolRuntime, **kwargs) -> str:
-
-    # 1. Validate runtime, extract user_id
-    # 2. Get dependencies (DI)
-    # 3. Get OAuth credentials from DB
-    # 4. Get or create cached client
-    # 5. Execute API call (subclass)
-    # 6. Format response
+        # 1. Validate runtime, extract user_id
+        # 2. Get dependencies (DI)
+        # 3. Get OAuth credentials from DB
+        # 4. Get or create cached client
+        # 5. Execute API call (subclass)
+        # 6. Format response
 
     @abstractmethod
     async def execute_api_call(self, client, user_id, **kwargs) -> dict:
@@ -1133,15 +1113,12 @@ class ConnectorTool[ClientType](ABC):
 
     def create_client_factory(self, user_uuid, credentials, connector_service):
         """Returns async factory for client instantiation."""
-
         async def create_client():
             return self.client_class(user_uuid, credentials, connector_service)
-
         return create_client
 ```
 
 **Flux OAuth:**
-
 ```
 User Request → ConnectorTool.execute()
                     │
@@ -1171,20 +1148,19 @@ class APIKeyConnectorTool[ClientType](ABC):
     """Base class for API key-based connector tools."""
 
     # Subclasses must define:
-    connector_type: ConnectorType  # e.g., OPENWEATHERMAP
-    client_class: type[ClientType]  # e.g., OpenWeatherMapClient
+    connector_type: ConnectorType       # e.g., OPENWEATHERMAP
+    client_class: type[ClientType]      # e.g., OpenWeatherMapClient
 
     # Optional:
-    registry_enabled: bool = False  # Enable Data Registry mode
+    registry_enabled: bool = False      # Enable Data Registry mode
 
     async def execute(self, runtime: ToolRuntime, **kwargs) -> str:
-
-    # 1. Validate runtime, extract user_id
-    # 2. Get dependencies (DI)
-    # 3. Get API key credentials from DB
-    # 4. Create client with user's key
-    # 5. Execute API call (subclass)
-    # 6. Format response
+        # 1. Validate runtime, extract user_id
+        # 2. Get dependencies (DI)
+        # 3. Get API key credentials from DB
+        # 4. Create client with user's key
+        # 5. Execute API call (subclass)
+        # 6. Format response
 
     @abstractmethod
     def create_client(self, credentials: APIKeyCredentials, user_id: UUID) -> ClientType:
@@ -1198,7 +1174,6 @@ class APIKeyConnectorTool[ClientType](ABC):
 ```
 
 **Flux API Key:**
-
 ```
 User Request → APIKeyConnectorTool.execute()
                     │
@@ -1220,14 +1195,14 @@ User Request → APIKeyConnectorTool.execute()
 
 ### 11.4 Différences Clés OAuth vs API Key
 
-| Aspect             | ConnectorTool (OAuth)                                  | APIKeyConnectorTool (API Key) |
-|--------------------|--------------------------------------------------------|-------------------------------|
-| **Auth Type**      | OAuth 2.0 tokens                                       | API Key simple                |
-| **DB Storage**     | access_token, refresh_token, expires_at                | api_key (Fernet encrypted)    |
-| **Token Refresh**  | Automatique via ConnectorService                       | N/A                           |
-| **Client Caching** | Via `get_or_create_client()`                           | Non (création à chaque appel) |
-| **Exemples**       | Google Contacts, Gmail, Calendar, Drive, Tasks, Places | OpenWeatherMap, Perplexity    |
-| **User Setup**     | OAuth flow (redirect)                                  | Saisie clé API dans settings  |
+| Aspect | ConnectorTool (OAuth) | APIKeyConnectorTool (API Key) |
+|--------|----------------------|------------------------------|
+| **Auth Type** | OAuth 2.0 tokens | API Key simple |
+| **DB Storage** | access_token, refresh_token, expires_at | api_key (Fernet encrypted) |
+| **Token Refresh** | Automatique via ConnectorService | N/A |
+| **Client Caching** | Via `get_or_create_client()` | Non (création à chaque appel) |
+| **Exemples** | Google Contacts, Gmail, Calendar, Drive, Tasks, Places | OpenWeatherMap, Perplexity |
+| **User Setup** | OAuth flow (redirect) | Saisie clé API dans settings |
 
 ### 11.5 Tool Registry Architecture
 
@@ -1281,82 +1256,74 @@ User Request → APIKeyConnectorTool.execute()
 #### OAuth Connectors (Google)
 
 ##### Contacts Agent
-
 **Fichier**: `tools/google_contacts_tools.py`
 
-| Tool                       | Description                         | Catégorie |
-|----------------------------|-------------------------------------|-----------|
-| `search_contacts_tool`     | Recherche contacts (query fuzzy)    | READ      |
-| `list_contacts_tool`       | Liste paginée (pageSize, pageToken) | READ      |
-| `get_contact_details_tool` | Détails complet d'un contact        | READ      |
+| Tool | Description | Catégorie |
+|------|-------------|-----------|
+| `search_contacts_tool` | Recherche contacts (query fuzzy) | READ |
+| `list_contacts_tool` | Liste paginée (pageSize, pageToken) | READ |
+| `get_contact_details_tool` | Détails complet d'un contact | READ |
 
 ##### Emails Agent
-
 **Fichier**: `tools/emails_tools.py`
 
-| Tool                     | Description                    | Catégorie |
-|--------------------------|--------------------------------|-----------|
-| `search_emails_tool`     | Recherche Gmail (query syntax) | READ      |
-| `get_email_details_tool` | Contenu email complet          | READ      |
-| `send_email_tool`        | Envoi email (→ Draft HITL)     | WRITE     |
+| Tool | Description | Catégorie |
+|------|-------------|-----------|
+| `search_emails_tool` | Recherche Gmail (query syntax) | READ |
+| `get_email_details_tool` | Contenu email complet | READ |
+| `send_email_tool` | Envoi email (→ Draft HITL) | WRITE |
 
 ##### Calendar Agent
-
 **Fichier**: `tools/calendar_tools.py`
 
-| Tool                     | Description                          | Catégorie | HITL  |
-|--------------------------|--------------------------------------|-----------|-------|
-| `search_events_tool`     | Recherche events (query, time_range) | READ      | —     |
-| `get_event_details_tool` | Détails event complet                | READ      | —     |
-| `create_event_tool`      | Création event                       | WRITE     | Draft |
-| `update_event_tool`      | Modification event                   | WRITE     | Draft |
-| `delete_event_tool`      | Suppression event                    | WRITE     | Draft |
+| Tool | Description | Catégorie | HITL |
+|------|-------------|-----------|------|
+| `search_events_tool` | Recherche events (query, time_range) | READ | — |
+| `get_event_details_tool` | Détails event complet | READ | — |
+| `create_event_tool` | Création event | WRITE | Draft |
+| `update_event_tool` | Modification event | WRITE | Draft |
+| `delete_event_tool` | Suppression event | WRITE | Draft |
 
 ##### Drive Agent
-
 **Fichier**: `tools/drive_tools.py`
 
-| Tool                    | Description                      | Catégorie |
-|-------------------------|----------------------------------|-----------|
-| `search_files_tool`     | Recherche fichiers Drive (query) | READ      |
-| `list_files_tool`       | Liste fichiers d'un dossier      | READ      |
-| `get_file_content_tool` | Contenu/métadonnées fichier      | READ      |
+| Tool | Description | Catégorie |
+|------|-------------|-----------|
+| `search_files_tool` | Recherche fichiers Drive (query) | READ |
+| `list_files_tool` | Liste fichiers d'un dossier | READ |
+| `get_file_content_tool` | Contenu/métadonnées fichier | READ |
 
 ##### Tasks Agent
-
 **Fichier**: `tools/tasks_tools.py`
 
-| Tool                   | Description                | Catégorie | HITL  |
-|------------------------|----------------------------|-----------|-------|
-| `list_tasks_tool`      | Liste tâches d'une liste   | READ      | —     |
-| `list_task_lists_tool` | Liste des listes de tâches | READ      | —     |
-| `create_task_tool`     | Création tâche             | WRITE     | Draft |
-| `complete_task_tool`   | Marquer tâche complète     | WRITE     | —     |
+| Tool | Description | Catégorie | HITL |
+|------|-------------|-----------|------|
+| `list_tasks_tool` | Liste tâches d'une liste | READ | — |
+| `list_task_lists_tool` | Liste des listes de tâches | READ | — |
+| `create_task_tool` | Création tâche | WRITE | Draft |
+| `complete_task_tool` | Marquer tâche complète | WRITE | — |
 
 ##### Places Agent
-
 **Fichier**: `tools/places_tools.py`
 
-| Tool                     | Description                                | Catégorie |
-|--------------------------|--------------------------------------------|-----------|
-| `search_places_tool`     | Recherche lieux (query texte ou proximité) | READ      |
-| `get_place_details_tool` | Détails d'un lieu                          | READ      |
+| Tool | Description | Catégorie |
+|------|-------------|-----------|
+| `search_places_tool` | Recherche lieux (query texte ou proximité) | READ |
+| `get_place_details_tool` | Détails d'un lieu | READ |
 
 #### API Key Connectors
 
 ##### Weather Agent
-
 **Fichier**: `tools/weather_tools.py`
 **Connecteur**: OpenWeatherMap (API Key)
 
-| Tool                        | Description                   | Catégorie |
-|-----------------------------|-------------------------------|-----------|
-| `get_current_weather_tool`  | Météo actuelle (ville/coords) | READ      |
-| `get_weather_forecast_tool` | Prévisions 5 jours            | READ      |
-| `get_hourly_forecast_tool`  | Prévisions horaires           | READ      |
+| Tool | Description | Catégorie |
+|------|-------------|-----------|
+| `get_current_weather_tool` | Météo actuelle (ville/coords) | READ |
+| `get_weather_forecast_tool` | Prévisions 5 jours | READ |
+| `get_hourly_forecast_tool` | Prévisions horaires | READ |
 
 **Architecture**:
-
 ```python
 class GetCurrentWeatherTool(APIKeyConnectorTool[OpenWeatherMapClient]):
     connector_type = ConnectorType.OPENWEATHERMAP
@@ -1376,17 +1343,15 @@ class GetCurrentWeatherTool(APIKeyConnectorTool[OpenWeatherMapClient]):
 ```
 
 ##### Perplexity Agent
-
 **Fichier**: `tools/perplexity_tools.py`
 **Connecteur**: Perplexity AI (API Key)
 
-| Tool                     | Description                     | Catégorie |
-|--------------------------|---------------------------------|-----------|
-| `perplexity_search_tool` | Recherche web via Perplexity    | READ      |
-| `perplexity_ask_tool`    | Question/réponse via Perplexity | READ      |
+| Tool | Description | Catégorie |
+|------|-------------|-----------|
+| `perplexity_search_tool` | Recherche web via Perplexity | READ |
+| `perplexity_ask_tool` | Question/réponse via Perplexity | READ |
 
 **Architecture**:
-
 ```python
 class PerplexitySearchTool(APIKeyConnectorTool[PerplexityClient]):
     connector_type = ConnectorType.PERPLEXITY
@@ -1408,16 +1373,15 @@ class PerplexitySearchTool(APIKeyConnectorTool[PerplexityClient]):
 #### Public API (No Auth)
 
 ##### Wikipedia Agent
-
 **Fichier**: `tools/wikipedia_tools.py`
 **Connecteur**: Wikipedia (API publique)
 
-| Tool                         | Description                  | Catégorie |
-|------------------------------|------------------------------|-----------|
-| `search_wikipedia_tool`      | Recherche articles Wikipedia | READ      |
-| `get_wikipedia_summary_tool` | Résumé d'un article          | READ      |
-| `get_wikipedia_article_tool` | Article complet              | READ      |
-| `get_wikipedia_related_tool` | Articles connexes            | READ      |
+| Tool | Description | Catégorie |
+|------|-------------|-----------|
+| `search_wikipedia_tool` | Recherche articles Wikipedia | READ |
+| `get_wikipedia_summary_tool` | Résumé d'un article | READ |
+| `get_wikipedia_article_tool` | Article complet | READ |
+| `get_wikipedia_related_tool` | Articles connexes | READ |
 
 ### 11.7 Tool Output Standards
 
@@ -1425,9 +1389,9 @@ Tous les tools retournent `StandardToolOutput` (défini dans `tools/output.py`):
 
 ```python
 class StandardToolOutput(BaseModel):
-    summary_for_llm: str  # Résumé textuel pour LLM (compact)
+    summary_for_llm: str          # Résumé textuel pour LLM (compact)
     registry_updates: dict[str, RegistryItem]  # Items pour frontend + INTELLIA v10
-    tool_metadata: dict[str, Any]  # Stats, pagination, etc.
+    tool_metadata: dict[str, Any] # Stats, pagination, etc.
     requires_confirmation: bool = False  # Trigger draft HITL
 ```
 
@@ -1440,13 +1404,11 @@ class StandardToolOutput(BaseModel):
 class ConnectorType(str, Enum):
     MICROSOFT_OUTLOOK = "microsoft_outlook"
 
-
 # 2. Créer le client (connectors/clients/microsoft_outlook_client.py)
 class MicrosoftOutlookClient:
     def __init__(self, user_id: UUID, credentials: ConnectorCredentials, connector_service):
         self.credentials = credentials
         # ...
-
 
 # 3. Créer les tools (tools/microsoft_outlook_tools.py)
 class SearchOutlookTool(ConnectorTool[MicrosoftOutlookClient]):
@@ -1464,13 +1426,11 @@ class SearchOutlookTool(ConnectorTool[MicrosoftOutlookClient]):
 class ConnectorType(str, Enum):
     OPENAI = "openai"
 
-
 # 2. Créer le client (connectors/clients/openai_client.py)
 class OpenAIClient:
     def __init__(self, api_key: str, user_id: UUID):
         self.api_key = api_key
         self.user_id = user_id
-
 
 # 3. Créer les tools (tools/openai_tools.py)
 class OpenAICompletionTool(APIKeyConnectorTool[OpenAIClient]):
@@ -1488,48 +1448,48 @@ class OpenAICompletionTool(APIKeyConnectorTool[OpenAIClient]):
 
 ## 12. Fichiers Clés
 
-| Catégorie         | Fichier                                 | Description                               |
-|-------------------|-----------------------------------------|-------------------------------------------|
-| **Graph**         | `graph.py`                              | Définition principale graph               |
-| **State**         | `models.py`                             | MessagesState schema                      |
-| **Nodes**         | `nodes/router_node_v3.py`               | Classification intent (Architecture v3)   |
-|                   | `nodes/planner_node_v3.py`              | Génération plan LLM (SmartPlannerService) |
-|                   | `nodes/semantic_validator_node.py`      | Validation sémantique                     |
-|                   | `nodes/clarification_node.py`           | HITL clarification                        |
-|                   | `nodes/approval_gate_node.py`           | HITL approbation                          |
-|                   | `nodes/task_orchestrator_node.py`       | Dispatch parallèle                        |
-|                   | `nodes/hitl_dispatch_node.py`           | HITL interactions (Phase 8.1)             |
-|                   | `nodes/response_node.py`                | Synthèse réponse (INTELLIA v10)           |
-|                   | `nodes/routing.py`                      | Fonctions routing                         |
-| **Orchestration** | `orchestration/parallel_executor.py`    | Exécution asyncio + ToolRegistry          |
-|                   | `orchestration/plan_schemas.py`         | DSL ExecutionPlan                         |
-|                   | `orchestration/dependency_graph.py`     | Calcul waves                              |
-|                   | `orchestration/condition_evaluator.py`  | Résolution refs                           |
-| **Tools Base**    | `tools/base.py`                         | **ConnectorTool + APIKeyConnectorTool**   |
-|                   | `tools/output.py`                       | StandardToolOutput                        |
-|                   | `tools/mixins.py`                       | ToolOutputMixin                           |
-|                   | `tools/decorators.py`                   | @connector_tool                           |
-| **Tools OAuth**   | `tools/google_contacts_tools.py`        | Contacts tools                            |
-|                   | `tools/emails_tools.py`                 | Gmail tools                               |
-|                   | `tools/calendar_tools.py`               | Calendar tools                            |
-|                   | `tools/drive_tools.py`                  | Drive tools                               |
-|                   | `tools/tasks_tools.py`                  | Tasks tools                               |
-|                   | `tools/places_tools.py`                 | Places tools                              |
-| **Tools API Key** | `tools/weather_tools.py`                | Weather tools (OpenWeatherMap)            |
-|                   | `tools/perplexity_tools.py`             | Perplexity tools                          |
-| **Tools Public**  | `tools/wikipedia_tools.py`              | Wikipedia tools                           |
-| **Dependencies**  | `dependencies.py`                       | ToolDependencies + get_dependencies()     |
-| **Data Registry** | `data_registry/models.py`               | RegistryItem, RegistryItemType            |
-|                   | `data_registry/state.py`                | merge_registry reducer                    |
-| **Prompts**       | `prompts/v1/response_system_prompt.txt` | Prompt response LLM                       |
-|                   | `prompts/v1/fewshot/*.txt`              | Few-shot examples (10 domaines)           |
-|                   | `prompts/v1/prompt_loader.py`           | Chargement dynamique prompts              |
-| **Drafts**        | `drafts/models.py`                      | Draft types & lifecycle                   |
-|                   | `drafts/service.py`                     | create_*_draft functions                  |
-| **Streaming**     | `services/streaming/service.py`         | SSE formatting                            |
-| **HITL**          | `services/hitl/registry.py`             | Types interactions                        |
-| **Connectors**    | `connectors/service.py`                 | ConnectorService                          |
-|                   | `connectors/schemas.py`                 | ConnectorCredentials, APIKeyCredentials   |
+| Catégorie | Fichier | Description |
+|-----------|---------|-------------|
+| **Graph** | `graph.py` | Définition principale graph |
+| **State** | `models.py` | MessagesState schema |
+| **Nodes** | `nodes/router_node_v3.py` | Classification intent (Architecture v3) |
+| | `nodes/planner_node_v3.py` | Génération plan LLM (SmartPlannerService) |
+| | `nodes/semantic_validator_node.py` | Validation sémantique |
+| | `nodes/clarification_node.py` | HITL clarification |
+| | `nodes/approval_gate_node.py` | HITL approbation |
+| | `nodes/task_orchestrator_node.py` | Dispatch parallèle |
+| | `nodes/hitl_dispatch_node.py` | HITL interactions (Phase 8.1) |
+| | `nodes/response_node.py` | Synthèse réponse (INTELLIA v10) |
+| | `nodes/routing.py` | Fonctions routing |
+| **Orchestration** | `orchestration/parallel_executor.py` | Exécution asyncio + ToolRegistry |
+| | `orchestration/plan_schemas.py` | DSL ExecutionPlan |
+| | `orchestration/dependency_graph.py` | Calcul waves |
+| | `orchestration/condition_evaluator.py` | Résolution refs |
+| **Tools Base** | `tools/base.py` | **ConnectorTool + APIKeyConnectorTool** |
+| | `tools/output.py` | StandardToolOutput |
+| | `tools/mixins.py` | ToolOutputMixin |
+| | `tools/decorators.py` | @connector_tool |
+| **Tools OAuth** | `tools/google_contacts_tools.py` | Contacts tools |
+| | `tools/emails_tools.py` | Gmail tools |
+| | `tools/calendar_tools.py` | Calendar tools |
+| | `tools/drive_tools.py` | Drive tools |
+| | `tools/tasks_tools.py` | Tasks tools |
+| | `tools/places_tools.py` | Places tools |
+| **Tools API Key** | `tools/weather_tools.py` | Weather tools (OpenWeatherMap) |
+| | `tools/perplexity_tools.py` | Perplexity tools |
+| **Tools Public** | `tools/wikipedia_tools.py` | Wikipedia tools |
+| **Dependencies** | `dependencies.py` | ToolDependencies + get_dependencies() |
+| **Data Registry** | `data_registry/models.py` | RegistryItem, RegistryItemType |
+| | `data_registry/state.py` | merge_registry reducer |
+| **Prompts** | `prompts/v1/response_system_prompt.txt` | Prompt response LLM |
+| | `prompts/v1/fewshot/*.txt` | Few-shot examples (10 domaines) |
+| | `prompts/v1/prompt_loader.py` | Chargement dynamique prompts |
+| **Drafts** | `drafts/models.py` | Draft types & lifecycle |
+| | `drafts/service.py` | create_*_draft functions |
+| **Streaming** | `services/streaming/service.py` | SSE formatting |
+| **HITL** | `services/hitl/registry.py` | Types interactions |
+| **Connectors** | `connectors/service.py` | ConnectorService |
+| | `connectors/schemas.py` | ConnectorCredentials, APIKeyCredentials |
 
 ---
 
@@ -1538,18 +1498,15 @@ class OpenAICompletionTool(APIKeyConnectorTool[OpenAIClient]):
 **Version**: 1.1 (2025-12-06)
 **Status**: Phase B+ ✅ Production Ready | Phase E ⚠️ Partiellement Implémenté
 
-INTELLIPLANNER est un ensemble d'améliorations architecturales pour le système d'orchestration multi-agents. Il comprend
-deux composants principaux:
+INTELLIPLANNER est un ensemble d'améliorations architecturales pour le système d'orchestration multi-agents. Il comprend deux composants principaux:
 
-> **Note**: La Phase E (AdaptiveRePlanner) est partiellement implémentée. Les décisions `RETRY_SAME`, `REPLAN_MODIFIED`
-> et `REPLAN_NEW` ne sont pas encore opérationnelles (voir section 13.8).
+> **Note**: La Phase E (AdaptiveRePlanner) est partiellement implémentée. Les décisions `RETRY_SAME`, `REPLAN_MODIFIED` et `REPLAN_NEW` ne sont pas encore opérationnelles (voir section 13.8).
 
 ### 13.1 Phase B+: Flux de Données Structurées
 
 #### Problème Résolu
 
-Les templates Jinja2 comme `{{ steps.list_all_calendars.calendars }}` échouaient car seul `summary_for_llm` (texte)était
-stocké dans `completed_steps`, pas les données structurées provenant de `registry_updates`.
+Les templates Jinja2 comme `{{ steps.list_all_calendars.calendars }}` échouaient car seul `summary_for_llm` (texte) était stocké dans `completed_steps`, pas les données structurées provenant de `registry_updates`.
 
 #### Architecture du Flux
 
@@ -1567,13 +1524,13 @@ completed_steps[step_id]
 
 #### Composants Modifiés
 
-| Fichier                              | Modification                                                         |
-|--------------------------------------|----------------------------------------------------------------------|
-| `tools/output.py`                    | Ajout `structured_data`, `get_step_output()`, `REGISTRY_TYPE_TO_KEY` |
-| `orchestration/parallel_executor.py` | `StepResult.structured_data` + `_merge_single_step_result()`         |
-| `orchestration/schemas.py`           | `StepResult` export pour orchestration                               |
-| `orchestration/jinja_evaluator.py`   | `JinjaEvaluator` pour évaluation templates sécurisée                 |
-| `query_engine/models.py`             | Source "steps" acceptée dans `validate_source()`                     |
+| Fichier | Modification |
+|---------|--------------|
+| `tools/output.py` | Ajout `structured_data`, `get_step_output()`, `REGISTRY_TYPE_TO_KEY` |
+| `orchestration/parallel_executor.py` | `StepResult.structured_data` + `_merge_single_step_result()` |
+| `orchestration/schemas.py` | `StepResult` export pour orchestration |
+| `orchestration/jinja_evaluator.py` | `JinjaEvaluator` pour évaluation templates sécurisée |
+| `query_engine/models.py` | Source "steps" acceptée dans `validate_source()` |
 
 #### API: StandardToolOutput
 
@@ -1583,7 +1540,7 @@ from src.domains.agents.tools.output import StandardToolOutput, REGISTRY_TYPE_TO
 output = StandardToolOutput(
     summary_for_llm="Found 3 calendars",
     registry_updates={...},  # RegistryItems pour SSE
-    structured_data={  # NOUVEAU - Pour Jinja2
+    structured_data={        # NOUVEAU - Pour Jinja2
         "calendars": [{"id": "cal1"}, {"id": "cal2"}],
         "count": 2,
         "primary_id": "cal1",
@@ -1597,8 +1554,7 @@ step_output = output.get_step_output()
 
 #### Fallback Automatique
 
-Si `structured_data` n'est pas peuplé, `get_step_output()` extrait automatiquement les payloads depuis`registry_updates`
-groupés par type:
+Si `structured_data` n'est pas peuplé, `get_step_output()` extrait automatiquement les payloads depuis `registry_updates` groupés par type:
 
 ```python
 output = StandardToolOutput(
@@ -1624,7 +1580,7 @@ REGISTRY_TYPE_TO_KEY = {
     FILE: "files",
     CALENDAR: "calendars",
     PLACE: "places",
-    WEATHER: "weather",  # Singulier pour météo
+    WEATHER: "weather",      # Singulier pour météo
     WIKIPEDIA_ARTICLE: "articles",
     SEARCH_RESULT: "results",
     DRAFT: "drafts",
@@ -1654,37 +1610,37 @@ Handle Decision (PROCEED / RETRY / REPLAN / ESCALATE / ABORT)
 
 #### Triggers Détectés
 
-| Trigger             | Description                                              |
-|---------------------|----------------------------------------------------------|
-| `EMPTY_RESULTS`     | Tous les outils ont retourné 0 résultat                  |
-| `PARTIAL_EMPTY`     | Certains outils sans résultat (> seuil configurable)     |
-| `PARTIAL_FAILURE`   | Certains steps ont échoué avec erreurs                   |
+| Trigger | Description |
+|---------|-------------|
+| `EMPTY_RESULTS` | Tous les outils ont retourné 0 résultat |
+| `PARTIAL_EMPTY` | Certains outils sans résultat (> seuil configurable) |
+| `PARTIAL_FAILURE` | Certains steps ont échoué avec erreurs |
 | `SEMANTIC_MISMATCH` | Résultats ne correspondent pas à l'intention utilisateur |
-| `REFERENCE_ERROR`   | `$steps.X.field` n'a pas pu être résolu                  |
-| `DEPENDENCY_ERROR`  | Données de dépendance manquantes                         |
-| `TIMEOUT`           | Exécution a dépassé la limite de temps                   |
-| `NONE`              | Aucun trigger (exécution réussie)                        |
+| `REFERENCE_ERROR` | `$steps.X.field` n'a pas pu être résolu |
+| `DEPENDENCY_ERROR` | Données de dépendance manquantes |
+| `TIMEOUT` | Exécution a dépassé la limite de temps |
+| `NONE` | Aucun trigger (exécution réussie) |
 
 #### Décisions
 
-| Décision          | Signification                                |
-|-------------------|----------------------------------------------|
-| `PROCEED`         | Continuer normalement vers response_node     |
-| `RETRY_SAME`      | Réexécuter le même plan (erreur transitoire) |
-| `REPLAN_MODIFIED` | Régénérer avec paramètres modifiés           |
-| `REPLAN_NEW`      | Nouvelle stratégie complète                  |
-| `ESCALATE_USER`   | Demander clarification utilisateur           |
-| `ABORT`           | Abandonner et expliquer l'échec              |
+| Décision | Signification |
+|----------|---------------|
+| `PROCEED` | Continuer normalement vers response_node |
+| `RETRY_SAME` | Réexécuter le même plan (erreur transitoire) |
+| `REPLAN_MODIFIED` | Régénérer avec paramètres modifiés |
+| `REPLAN_NEW` | Nouvelle stratégie complète |
+| `ESCALATE_USER` | Demander clarification utilisateur |
+| `ABORT` | Abandonner et expliquer l'échec |
 
 #### Stratégies de Recovery
 
-| Stratégie            | Usage                         |
-|----------------------|-------------------------------|
-| `BROADEN_SEARCH`     | Élargir critères de recherche |
-| `ALTERNATIVE_SOURCE` | Utiliser source alternative   |
-| `REDUCE_SCOPE`       | Réduire l'étendue             |
-| `SKIP_OPTIONAL`      | Ignorer steps optionnels      |
-| `ADD_VERIFICATION`   | Ajouter step de vérification  |
+| Stratégie | Usage |
+|-----------|-------|
+| `BROADEN_SEARCH` | Élargir critères de recherche |
+| `ALTERNATIVE_SOURCE` | Utiliser source alternative |
+| `REDUCE_SCOPE` | Réduire l'étendue |
+| `SKIP_OPTIONAL` | Ignorer steps optionnels |
+| `ADD_VERIFICATION` | Ajouter step de vérification |
 
 #### API
 
@@ -1779,7 +1735,6 @@ class StepAnalysis:
     error: str | None
     execution_time_ms: int
 
-
 @dataclass
 class ExecutionAnalysis:
     """Analyse agrégée de l'exécution du plan."""
@@ -1792,7 +1747,6 @@ class ExecutionAnalysis:
     execution_time_ms: int
     step_analyses: list[StepAnalysis]
     # Propriétés: success_rate, empty_rate, is_complete_failure, is_partial_failure, is_all_empty
-
 
 @dataclass
 class RePlanContext:
@@ -1808,7 +1762,6 @@ class RePlanContext:
     previous_triggers: list[RePlanTrigger] = []
     accumulated_errors: list[str] = []
 
-
 class RePlanResult(BaseModel):
     """Résultat de l'analyse de re-planning."""
     decision: RePlanDecision
@@ -1823,20 +1776,20 @@ class RePlanResult(BaseModel):
 
 ### 13.6 Fichiers Clés
 
-| Catégorie    | Fichier                                                       | Description                                                                         |
-|--------------|---------------------------------------------------------------|-------------------------------------------------------------------------------------|
-| **Phase B+** | `tools/output.py`                                             | `StandardToolOutput.structured_data` + `get_step_output()` + `REGISTRY_TYPE_TO_KEY` |
-|              | `orchestration/parallel_executor.py`                          | `StepResult.structured_data` + `_merge_single_step_result()`                        |
-|              | `orchestration/schemas.py`                                    | `StepResult` export pour orchestration                                              |
-|              | `orchestration/jinja_evaluator.py`                            | `JinjaEvaluator` pour évaluation templates sécurisée                                |
-|              | `orchestration/query_engine/models.py`                        | Source "steps" dans `validate_source()`                                             |
-| **Phase E**  | `orchestration/adaptive_replanner.py`                         | Service complet (~900 lignes) avec enums, dataclasses, `AdaptiveRePlanner`          |
-|              | `orchestration/__init__.py`                                   | Exports publics (enums, fonctions utilitaires)                                      |
-|              | `nodes/task_orchestrator_node.py`                             | Intégration post-exécution                                                          |
-|              | `core/config/agents.py`                                       | `adaptive_replanning_*` settings                                                    |
-|              | `core/config/advanced.py`                                     | `jinja_max_recursion_depth` setting                                                 |
-| **Tests**    | `tests/agents/orchestration/test_adaptive_replanner.py`       | Tests unitaires replanner                                                           |
-|              | `tests/unit/.../test_standard_tool_output_structured_data.py` | Tests structured_data                                                               |
+| Catégorie | Fichier | Description |
+|-----------|---------|-------------|
+| **Phase B+** | `tools/output.py` | `StandardToolOutput.structured_data` + `get_step_output()` + `REGISTRY_TYPE_TO_KEY` |
+| | `orchestration/parallel_executor.py` | `StepResult.structured_data` + `_merge_single_step_result()` |
+| | `orchestration/schemas.py` | `StepResult` export pour orchestration |
+| | `orchestration/jinja_evaluator.py` | `JinjaEvaluator` pour évaluation templates sécurisée |
+| | `orchestration/query_engine/models.py` | Source "steps" dans `validate_source()` |
+| **Phase E** | `orchestration/adaptive_replanner.py` | Service complet (~900 lignes) avec enums, dataclasses, `AdaptiveRePlanner` |
+| | `orchestration/__init__.py` | Exports publics (enums, fonctions utilitaires) |
+| | `nodes/task_orchestrator_node.py` | Intégration post-exécution |
+| | `core/config/agents.py` | `adaptive_replanning_*` settings |
+| | `core/config/advanced.py` | `jinja_max_recursion_depth` setting |
+| **Tests** | `tests/agents/orchestration/test_adaptive_replanner.py` | Tests unitaires replanner |
+| | `tests/unit/.../test_standard_tool_output_structured_data.py` | Tests structured_data |
 
 ### 13.7 Backward Compatibility
 
@@ -1847,17 +1800,16 @@ class RePlanResult(BaseModel):
 
 ### 13.8 Status d'Implémentation Phase E
 
-| Décision          | Status        | Notes                                     |
-|-------------------|---------------|-------------------------------------------|
-| `PROCEED`         | ✅ Implémenté | Continue vers `response_node`             |
-| `ESCALATE_USER`   | ✅ Implémenté | Message affiché à l'utilisateur           |
-| `ABORT`           | ✅ Implémenté | Abandonne avec message explicatif         |
-| `RETRY_SAME`      | ⏳ En cours   | TODO - Requiert restructuration du graphe |
-| `REPLAN_MODIFIED` | ⏳ En cours   | TODO - Requiert appel au `planner_node`   |
-| `REPLAN_NEW`      | ⏳ En cours   | TODO - Stratégie complète nouvelle        |
+| Décision | Status | Notes |
+|----------|--------|-------|
+| `PROCEED` | ✅ Implémenté | Continue vers `response_node` |
+| `ESCALATE_USER` | ✅ Implémenté | Message affiché à l'utilisateur |
+| `ABORT` | ✅ Implémenté | Abandonne avec message explicatif |
+| `RETRY_SAME` | ⏳ En cours | TODO - Requiert restructuration du graphe |
+| `REPLAN_MODIFIED` | ⏳ En cours | TODO - Requiert appel au `planner_node` |
+| `REPLAN_NEW` | ⏳ En cours | TODO - Stratégie complète nouvelle |
 
 **Fonctionnalités opérationnelles:**
-
 - ✅ Détection de tous les triggers (EMPTY_RESULTS, PARTIAL_FAILURE, etc.)
 - ✅ Analyse des résultats d'exécution (`analyze_execution_results()`)
 - ✅ Vérification rapide (`should_trigger_replan()`)
@@ -1865,8 +1817,7 @@ class RePlanResult(BaseModel):
 - ✅ Configuration via `.env` (`ADAPTIVE_REPLANNING_*`)
 
 **Prochaines étapes:**
-Les flows `RETRY` et `REPLAN` nécessitent une restructuration du graphe LangGraph pour permettre une transition de
-`task_orchestrator_node` vers `planner_node` avec les paramètres de recovery.
+Les flows `RETRY` et `REPLAN` nécessitent une restructuration du graphe LangGraph pour permettre une transition de `task_orchestrator_node` vers `planner_node` avec les paramètres de recovery.
 
 ### 13.9 Exemples d'Accès Templates Jinja2
 
@@ -1890,32 +1841,31 @@ Une fois les tools exécutés, les données sont accessibles via `{{ steps.step_
 {{ steps.get_details.contact.name | default("Inconnu") }}
 ```
 
-**Note**: Le `JinjaEvaluator` utilise `SandboxedEnvironment` pour la sécurité et supporte la conversion automatique
-`.length` → `| length` pour compatibilité JavaScript.
+**Note**: Le `JinjaEvaluator` utilise `SandboxedEnvironment` pour la sécurité et supporte la conversion automatique `.length` → `| length` pour compatibilité JavaScript.
 
 ---
 
 ## 14. Évolution Versions
 
-| Phase                 | Feature                                         | Status |
-|-----------------------|-------------------------------------------------|--------|
-| Core                  | Routing & Response basiques                     | ✓     |
-| Phase 5               | Génération plan LLM                             | ✓     |
-| Phase 5.2B-asyncio    | Exécution parallèle asyncio                     | ✓     |
-| Phase 2 OPTIMPLAN     | Validation sémantique                           | ✓     |
-| Phase 3               | Filtrage domaines                               | ✓     |
-| Phase 8               | Approbation plan HITL                           | ✓     |
-| LOT 6                 | Draft critique HITL                             | ✓     |
-| Data Registry         | Rendu frontend riche                            | ✓     |
-| LOT 5.4               | Calendar tools                                  | ✓     |
-| LOT 9                 | Drive tools + Tasks tools                       | ✓     |
-| LOT 10                | Weather tools + Wikipedia tools                 | ✓     |
-| LOT 11                | Perplexity tools + Places tools                 | ✓     |
-| **INTELLIA v10**      | **JSON + Few-Shot Architecture**                | ✓     |
-| **INTELLIA v10.1**    | **Détection dynamique search/details**          | ✓     |
-| **v4.2**              | **APIKeyConnectorTool (Weather, Perplexity)**   | ✓     |
-| **INTELLIPLANNER B+** | **Flux données structurées (Jinja2 templates)** | ✓     |
-| **INTELLIPLANNER E**  | **Re-planning adaptatif intelligent**           | ✓     |
+| Phase | Feature | Status |
+|-------|---------|--------|
+| Core | Routing & Response basiques | ✓ |
+| Phase 5 | Génération plan LLM | ✓ |
+| Phase 5.2B-asyncio | Exécution parallèle asyncio | ✓ |
+| Phase 2 OPTIMPLAN | Validation sémantique | ✓ |
+| Phase 3 | Filtrage domaines | ✓ |
+| Phase 8 | Approbation plan HITL | ✓ |
+| LOT 6 | Draft critique HITL | ✓ |
+| Data Registry | Rendu frontend riche | ✓ |
+| LOT 5.4 | Calendar tools | ✓ |
+| LOT 9 | Drive tools + Tasks tools | ✓ |
+| LOT 10 | Weather tools + Wikipedia tools | ✓ |
+| LOT 11 | Perplexity tools + Places tools | ✓ |
+| **INTELLIA v10** | **JSON + Few-Shot Architecture** | ✓ |
+| **INTELLIA v10.1** | **Détection dynamique search/details** | ✓ |
+| **v4.2** | **APIKeyConnectorTool (Weather, Perplexity)** | ✓ |
+| **INTELLIPLANNER B+** | **Flux données structurées (Jinja2 templates)** | ✓ |
+| **INTELLIPLANNER E** | **Re-planning adaptatif intelligent** | ✓ |
 
 ---
 
@@ -1924,23 +1874,19 @@ Une fois les tools exécutés, les données sont accessibles via `{{ steps.step_
 ### v4.2 - APIKeyConnectorTool
 
 **Nouveaux fichiers/classes**:
-
 - `tools/base.py`: Ajout de `APIKeyConnectorTool[ClientType]`
 - `dependencies.py`: Ajout de `get_api_key_credentials()` dans `ConcurrencySafeConnectorService`
 
 **Outils migrés**:
-
 - `weather_tools.py`: Utilise maintenant `APIKeyConnectorTool` au lieu d'un singleton global
 - `perplexity_tools.py`: Idem
 
 **Avantages**:
-
 - **Clés per-user**: Chaque utilisateur utilise sa propre clé API (pas de clé partagée)
 - **Sécurité**: Clés stockées chiffrées en DB (Fernet)
 - **Maintenabilité**: Architecture générique pour futurs connecteurs API Key
 
 **Breaking changes**: Aucun pour les utilisateurs finaux. Les tests doivent utiliser le pattern:
-
 ```python
 with patch("src.domains.agents.tools.base.get_dependencies", return_value=mock_deps):
     result = await tool.execute(runtime, **kwargs)
@@ -1949,12 +1895,10 @@ with patch("src.domains.agents.tools.base.get_dependencies", return_value=mock_d
 ### INTELLIA v10/v10.1
 
 **Code supprimé**:
-
 - `data_registry/formatters.py` - FormatterRegistry et BaseRegistryFormatter
 - `data_registry/formatters_impl.py` - Toutes les implémentations de formatters
 
 **Fonctions supprimées de response_node.py**:
-
 - `_is_contacts_result_data()` - Détection par structure
 - `_is_emails_result_data()` - Détection par structure
 - `_format_unknown_type()` - Formatage Markdown fallback
@@ -1962,21 +1906,18 @@ with patch("src.domains.agents.tools.base.get_dependencies", return_value=mock_d
 - `_detect_result_domains()` - Remplacé par `_detect_result_domains_from_registry()`
 
 **Nouveau flux**:
-
 1. Les données passent par le Data Registry (inchangé)
 2. `_format_registry_mode_results()` génère des blocs JSON
 3. `load_fewshot_examples()` charge les exemples pertinents
 4. Le LLM formate les données en Markdown conversationnel
 
 **Avantages**:
-
 - **Formatage contextuel**: Le LLM adapte le format à la conversation
 - **Maintenance simplifiée**: Un seul point de formatage (few-shots)
 - **Extensibilité**: Ajouter un domaine = ajouter un fichier few-shot
 - **Cohérence**: Tous les domaines utilisent le même pattern
 
 **Nouveautés v10.1**:
-
 - `_detect_action_from_items()` - Détection automatique search vs details
 - Fichiers few-shot `*_details.txt` pour contacts, emails, calendar, tasks, places
 - `_detect_domain_operations()` retourne maintenant des tuples `(domain, action)` dynamiques
@@ -1986,7 +1927,6 @@ with patch("src.domains.agents.tools.base.get_dependencies", return_value=mock_d
 **Phase B+ - Flux de Données Structurées**:
 
 **Nouvelles API**:
-
 ```python
 # tools/output.py
 StandardToolOutput.structured_data  # Dict pour Jinja2
@@ -1999,19 +1939,16 @@ ToolExecutionResult.structured_data  # Résultat intermédiaire
 ```
 
 **Comportement modifié**:
-
 - `completed_steps[step_id]` contient maintenant `structured_data` (dict) au lieu de `summary_for_llm` (str)
 - Templates Jinja2 `{{ steps.X.field }}` fonctionnent avec les données complètes
 
 **Backward Compatibility**:
-
 - Tools sans `structured_data` → fallback automatique depuis `registry_updates`
 - Tools legacy retournant `str` → comportement inchangé
 
 **Phase E - AdaptiveRePlanner**:
 
 **Nouveaux modules**:
-
 ```python
 # orchestration/adaptive_replanner.py
 AdaptiveRePlanner  # Service principal
@@ -2026,14 +1963,12 @@ should_trigger_replan()  # Quick check
 ```
 
 **Configuration**:
-
 ```env
 ADAPTIVE_REPLANNING_MAX_ATTEMPTS=3
 ADAPTIVE_REPLANNING_EMPTY_THRESHOLD=0.8
 ```
 
 **Métriques Prometheus** (4 nouvelles):
-
 - `adaptive_replanner_triggers_total{trigger}`
 - `adaptive_replanner_decisions_total{decision}`
 - `adaptive_replanner_attempts_total{attempt_number}`
