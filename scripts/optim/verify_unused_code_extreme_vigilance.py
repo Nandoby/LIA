@@ -115,13 +115,10 @@ class ExtremeVigilanceChecker:
             # Check 10 lines before function definition
             lines = self.file_content.split("\n")
             for i, line in enumerate(lines):
-                if (
-                    f"def {self.function_name}(" in line
-                    or f"async def {self.function_name}(" in line
-                ):
+                if f"def {self.function_name}(" in line or f"async def {self.function_name}(" in line:
                     # Check previous 10 lines for route decorator
                     start = max(0, i - 10)
-                    context = "\n".join(lines[start : i + 1])
+                    context = "\n".join(lines[start:i+1])
                     if re.search(pattern, context):
                         self.reasons_to_keep.append(f"FastAPI route: {pattern}")
                         return
@@ -132,9 +129,7 @@ class ExtremeVigilanceChecker:
             if self.function_name in pattern or re.search(pattern, self.file_content):
                 # Check if function name appears in Depends()
                 if f"Depends({self.function_name})" in self.file_content:
-                    self.reasons_to_keep.append(
-                        f"FastAPI dependency: Depends({self.function_name})"
-                    )
+                    self.reasons_to_keep.append(f"FastAPI dependency: Depends({self.function_name})")
                     return
 
     def _check_middleware(self):
@@ -148,9 +143,7 @@ class ExtremeVigilanceChecker:
     def _check_callback(self):
         """Check if function is a callback (LangChain, etc.)."""
         for pattern in SAFEGUARD_PATTERNS["callbacks"]:
-            if re.search(pattern, self.function_name) or re.search(
-                pattern, self.file_content
-            ):
+            if re.search(pattern, self.function_name) or re.search(pattern, self.file_content):
                 if "on_" in self.function_name or "Handler" in self.file_path:
                     self.reasons_to_keep.append(f"Callback function: {pattern}")
                     return
@@ -166,10 +159,7 @@ class ExtremeVigilanceChecker:
             # Check lines before function definition
             lines = self.file_content.split("\n")
             for i, line in enumerate(lines):
-                if (
-                    f"def {self.function_name}(" in line
-                    or f"async def {self.function_name}(" in line
-                ):
+                if f"def {self.function_name}(" in line or f"async def {self.function_name}(" in line:
                     # Check previous 5 lines for decorators
                     start = max(0, i - 5)
                     context = "\n".join(lines[start:i])
@@ -188,10 +178,7 @@ class ExtremeVigilanceChecker:
                 content = test_file.read_text(encoding="utf-8")
                 if self.function_name in content:
                     # Check if it's actually calling the function (not just a string)
-                    if (
-                        f"{self.function_name}(" in content
-                        or f".{self.function_name}" in content
-                    ):
+                    if f"{self.function_name}(" in content or f".{self.function_name}" in content:
                         self.reasons_to_keep.append(f"Used in test: {test_file.name}")
                         return
             except:
@@ -201,9 +188,7 @@ class ExtremeVigilanceChecker:
         """Check if function might be imported dynamically."""
         # Check if file has dynamic imports
         if "importlib" in self.file_content or "__import__" in self.file_content:
-            self.reasons_to_keep.append(
-                "File has dynamic imports - may be used dynamically"
-            )
+            self.reasons_to_keep.append("File has dynamic imports - may be used dynamically")
 
 
 def analyze_unused_code_with_extreme_vigilance():
@@ -214,9 +199,7 @@ def analyze_unused_code_with_extreme_vigilance():
         Dict with categorized results
     """
     # Read unused code report
-    unused_code_path = (
-        Path(__file__).parent.parent.parent / "docs" / "optim" / "02_UNUSED_CODE.md"
-    )
+    unused_code_path = Path(__file__).parent.parent.parent / "docs" / "optim" / "02_UNUSED_CODE.md"
 
     if not unused_code_path.exists():
         print(f"ERROR: {unused_code_path} not found")
@@ -275,7 +258,8 @@ def analyze_unused_code_with_extreme_vigilance():
 
         # Run extreme vigilance check
         checker = ExtremeVigilanceChecker(
-            function_name.replace("()", ""), file_path.replace("\\", "/")
+            function_name.replace("()", ""),
+            file_path.replace("\\", "/")
         )
         is_safe, reasons = checker.check()
 
@@ -283,41 +267,25 @@ def analyze_unused_code_with_extreme_vigilance():
         if not is_safe:
             for reason in reasons:
                 if "FastAPI route" in reason:
-                    results["KEEP - FastAPI route"].append(
-                        (function_name, location, reason)
-                    )
+                    results["KEEP - FastAPI route"].append((function_name, location, reason))
                 elif "FastAPI dependency" in reason:
-                    results["KEEP - FastAPI dependency"].append(
-                        (function_name, location, reason)
-                    )
+                    results["KEEP - FastAPI dependency"].append((function_name, location, reason))
                 elif "Middleware" in reason:
-                    results["KEEP - Middleware"].append(
-                        (function_name, location, reason)
-                    )
+                    results["KEEP - Middleware"].append((function_name, location, reason))
                 elif "Callback" in reason:
                     results["KEEP - Callback"].append((function_name, location, reason))
                 elif "Magic method" in reason:
-                    results["KEEP - Magic method"].append(
-                        (function_name, location, reason)
-                    )
+                    results["KEEP - Magic method"].append((function_name, location, reason))
                 elif "decorator" in reason:
-                    results["KEEP - Decorator"].append(
-                        (function_name, location, reason)
-                    )
+                    results["KEEP - Decorator"].append((function_name, location, reason))
                 elif "test" in reason:
-                    results["KEEP - Test usage"].append(
-                        (function_name, location, reason)
-                    )
+                    results["KEEP - Test usage"].append((function_name, location, reason))
                 elif "dynamic" in reason:
-                    results["KEEP - Dynamic import"].append(
-                        (function_name, location, reason)
-                    )
+                    results["KEEP - Dynamic import"].append((function_name, location, reason))
                 break  # Only need first reason
         else:
             # Still require manual review for "safe" items
-            results["MAYBE SAFE - Manual review required"].append(
-                (function_name, location, confidence)
-            )
+            results["MAYBE SAFE - Manual review required"].append((function_name, location, confidence))
 
     return results
 
@@ -338,19 +306,13 @@ def generate_report(results: Dict):
         if category.startswith("KEEP"):
             total_keep += len(items)
 
-    report.append("**Total analyzed** : 152 functions\n")
+    report.append(f"**Total analyzed** : 152 functions\n")
     report.append(f"**KEEP (safeguarded)** : {total_keep}\n")
-    report.append(
-        f"**MAYBE SAFE (manual review)** : {len(results.get('MAYBE SAFE - Manual review required', []))}\n"
-    )
-    report.append(
-        f"**SAFE (can delete)** : {len(results.get('SAFE - Can delete', []))}\n"
-    )
+    report.append(f"**MAYBE SAFE (manual review)** : {len(results.get('MAYBE SAFE - Manual review required', []))}\n")
+    report.append(f"**SAFE (can delete)** : {len(results.get('SAFE - Can delete', []))}\n")
     report.append("\n")
 
-    report.append(
-        "**Recommendation** : 🔴 **DO NOT DELETE ANY CODE** without manual review\n"
-    )
+    report.append("**Recommendation** : 🔴 **DO NOT DELETE ANY CODE** without manual review\n")
     report.append("\n---\n")
 
     # Detail each category
@@ -395,12 +357,7 @@ def main():
 
         # Generate report
         report = generate_report(results)
-        output_path = (
-            Path(__file__).parent.parent.parent
-            / "docs"
-            / "optim"
-            / "UNUSED_CODE_EXTREME_VIGILANCE.md"
-        )
+        output_path = Path(__file__).parent.parent.parent / "docs" / "optim" / "UNUSED_CODE_EXTREME_VIGILANCE.md"
         output_path.write_text(report, encoding="utf-8")
         print()
         print(f"Report saved to: {output_path}")

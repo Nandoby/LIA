@@ -134,18 +134,8 @@ async def _check_user_health(user_id: str):
         if health.connectors:
             typer.echo("\n📋 Connectors:")
             for c in health.connectors:
-                emoji = (
-                    "🟢"
-                    if c.severity == "info"
-                    else "🟡"
-                    if c.severity == "warning"
-                    else "🔴"
-                )
-                expires = (
-                    f" (expires in {c.expires_in_minutes} min)"
-                    if c.expires_in_minutes
-                    else ""
-                )
+                emoji = "🟢" if c.severity == "info" else "🟡" if c.severity == "warning" else "🔴"
+                expires = f" (expires in {c.expires_in_minutes} min)" if c.expires_in_minutes else ""
                 typer.echo(f"   {emoji} {c.display_name}: {c.health_status}{expires}")
 
 

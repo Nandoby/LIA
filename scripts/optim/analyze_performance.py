@@ -62,15 +62,13 @@ def analyze_nested_loops():
             def visit_For(self, node):
                 if self.in_loop:
                     # Nested loop detected
-                    findings.append(
-                        {
-                            "item": f"Nested loop in {py_file.name}",
-                            "location": f"{py_file.relative_to(SRC_ROOT)}:{node.lineno}",
-                            "confidence": "medium",
-                            "reason": "Nested for loop (potential O(n²))",
-                            "details": f"Outer loop at line {self.loop_line}",
-                        }
-                    )
+                    findings.append({
+                        'item': f"Nested loop in {py_file.name}",
+                        'location': f"{py_file.relative_to(SRC_ROOT)}:{node.lineno}",
+                        'confidence': 'medium',
+                        'reason': 'Nested for loop (potential O(n²))',
+                        'details': f'Outer loop at line {self.loop_line}'
+                    })
 
                 # Continue traversal
                 old_in_loop = self.in_loop
@@ -84,15 +82,13 @@ def analyze_nested_loops():
             def visit_While(self, node):
                 # Same logic for while loops
                 if self.in_loop:
-                    findings.append(
-                        {
-                            "item": f"Nested loop in {py_file.name}",
-                            "location": f"{py_file.relative_to(SRC_ROOT)}:{node.lineno}",
-                            "confidence": "medium",
-                            "reason": "Nested while loop (potential O(n²))",
-                            "details": f"Outer loop at line {self.loop_line}",
-                        }
-                    )
+                    findings.append({
+                        'item': f"Nested loop in {py_file.name}",
+                        'location': f"{py_file.relative_to(SRC_ROOT)}:{node.lineno}",
+                        'confidence': 'medium',
+                        'reason': 'Nested while loop (potential O(n²))',
+                        'details': f'Outer loop at line {self.loop_line}'
+                    })
 
                 old_in_loop = self.in_loop
                 old_loop_line = self.loop_line
@@ -115,11 +111,11 @@ def analyze_sync_in_async():
 
     # Patterns to detect
     blocking_patterns = [
-        ("requests.get", "Use httpx.AsyncClient instead"),
-        ("requests.post", "Use httpx.AsyncClient instead"),
-        ("requests.put", "Use httpx.AsyncClient instead"),
-        ("time.sleep", "Use asyncio.sleep instead"),
-        ("open(", "Use aiofiles instead (for async I/O)"),
+        ('requests.get', 'Use httpx.AsyncClient instead'),
+        ('requests.post', 'Use httpx.AsyncClient instead'),
+        ('requests.put', 'Use httpx.AsyncClient instead'),
+        ('time.sleep', 'Use asyncio.sleep instead'),
+        ('open(', 'Use aiofiles instead (for async I/O)'),
     ]
 
     findings = []
@@ -128,29 +124,27 @@ def analyze_sync_in_async():
         results = grep_in_directory(
             pattern,
             SRC_ROOT,
-            extensions=[".py"],
+            extensions=['.py'],
             exclude_dirs=EXCLUDE_DIRS,
-            regex=False,
+            regex=False
         )
 
         # Check if in async function
         for result in results:
-            file_path = SRC_ROOT / result["file"]
+            file_path = SRC_ROOT / result['file']
             tree = parse_file(file_path)
             if not tree:
                 continue
 
             # Check if line is inside async function
-            if _is_in_async_function(tree, result["line"]):
-                findings.append(
-                    {
-                        "item": f"Blocking call: {pattern}",
-                        "location": f"{result['file']}:{result['line']}",
-                        "confidence": "high",
-                        "reason": "Blocking call in async function",
-                        "details": f"Suggestion: {suggestion}",
-                    }
-                )
+            if _is_in_async_function(tree, result['line']):
+                findings.append({
+                    'item': f"Blocking call: {pattern}",
+                    'location': f"{result['file']}:{result['line']}",
+                    'confidence': 'high',
+                    'reason': f'Blocking call in async function',
+                    'details': f'Suggestion: {suggestion}'
+                })
 
     print(f"   Found {len(findings)} blocking calls in async functions")
     return findings
@@ -158,7 +152,6 @@ def analyze_sync_in_async():
 
 def _is_in_async_function(tree, line_num):
     """Check if line is inside async function."""
-
     class AsyncFunctionChecker(ast.NodeVisitor):
         def __init__(self):
             self.in_async = False
@@ -166,9 +159,7 @@ def _is_in_async_function(tree, line_num):
 
         def visit_AsyncFunctionDef(self, node):
             # Get line range of async function
-            end_line = (
-                node.end_lineno if hasattr(node, "end_lineno") else node.lineno + 100
-            )
+            end_line = node.end_lineno if hasattr(node, 'end_lineno') else node.lineno + 100
             self.async_ranges.append((node.lineno, end_line))
             self.generic_visit(node)
 
@@ -186,7 +177,10 @@ def check_radon_available():
     """Check if radon is installed."""
     try:
         result = subprocess.run(
-            ["radon", "--version"], capture_output=True, text=True, timeout=5
+            ['radon', '--version'],
+            capture_output=True,
+            text=True,
+            timeout=5
         )
         return result.returncode == 0
     except (FileNotFoundError, subprocess.TimeoutExpired):
@@ -201,22 +195,22 @@ def analyze_performance():
 
     all_findings = []
     stats = {
-        "nested_loops": 0,
-        "blocking_calls": 0,
-        "total": 0,
+        'nested_loops': 0,
+        'blocking_calls': 0,
+        'total': 0,
     }
 
     # 1. Nested loops
     nested_loop_findings = analyze_nested_loops()
     all_findings.extend(nested_loop_findings)
-    stats["nested_loops"] = len(nested_loop_findings)
+    stats['nested_loops'] = len(nested_loop_findings)
 
     # 2. Blocking calls in async
     blocking_findings = analyze_sync_in_async()
     all_findings.extend(blocking_findings)
-    stats["blocking_calls"] = len(blocking_findings)
+    stats['blocking_calls'] = len(blocking_findings)
 
-    stats["total"] = len(all_findings)
+    stats['total'] = len(all_findings)
 
     # 3. Complexity analysis (if radon available)
     if check_radon_available():
@@ -227,7 +221,7 @@ def analyze_performance():
         print("   Install: pip install radon")
         print("   For complexity metrics: radon cc apps/api/src -a -s")
 
-    print("\n[SUMMARY] Summary:")
+    print(f"\n[SUMMARY] Summary:")
     print(f"   Nested loops: {stats['nested_loops']}")
     print(f"   Blocking calls in async: {stats['blocking_calls']}")
     print(f"   Total findings: {stats['total']}")
@@ -391,7 +385,7 @@ print(f"Improvement: {{improvement:.1f}}%")
 - Always benchmark before/after
 - Premature optimization is the root of all evil (profile first!)
 - Verify tests after each optimization
-""",
+"""
     }
 
     generate_finding_report(
@@ -399,7 +393,7 @@ print(f"Improvement: {{improvement:.1f}}%")
         findings=findings,
         output_path=OUTPUT_FILE,
         script_name="analyze_performance.py",
-        additional_sections=additional_sections,
+        additional_sections=additional_sections
     )
 
 
@@ -413,7 +407,7 @@ if __name__ == "__main__":
         findings, stats = analyze_performance()
         generate_report(findings, stats)
 
-        print("\n[OK] Analysis complete!")
+        print(f"\n[OK] Analysis complete!")
         print(f"   Report: {OUTPUT_FILE}")
         print(f"   Findings: {len(findings)}")
         print(f"\n[NEXT] Next: Review findings manually in {OUTPUT_FILE}")
@@ -424,6 +418,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\n[ERROR] Error during analysis: {e}")
         import traceback
-
         traceback.print_exc()
         sys.exit(1)

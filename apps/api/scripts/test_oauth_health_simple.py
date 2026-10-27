@@ -11,7 +11,6 @@ Usage (from api container):
 import asyncio
 import sys
 from datetime import UTC, datetime, timedelta
-from uuid import UUID
 
 
 def init_app():
@@ -33,10 +32,10 @@ async def modify_connector_expiration(connector_id: str, minutes_until_expiry: i
         # Use raw SQL to avoid ORM relationship issues
         result = await session.execute(
             text("""
-                 SELECT id, connector_type, credentials_encrypted
-                 FROM connectors
-                 WHERE id = :connector_id
-                 """),
+                SELECT id, connector_type, credentials_encrypted
+                FROM connectors
+                WHERE id = :connector_id
+            """),
             {"connector_id": connector_id},
         )
         row = result.fetchone()
@@ -67,10 +66,10 @@ async def modify_connector_expiration(connector_id: str, minutes_until_expiry: i
 
         await session.execute(
             text("""
-                 UPDATE connectors
-                 SET credentials_encrypted = :credentials
-                 WHERE id = :connector_id
-                 """),
+                UPDATE connectors
+                SET credentials_encrypted = :credentials
+                WHERE id = :connector_id
+            """),
             {"credentials": new_encrypted, "connector_id": connector_id},
         )
         await session.commit()
@@ -82,7 +81,7 @@ async def modify_connector_expiration(connector_id: str, minutes_until_expiry: i
         else:
             status = "HEALTHY"
 
-        print("✅ Connector modified")
+        print(f"✅ Connector modified")
         print(f"   Old expires_at: {old_expires}")
         print(f"   New expires_at: {new_expires_at}")
         print(f"   Expected status: {status}")
@@ -92,9 +91,7 @@ async def modify_connector_expiration(connector_id: str, minutes_until_expiry: i
 def main():
     if len(sys.argv) < 3:
         print("Usage:")
-        print(
-            "  python scripts/test_oauth_health_simple.py simulate-warning <connector_id> [minutes]"
-        )
+        print("  python scripts/test_oauth_health_simple.py simulate-warning <connector_id> [minutes]")
         print("  python scripts/test_oauth_health_simple.py simulate-critical <connector_id>")
         print("  python scripts/test_oauth_health_simple.py restore <connector_id>")
         sys.exit(1)

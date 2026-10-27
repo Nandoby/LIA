@@ -16,7 +16,7 @@ import argparse
 import asyncio
 import sys
 import uuid
-from datetime import UTC, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 # Add project root to path
@@ -29,7 +29,7 @@ from src.core.security import get_password_hash
 from src.infrastructure.database.session import AsyncSessionLocal
 
 DEFAULT_EMAIL = "admin@example.com"
-DEFAULT_PASSWORD = "admin123"
+DEFAULT_ADMIN_PASS = "admin123"
 DEFAULT_NAME = "Admin User"
 
 
@@ -57,18 +57,18 @@ async def create_admin(email: str, password: str, full_name: str) -> None:
                     {"id": user_id},
                 )
                 await session.commit()
-                print("  → Promoted to superuser.")
+                print(f"  → Promoted to superuser.")
             else:
-                print("  → No changes needed.")
+                print(f"  → No changes needed.")
             return
 
         # Create admin user via raw SQL
-        now = datetime.now(UTC)
+        now = datetime.now(timezone.utc)
         await session.execute(
             text("""
-                 INSERT INTO users (id, email, hashed_password, full_name, is_active, is_verified, is_superuser, created_at, updated_at)
-                 VALUES (:id, :email, :hashed_password, :full_name, true, true, true, :now, :now)
-                 """),
+                INSERT INTO users (id, email, hashed_password, full_name, is_active, is_verified, is_superuser, created_at, updated_at)
+                VALUES (:id, :email, :hashed_password, :full_name, true, true, true, :now, :now)
+            """),
             {
                 "id": str(uuid.uuid4()),
                 "email": email,
@@ -79,12 +79,12 @@ async def create_admin(email: str, password: str, full_name: str) -> None:
         )
         await session.commit()
 
-        print("\n✅ Admin user created successfully!")
+        print(f"\n✅ Admin user created successfully!")
         print(f"   Email:    {email}")
-        print(f"   Password: {password}")
+        print(f"   Password: {'*' * len(password)}")
         print(f"   Name:     {full_name}")
-        print("\n   You can now log in at the application's login page.")
-        print("   ⚠ Change the default password after first login!")
+        print(f"\n   You can now log in at the application's login page.")
+        print(f"   ⚠ Change the default password after first login!")
 
 
 def parse_args() -> argparse.Namespace:
@@ -96,8 +96,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--password",
-        default=DEFAULT_PASSWORD,
-        help=f"Admin password (default: {DEFAULT_PASSWORD})",
+        default=DEFAULT_ADMIN_PASS,
+        help=f"Admin password (default: {DEFAULT_ADMIN_PASS})",
     )
     parser.add_argument(
         "--name",

@@ -20,7 +20,7 @@ def grep_in_directory(
     extensions: List[str] = [".py"],
     exclude_dirs: Optional[List[str]] = None,
     case_sensitive: bool = True,
-    regex: bool = False,
+    regex: bool = False
 ) -> List[Dict[str, Any]]:
     """
     Generic grep with filtering.
@@ -48,13 +48,7 @@ def grep_in_directory(
         >>> print(f"Found {len(results)} matches")
     """
     if exclude_dirs is None:
-        exclude_dirs = [
-            "__pycache__",
-            ".venv",
-            ".git",
-            "alembic/versions",
-            "node_modules",
-        ]
+        exclude_dirs = ["__pycache__", ".venv", ".git", "alembic/versions", "node_modules"]
 
     # Compile regex pattern
     flags = 0 if case_sensitive else re.IGNORECASE
@@ -94,19 +88,17 @@ def grep_in_directory(
 
         # Search in file
         try:
-            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                 for line_num, line in enumerate(f, start=1):
                     matches = pattern_re.finditer(line)
                     for match in matches:
-                        results.append(
-                            {
-                                "file": str(file_path.relative_to(directory)),
-                                "line": line_num,
-                                "col": match.start() + 1,
-                                "match": match.group(),
-                                "context": line.rstrip(),
-                            }
-                        )
+                        results.append({
+                            'file': str(file_path.relative_to(directory)),
+                            'line': line_num,
+                            'col': match.start() + 1,
+                            'match': match.group(),
+                            'context': line.rstrip()
+                        })
         except Exception as e:
             print(f"[WARN] Failed to read {file_path}: {e}")
             continue
@@ -119,7 +111,7 @@ def count_occurrences(
     directory: Path,
     extensions: List[str] = [".py"],
     exclude_dirs: Optional[List[str]] = None,
-    case_sensitive: bool = True,
+    case_sensitive: bool = True
 ) -> int:
     """
     Count pattern occurrences in directory.
@@ -145,7 +137,9 @@ def count_occurrences(
 
 
 def find_files_importing(
-    module_name: str, directory: Path, exclude_dirs: Optional[List[str]] = None
+    module_name: str,
+    directory: Path,
+    exclude_dirs: Optional[List[str]] = None
 ) -> List[Path]:
     """
     Find all files importing a module.
@@ -176,25 +170,25 @@ def find_files_importing(
     pattern1 = f"^import\\s+{re.escape(module_name)}\\b"
     results1 = grep_in_directory(pattern1, directory, [".py"], exclude_dirs, regex=True)
     for result in results1:
-        importing_files.add(Path(directory) / result["file"])
+        importing_files.add(Path(directory) / result['file'])
 
     # Pattern 2: from module_name import ...
     pattern2 = f"^from\\s+{re.escape(module_name)}\\s+import"
     results2 = grep_in_directory(pattern2, directory, [".py"], exclude_dirs, regex=True)
     for result in results2:
-        importing_files.add(Path(directory) / result["file"])
+        importing_files.add(Path(directory) / result['file'])
 
     # Pattern 3: from parent.module_name import ...
     pattern3 = f"^from\\s+\\S*\\.{re.escape(module_name)}\\s+import"
     results3 = grep_in_directory(pattern3, directory, [".py"], exclude_dirs, regex=True)
     for result in results3:
-        importing_files.add(Path(directory) / result["file"])
+        importing_files.add(Path(directory) / result['file'])
 
     # Pattern 4: from .module_name import ... (relative imports)
     pattern4 = f"^from\\s+\\.+{re.escape(module_name)}\\s+import"
     results4 = grep_in_directory(pattern4, directory, [".py"], exclude_dirs, regex=True)
     for result in results4:
-        importing_files.add(Path(directory) / result["file"])
+        importing_files.add(Path(directory) / result['file'])
 
     return sorted(list(importing_files))
 
@@ -203,7 +197,7 @@ def find_function_usages(
     function_name: str,
     directory: Path,
     exclude_definition: bool = True,
-    exclude_dirs: Optional[List[str]] = None,
+    exclude_dirs: Optional[List[str]] = None
 ) -> List[Dict[str, Any]]:
     """
     Find all usages of a function.
@@ -231,8 +225,8 @@ def find_function_usages(
         # def function_name( or async def function_name(
         filtered_results = []
         for result in results:
-            context = result["context"].strip()
-            if not (context.startswith("def ") or context.startswith("async def ")):
+            context = result['context'].strip()
+            if not (context.startswith('def ') or context.startswith('async def ')):
                 filtered_results.append(result)
         return filtered_results
 
@@ -244,7 +238,7 @@ def find_files_with_pattern(
     directory: Path,
     extensions: List[str] = [".py"],
     exclude_dirs: Optional[List[str]] = None,
-    regex: bool = False,
+    regex: bool = False
 ) -> List[Path]:
     """
     Find files containing a pattern.
@@ -263,14 +257,12 @@ def find_files_with_pattern(
         >>> files = find_files_with_pattern("TODO", Path("src"))
         >>> print(f"{len(files)} files have TODOs")
     """
-    results = grep_in_directory(
-        pattern, directory, extensions, exclude_dirs, regex=regex
-    )
+    results = grep_in_directory(pattern, directory, extensions, exclude_dirs, regex=regex)
 
     # Get unique files
     files = set()
     for result in results:
-        files.add(Path(directory) / result["file"])
+        files.add(Path(directory) / result['file'])
 
     return sorted(list(files))
 
@@ -279,7 +271,7 @@ def grep_files(
     pattern: str,
     file_paths: List[Path],
     case_sensitive: bool = True,
-    regex: bool = False,
+    regex: bool = False
 ) -> List[Dict[str, Any]]:
     """
     Grep in specific files (not recursive).
@@ -315,19 +307,17 @@ def grep_files(
             continue
 
         try:
-            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                 for line_num, line in enumerate(f, start=1):
                     matches = pattern_re.finditer(line)
                     for match in matches:
-                        results.append(
-                            {
-                                "file": str(file_path),
-                                "line": line_num,
-                                "col": match.start() + 1,
-                                "match": match.group(),
-                                "context": line.rstrip(),
-                            }
-                        )
+                        results.append({
+                            'file': str(file_path),
+                            'line': line_num,
+                            'col': match.start() + 1,
+                            'match': match.group(),
+                            'context': line.rstrip()
+                        })
         except Exception as e:
             print(f"[WARN] Failed to read {file_path}: {e}")
             continue
@@ -356,14 +346,14 @@ def extract_module_name_from_path(file_path: Path, src_root: Path) -> str:
         rel_path = file_path.relative_to(src_root)
 
         # Remove .py extension
-        if rel_path.suffix == ".py":
-            rel_path = rel_path.with_suffix("")
+        if rel_path.suffix == '.py':
+            rel_path = rel_path.with_suffix('')
 
         # Convert path separators to dots
-        module_name = str(rel_path).replace("\\", ".").replace("/", ".")
+        module_name = str(rel_path).replace('\\', '.').replace('/', '.')
 
         # Remove __init__ if present
-        if module_name.endswith(".__init__"):
+        if module_name.endswith('.__init__'):
             module_name = module_name[:-9]
 
         return module_name
@@ -386,9 +376,7 @@ if __name__ == "__main__":
 
             print(f"\n[OK] Found {len(results)} matches")
             for result in results[:10]:  # Show first 10
-                print(
-                    f"   {result['file']}:{result['line']} - {result['context'][:60]}"
-                )
+                print(f"   {result['file']}:{result['line']} - {result['context'][:60]}")
 
             if len(results) > 10:
                 print(f"   ... and {len(results) - 10} more")
