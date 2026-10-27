@@ -1,7 +1,15 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Blocks, Download, Languages, Pencil, RotateCcw, Trash2, Upload } from 'lucide-react';
+import {
+  Blocks,
+  Download,
+  Languages,
+  Pencil,
+  RotateCcw,
+  Trash2,
+  Upload,
+} from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -38,7 +46,7 @@ interface AdminSkillsSectionProps {
 export function AdminSkillsSection({ lng }: AdminSkillsSectionProps) {
   const { t } = useTranslation(lng);
   const {
-    skills,
+    skills: allSkills,
     loading,
     error,
     refetch,
@@ -46,14 +54,14 @@ export function AdminSkillsSection({ lng }: AdminSkillsSectionProps) {
     reloading,
     importAdminSkill,
     deleteAdminSkill,
-    toggleSkill,
-    toggling,
+    adminSystemToggleSkill,
+    togglingSystem,
     translateSkillDescription,
     translating,
     updateAdminSkillDescription,
     updatingDescription,
     downloadSkill,
-  } = useSkills();
+  } = useSkills(true);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
@@ -65,7 +73,7 @@ export function AdminSkillsSection({ lng }: AdminSkillsSectionProps) {
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
   const [editDescription, setEditDescription] = useState('');
 
-  const adminSkills = skills.filter(s => s.scope === 'admin');
+  const adminSkills = allSkills.filter((s) => s.scope === 'admin');
 
   const handleReload = async () => {
     try {
@@ -80,10 +88,10 @@ export function AdminSkillsSection({ lng }: AdminSkillsSectionProps) {
 
   const handleToggle = async (skill: Skill) => {
     try {
-      const result = await toggleSkill(skill.name);
+      const result = await adminSystemToggleSkill(skill.name);
       if (result) {
         toast.success(
-          result.enabled_for_user
+          result.admin_enabled
             ? t('settings.skills.enabled_toast', { name: skill.name })
             : t('settings.skills.disabled_toast', { name: skill.name })
         );
@@ -229,7 +237,9 @@ export function AdminSkillsSection({ lng }: AdminSkillsSectionProps) {
       {/* Error */}
       {!loading && error && (
         <div className="flex items-center gap-3 py-4">
-          <p className="text-sm text-muted-foreground">{t('settings.skills.load_error')}</p>
+          <p className="text-sm text-muted-foreground">
+            {t('settings.skills.load_error')}
+          </p>
           <button
             type="button"
             onClick={() => refetch()}
@@ -251,8 +261,11 @@ export function AdminSkillsSection({ lng }: AdminSkillsSectionProps) {
       {/* Skill cards */}
       {!loading && !error && adminSkills.length > 0 && (
         <div className="space-y-3">
-          {adminSkills.map(skill => (
-            <div key={skill.name} className="rounded-lg border bg-card p-4 space-y-2 group">
+          {adminSkills.map((skill) => (
+            <div
+              key={skill.name}
+              className="rounded-lg border bg-card p-4 space-y-2 group"
+            >
               <div className="flex items-center justify-between gap-2">
                 {/* Name + badges */}
                 <div className="flex items-center gap-2 min-w-0 flex-1 flex-wrap">
@@ -340,11 +353,11 @@ export function AdminSkillsSection({ lng }: AdminSkillsSectionProps) {
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
 
-                  {/* Toggle on/off */}
+                  {/* System-level toggle on/off */}
                   <Switch
-                    checked={skill.enabled_for_user}
+                    checked={skill.admin_enabled ?? true}
                     onCheckedChange={() => handleToggle(skill)}
-                    disabled={toggling}
+                    disabled={togglingSystem}
                     aria-label={t('settings.skills.toggle_skill', { name: skill.name })}
                   />
                 </div>
@@ -361,10 +374,7 @@ export function AdminSkillsSection({ lng }: AdminSkillsSectionProps) {
       )}
 
       {/* Delete admin skill confirmation */}
-      <AlertDialog
-        open={deletingName !== null}
-        onOpenChange={open => !open && setDeletingName(null)}
-      >
+      <AlertDialog open={deletingName !== null} onOpenChange={(open) => !open && setDeletingName(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('settings.skills.delete_admin_confirm_title')}</AlertDialogTitle>
@@ -385,7 +395,7 @@ export function AdminSkillsSection({ lng }: AdminSkillsSectionProps) {
       </AlertDialog>
 
       {/* Edit description dialog */}
-      <Dialog open={editingSkill !== null} onOpenChange={open => !open && setEditingSkill(null)}>
+      <Dialog open={editingSkill !== null} onOpenChange={(open) => !open && setEditingSkill(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>
@@ -399,7 +409,7 @@ export function AdminSkillsSection({ lng }: AdminSkillsSectionProps) {
             <Textarea
               id="skill-desc-edit"
               value={editDescription}
-              onChange={e => setEditDescription(e.target.value)}
+              onChange={(e) => setEditDescription(e.target.value)}
               rows={5}
               placeholder={t('settings.skills.edit_description_label')}
               className="resize-none text-sm"

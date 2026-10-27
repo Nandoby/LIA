@@ -73,7 +73,10 @@ export function getProgressMessage(
 /**
  * Handle registry_update: LARS registry data arrives BEFORE tokens
  */
-export function handleRegistryUpdate(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handleRegistryUpdate(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const { dispatch, withContext } = context;
   const registryMetadata = chunk.metadata as RegistryUpdateMetadata;
 
@@ -108,7 +111,10 @@ export function handleRegistryUpdate(chunk: ChatStreamChunk, context: SSEHandler
  * Sets current metrics for real-time display and adds to cumulative history
  * for collapsible request-by-request comparison.
  */
-export function handleDebugMetrics(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handleDebugMetrics(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const { dispatch, withContext } = context;
   const debugMetricsData = chunk.metadata as DebugMetrics;
 
@@ -155,9 +161,18 @@ export function handleDebugMetrics(chunk: ChatStreamChunk, context: SSEHandlerCo
 /**
  * Handle router_decision: First progress feedback (~1s after send)
  */
-export function handleRouterDecision(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
-  const { dispatch, withContext, t, assistantMessageId, progressMessageId, setProgressMessageId } =
-    context;
+export function handleRouterDecision(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
+  const {
+    dispatch,
+    withContext,
+    t,
+    assistantMessageId,
+    progressMessageId,
+    setProgressMessageId,
+  } = context;
 
   logger.debug(
     'chat_router_decision',
@@ -206,7 +221,10 @@ export function handleRouterDecision(chunk: ChatStreamChunk, context: SSEHandler
 /**
  * Handle planner_metadata: Planning progress (~2s after send)
  */
-export function handlePlannerMetadata(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handlePlannerMetadata(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const { dispatch, withContext, t, progressMessageId } = context;
 
   logger.info(
@@ -231,7 +249,10 @@ export function handlePlannerMetadata(chunk: ChatStreamChunk, context: SSEHandle
 /**
  * Handle execution_step: Dynamic execution progress messages
  */
-export function handleExecutionStep(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handleExecutionStep(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const { dispatch, withContext, t, progressMessageId } = context;
 
   logger.debug(
@@ -264,7 +285,10 @@ export function handleExecutionStep(chunk: ChatStreamChunk, context: SSEHandlerC
 /**
  * Handle token: Normal streaming token
  */
-export function handleToken(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handleToken(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const {
     dispatch,
     assistantMessageId,
@@ -297,7 +321,10 @@ export function handleToken(chunk: ChatStreamChunk, context: SSEHandlerContext):
 /**
  * Handle content_replacement: Post-processed content replacement
  */
-export function handleContentReplacement(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handleContentReplacement(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const { dispatch } = context;
   dispatch({
     type: 'STREAM_REPLACE',
@@ -308,7 +335,10 @@ export function handleContentReplacement(chunk: ChatStreamChunk, context: SSEHan
 /**
  * Handle done: Stream completion
  */
-export function handleDone(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handleDone(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const { dispatch, withContext, assistantMessageId } = context;
   const metadata = chunk.metadata as DoneMetadata | undefined;
 
@@ -340,8 +370,14 @@ export function handleHitlInterruptMetadata(
   chunk: ChatStreamChunk,
   context: SSEHandlerContext
 ): void {
-  const { dispatch, withContext, t, hitlQuestionBuffer, progressMessageId, setProgressMessageId } =
-    context;
+  const {
+    dispatch,
+    withContext,
+    t,
+    hitlQuestionBuffer,
+    progressMessageId,
+    setProgressMessageId,
+  } = context;
 
   const metadataChunk = chunk.metadata as ToolApprovalMetadata & {
     message_id: string;
@@ -385,7 +421,10 @@ export function handleHitlInterruptMetadata(
 /**
  * Handle hitl_question_token: Progressive token rendering
  */
-export function handleHitlQuestionToken(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handleHitlQuestionToken(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const { dispatch, withContext, hitlQuestionBuffer } = context;
 
   const tokenChunk = chunk.metadata as { message_id: string };
@@ -433,10 +472,6 @@ export function handleHitlInterruptComplete(
   const completeChunk = chunk.metadata as ToolApprovalMetadata & {
     message_id: string;
     generated_question?: string;
-    tokens_in?: number;
-    tokens_out?: number;
-    tokens_cache?: number;
-    cost_eur?: number;
   };
   const completeMessageId = completeChunk.message_id;
 
@@ -464,17 +499,12 @@ export function handleHitlInterruptComplete(
     );
   }
 
-  // Finalize stream with token metadata
+  // Finalize stream without token metadata (HITL tokens are partial/misleading)
   dispatch({
     type: 'STREAM_DONE',
     payload: {
       messageId: completeMessageId,
-      metadata: {
-        tokens_in: completeChunk.tokens_in,
-        tokens_out: completeChunk.tokens_out,
-        tokens_cache: completeChunk.tokens_cache,
-        cost_eur: completeChunk.cost_eur,
-      },
+      metadata: {},
     },
   });
 
@@ -528,7 +558,10 @@ export function handleHitlInterruptLegacy(
 /**
  * Handle voice_comment_start: Voice playback starting
  */
-export function handleVoiceCommentStart(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handleVoiceCommentStart(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const { withContext } = context;
   logger.debug(
     'chat_voice_comment_start',
@@ -542,7 +575,10 @@ export function handleVoiceCommentStart(chunk: ChatStreamChunk, context: SSEHand
 /**
  * Handle voice_audio_chunk: Stream audio chunk to playback queue
  */
-export function handleVoiceAudioChunk(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handleVoiceAudioChunk(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const { handleVoiceChunk, withContext } = context;
   const audioChunk = chunk.content as unknown as VoiceAudioChunk;
 
@@ -562,7 +598,10 @@ export function handleVoiceAudioChunk(chunk: ChatStreamChunk, context: SSEHandle
 /**
  * Handle voice_complete: Voice playback completed
  */
-export function handleVoiceComplete(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handleVoiceComplete(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const { withContext } = context;
   logger.info(
     'chat_voice_complete',
@@ -576,7 +615,10 @@ export function handleVoiceComplete(chunk: ChatStreamChunk, context: SSEHandlerC
 /**
  * Handle voice_error: Graceful degradation for voice errors
  */
-export function handleVoiceError(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handleVoiceError(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const { withContext } = context;
   logger.warn(
     'chat_voice_error',
@@ -595,7 +637,10 @@ export function handleVoiceError(chunk: ChatStreamChunk, context: SSEHandlerCont
 /**
  * Handle error: Stream error
  */
-export function handleError(chunk: ChatStreamChunk, context: SSEHandlerContext): void {
+export function handleError(
+  chunk: ChatStreamChunk,
+  context: SSEHandlerContext
+): void {
   const { dispatch, withContext } = context;
 
   logger.error(
@@ -611,3 +656,4 @@ export function handleError(chunk: ChatStreamChunk, context: SSEHandlerContext):
     payload: { error: chunk.content },
   });
 }
+

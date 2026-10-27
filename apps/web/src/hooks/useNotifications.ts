@@ -15,16 +15,7 @@ import { logger } from '@/lib/logger';
 import { onForegroundMessage } from '@/lib/firebase';
 import type { MessagePayload } from 'firebase/messaging';
 
-export type NotificationType =
-  | 'reminder'
-  | 'system'
-  | 'message'
-  | 'oauth_health_warning'
-  | 'oauth_health_critical'
-  | 'proactive_interest'
-  | 'proactive_heartbeat'
-  | 'scheduled_action'
-  | 'admin_broadcast';
+export type NotificationType = 'reminder' | 'system' | 'message' | 'oauth_health_warning' | 'oauth_health_critical' | 'proactive_interest' | 'proactive_heartbeat' | 'scheduled_action' | 'subagent_result' | 'admin_broadcast';
 
 export interface Notification {
   id: string;
@@ -55,17 +46,15 @@ export interface UseNotificationsOptions {
   /** Callback when reminder received */
   onReminder?: (content: string, reminderId: string) => void;
   /** Callback when proactive notification received (interest, heartbeat, etc.) */
-  onProactiveNotification?: (
-    content: string,
-    targetId: string,
-    metadata?: Record<string, unknown>
-  ) => void;
+  onProactiveNotification?: (content: string, targetId: string, metadata?: Record<string, unknown>) => void;
   /** Callback when scheduled action execution completes */
   onScheduledAction?: (content: string, actionId: string, title: string) => void;
   /** Callback when OAuth health warning received (expiring soon) */
   onOAuthWarning?: (notification: Notification) => void;
   /** Callback when OAuth health critical received (expired/error) */
   onOAuthCritical?: (notification: Notification) => void;
+  /** Callback when sub-agent execution completes (F6) */
+  onSubagentResult?: (content: string, targetId: string, metadata?: Record<string, unknown>) => void;
 }
 
 export interface UseNotificationsReturn {
@@ -109,6 +98,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
     onScheduledAction,
     onOAuthWarning,
     onOAuthCritical,
+    onSubagentResult,
   } = options;
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -127,9 +117,9 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
    */
   const addNotification = useCallback(
     (notification: Notification) => {
-      setNotifications(prev => {
+      setNotifications((prev) => {
         // Avoid duplicates by checking id
-        if (prev.some(n => n.id === notification.id)) {
+        if (prev.some((n) => n.id === notification.id)) {
           return prev;
         }
         return [notification, ...prev].slice(0, 50); // Keep last 50
@@ -142,14 +132,12 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
         onReminder?.(notification.content, notification.reminder_id);
       } else if ((notification.type as string).startsWith('proactive_') && notification.target_id) {
         // Generic proactive handler: covers interest, heartbeat, and future types
-        onProactiveNotification?.(
-          notification.content,
-          notification.target_id,
-          notification.metadata
-        );
+        onProactiveNotification?.(notification.content, notification.target_id, notification.metadata);
       } else if (notification.type === 'scheduled_action' && notification.action_id) {
         const actionTitle = (notification.metadata?.title as string) || notification.action_id;
         onScheduledAction?.(notification.content, notification.action_id, actionTitle);
+      } else if (notification.type === 'subagent_result' && notification.target_id) {
+        onSubagentResult?.(notification.content, notification.target_id, notification.metadata);
       } else if (notification.type === 'oauth_health_warning') {
         onOAuthWarning?.(notification);
       } else if (notification.type === 'oauth_health_critical') {
@@ -157,14 +145,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       }
       // Note: admin_broadcast is handled separately by BroadcastProvider (has its own SSE/FCM listeners)
     },
-    [
-      onNotification,
-      onReminder,
-      onProactiveNotification,
-      onScheduledAction,
-      onOAuthWarning,
-      onOAuthCritical,
-    ]
+    [onNotification, onReminder, onProactiveNotification, onScheduledAction, onOAuthWarning, onOAuthCritical, onSubagentResult]
   );
 
   /**
@@ -207,13 +188,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
               : data.metadata;
 
           const notification: Notification = {
-            id:
-              data.reminder_id ||
-              data.target_id ||
-              data.action_id ||
-              data.connector_id ||
-              data.broadcast_id ||
-              `notif-${Date.now()}`,
+            id: data.reminder_id || data.target_id || data.action_id || data.connector_id || data.broadcast_id || `notif-${Date.now()}`,
             type: data.type || 'system',
             content: data.content || data.message || '',
             reminder_id: data.reminder_id,
@@ -250,7 +225,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       // Also listen for default message events (fallback)
       eventSource.onmessage = handleNotificationEvent;
 
-      eventSource.onerror = _event => {
+      eventSource.onerror = (_event) => {
         logger.warn('SSE: Connection error', {
           component: 'useNotifications',
           readyState: eventSource.readyState,
@@ -353,13 +328,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
             : undefined;
 
       const notification: Notification = {
-        id:
-          payload.data?.reminder_id ||
-          payload.data?.target_id ||
-          payload.data?.action_id ||
-          payload.data?.connector_id ||
-          payload.data?.broadcast_id ||
-          `fcm-${Date.now()}`,
+        id: payload.data?.reminder_id || payload.data?.target_id || payload.data?.action_id || payload.data?.connector_id || payload.data?.broadcast_id || `fcm-${Date.now()}`,
         type: fcmType || 'system',
         content: payload.notification?.body || payload.data?.body || payload.data?.message || '',
         reminder_id: payload.data?.reminder_id,
@@ -394,17 +363,17 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
    * Mark a notification as read.
    */
   const markAsRead = useCallback((id: string) => {
-    setNotifications(prev => prev.map(n => (n.id === id ? { ...n, read: true } : n)));
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
   }, []);
 
   /**
    * Mark all notifications as read.
    */
   const markAllAsRead = useCallback(() => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   }, []);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return {
     notifications,

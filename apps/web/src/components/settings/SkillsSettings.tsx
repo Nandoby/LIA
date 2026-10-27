@@ -30,27 +30,16 @@ interface SkillsSettingsProps {
 
 export function SkillsSettings({ lng }: SkillsSettingsProps) {
   const { t } = useTranslation(lng);
-  const {
-    skills,
-    loading,
-    error,
-    refetch,
-    importSkill,
-    deleteSkill,
-    deleting,
-    toggleSkill,
-    toggling,
-    downloadSkill,
-  } = useSkills();
+  const { skills, loading, error, refetch, importSkill, deleteSkill, deleting, toggleSkill, toggling, downloadSkill } =
+    useSkills();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
   const [deletingName, setDeletingName] = useState<string | null>(null);
   const [downloadingName, setDownloadingName] = useState<string | null>(null);
   const [showGuide, setShowGuide] = useState(false);
 
-  // Admin skills disabled by administrator are hidden (not just greyed out)
-  const adminSkills = skills.filter(s => s.scope === 'admin' && s.enabled_for_user);
-  const userSkills = skills.filter(s => s.scope === 'user');
+  const adminSkills = skills.filter((s) => s.scope === 'admin');
+  const userSkills = skills.filter((s) => s.scope === 'user');
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -125,7 +114,9 @@ export function SkillsSettings({ lng }: SkillsSettingsProps) {
       {/* Error */}
       {!loading && error && (
         <div className="flex items-center gap-3 py-4">
-          <p className="text-sm text-muted-foreground">{t('settings.skills.load_error')}</p>
+          <p className="text-sm text-muted-foreground">
+            {t('settings.skills.load_error')}
+          </p>
           <button
             type="button"
             onClick={() => refetch()}
@@ -146,10 +137,12 @@ export function SkillsSettings({ lng }: SkillsSettingsProps) {
                 <h4 className="text-sm font-medium text-muted-foreground">
                   {t('settings.skills.admin_section_title')}
                 </h4>
-                <span className="text-xs text-muted-foreground">({adminSkills.length})</span>
+                <span className="text-xs text-muted-foreground">
+                  ({adminSkills.length})
+                </span>
               </div>
               <div className="space-y-2">
-                {adminSkills.map(skill => (
+                {adminSkills.map((skill) => (
                   <SkillCard
                     key={skill.name}
                     skill={skill}
@@ -176,7 +169,9 @@ export function SkillsSettings({ lng }: SkillsSettingsProps) {
                   {t('settings.skills.user_section_title')}
                 </h4>
                 {userSkills.length > 0 && (
-                  <span className="text-xs text-muted-foreground">({userSkills.length})</span>
+                  <span className="text-xs text-muted-foreground">
+                    ({userSkills.length})
+                  </span>
                 )}
                 <button
                   type="button"
@@ -223,7 +218,7 @@ export function SkillsSettings({ lng }: SkillsSettingsProps) {
 
             {userSkills.length > 0 && (
               <div className="space-y-2">
-                {userSkills.map(skill => (
+                {userSkills.map((skill) => (
                   <SkillCard
                     key={skill.name}
                     skill={skill}
@@ -245,7 +240,7 @@ export function SkillsSettings({ lng }: SkillsSettingsProps) {
       {/* Delete confirmation */}
       <AlertDialog
         open={deletingName !== null}
-        onOpenChange={open => !open && setDeletingName(null)}
+        onOpenChange={(open) => !open && setDeletingName(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -292,7 +287,9 @@ function SkillCard({
 }) {
   const isAdmin = skill.scope === 'admin';
   return (
-    <div className={`rounded-lg border p-3 space-y-1 group ${isAdmin ? 'bg-card/50' : 'bg-card'}`}>
+    <div
+      className={`rounded-lg border p-3 space-y-1 group ${isAdmin ? 'bg-card/50' : 'bg-card'}`}
+    >
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0 flex-1 flex-wrap">
           <span className="font-medium text-sm truncate">{skill.name}</span>
@@ -347,7 +344,13 @@ function SkillCard({
   );
 }
 
-function SkillBadges({ skill, t }: { skill: Skill; t: (key: string) => string }) {
+function SkillBadges({
+  skill,
+  t,
+}: {
+  skill: Skill;
+  t: (key: string) => string;
+}) {
   return (
     <>
       {skill.always_loaded && (

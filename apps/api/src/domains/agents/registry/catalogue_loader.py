@@ -436,7 +436,7 @@ def initialize_catalogue(registry: AgentRegistry) -> None:
     NAMING CONVENTION: domain=entity(singular), result_key=domain+"s", agent=domain+"_agent"
 
     This function loads and registers:
-    - 14 agent manifests :
+    - 14 agent manifests:
       * contact_agent (Google Contacts)
       * context_agent (Cross-domain utilities)
       * email_agent (Gmail)
@@ -685,6 +685,18 @@ def initialize_catalogue(registry: AgentRegistry) -> None:
     registry.register_tool_manifest(activate_skill_catalogue_manifest)
     registry.register_tool_manifest(read_skill_resource_catalogue_manifest)
     registry.register_tool_manifest(run_skill_script_catalogue_manifest)
+
+    # Register Sub-Agent delegation tool (F6 — transversal, always in catalogue)
+    from src.core.config import get_settings as _get_settings
+
+    if getattr(_get_settings(), "sub_agents_enabled", False):
+        from src.domains.agents.sub_agents.catalogue_manifests import (
+            SUB_AGENT_MANIFEST,
+            delegate_to_sub_agent_catalogue_manifest,
+        )
+
+        registry.register_agent_manifest(SUB_AGENT_MANIFEST)
+        registry.register_tool_manifest(delegate_to_sub_agent_catalogue_manifest)
 
     # Dynamic counting from registry (no more hardcoded values)
     registered_agents = list(registry._agent_manifests.keys())
