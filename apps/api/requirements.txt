@@ -74,7 +74,7 @@ tiktoken==0.12.0
 
 # Local Embedding Model - E5 for semantic memory search
 # Replaces OpenAI text-embedding-3-small for better Q/A matching (0.90 vs 0.61 avg score)
-# PyTorch is pulled as dependency - on x86_64 PyPI ships the CUDA build: Dockerfile.dev preinstalls CPU-only torch
+# PyTorch is pulled as dependency - pip installs CPU-only by default (no CUDA index)
 # ARM64 (Raspberry Pi): CPU-only wheels automatically (CUDA not supported on ARM)
 sentence-transformers==5.3.0  # HuggingFace E5 model (intfloat/multilingual-e5-small)
 
@@ -108,3 +108,9 @@ Pillow>=11.0.0  # Image validation, HEIC→JPEG conversion
 filetype>=1.2.0  # MIME detection by magic bytes (pure Python, ARM64 native)
 PyMuPDF>=1.25.0  # PDF text extraction (lightweight, ARM64 compatible)
 python-docx>=1.1.0  # DOCX text extraction for RAG Spaces
+python-pptx>=1.0.0  # PPTX text extraction for RAG Spaces
+openpyxl>=3.1.0  # XLSX text extraction for RAG Spaces
+striprtf>=0.0.26  # RTF text extraction for RAG Spaces (pure Python)
+odfpy>=1.4.1  # ODF (ODT/ODS/ODP) text extraction for RAG Spaces
+ebooklib>=0.18  # EPUB text extraction for RAG Spaces
+defusedxml>=0.7.1  # Secure XML parsing (prevents XXE, XML bombs) for RAG Spaces
