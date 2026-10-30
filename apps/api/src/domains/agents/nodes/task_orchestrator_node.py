@@ -928,17 +928,15 @@ async def _handle_execution_plan(
             # ================================================================
             # BugFix 2026-01-24: Also capture pre_exec_registry to preserve parent items
             # (e.g., events) when child steps (e.g., routes) fail
-            (
-                pre_executed_steps,
-                item_counts,
-                pre_exec_registry,
-            ) = await _pre_execute_for_each_providers(
-                execution_plan=execution_plan,
-                for_each_steps=for_each_steps_requiring_hitl,
-                config=config,
-                run_id=run_id,
-                initial_registry=initial_registry,
-                turn_id=current_turn_id,
+            pre_executed_steps, item_counts, pre_exec_registry = (
+                await _pre_execute_for_each_providers(
+                    execution_plan=execution_plan,
+                    for_each_steps=for_each_steps_requiring_hitl,
+                    config=config,
+                    run_id=run_id,
+                    initial_registry=initial_registry,
+                    turn_id=current_turn_id,
+                )
             )
 
             # Note: pre_exec_registry is passed to execute_plan_parallel separately
@@ -1317,7 +1315,7 @@ async def _handle_execution_plan(
 
             replan_context = RePlanContext(
                 user_request=user_message,
-                user_language="fr",  # TODO: Get from user preferences
+                user_language=state.get("user_language", "fr"),
                 execution_plan=execution_plan,
                 plan_id=execution_plan.plan_id,
                 completed_steps=completed_steps,
