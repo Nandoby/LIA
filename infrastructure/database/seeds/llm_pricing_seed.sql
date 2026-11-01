@@ -7,16 +7,17 @@
 SET session_replication_role = replica;
 
 -- Insert LLM Model Pricing (115 models)
-INSERT INTO llm_model_pricing (id,
-                               model_name,
-                               input_price_per_1m_tokens,
-                               cached_input_price_per_1m_tokens,
-                               output_price_per_1m_tokens,
-                               effective_from,
-                               is_active,
-                               created_at,
-                               updated_at)
-VALUES
+INSERT INTO llm_model_pricing (
+    id,
+    model_name,
+    input_price_per_1m_tokens,
+    cached_input_price_per_1m_tokens,
+    output_price_per_1m_tokens,
+    effective_from,
+    is_active,
+    created_at,
+    updated_at
+) VALUES
     -- ========================================================================
     -- OPENAI MODELS
     -- ========================================================================
@@ -132,16 +133,13 @@ VALUES
     (gen_random_uuid(), 'gemini-2.0-flash-lite', 0.075000, NULL, 0.300000, NOW(), true, NOW(), NOW()),
     (gen_random_uuid(), 'gemini-2.0-flash-lite-001', 0.075000, NULL, 0.300000, NOW(), true, NOW(), NOW()),
     (gen_random_uuid(), 'gemini-2.0-flash-live-001', 0.350000, NULL, 1.500000, NOW(), true, NOW(), NOW()),
-    (gen_random_uuid(), 'gemini-2.0-flash-preview-image-generation', 0.100000, 0.025000, 0.400000, NOW(), true, NOW(),
-     NOW()),
+    (gen_random_uuid(), 'gemini-2.0-flash-preview-image-generation', 0.100000, 0.025000, 0.400000, NOW(), true, NOW(), NOW()),
     (gen_random_uuid(), 'gemini-2.5-flash', 0.300000, 0.030000, 2.500000, NOW(), true, NOW(), NOW()),
     (gen_random_uuid(), 'gemini-2.5-flash-image', 0.300000, 0.030000, 2.500000, NOW(), true, NOW(), NOW()),
     (gen_random_uuid(), 'gemini-2.5-flash-image-preview', 0.300000, 0.030000, 2.500000, NOW(), true, NOW(), NOW()),
     (gen_random_uuid(), 'gemini-2.5-flash-lite', 0.100000, 0.010000, 0.400000, NOW(), true, NOW(), NOW()),
-    (gen_random_uuid(), 'gemini-2.5-flash-lite-preview-09-2025', 0.100000, 0.010000, 0.400000, NOW(), true, NOW(),
-     NOW()),
-    (gen_random_uuid(), 'gemini-2.5-flash-native-audio-preview-09-2025', 1.000000, NULL, 2.500000, NOW(), true, NOW(),
-     NOW()),
+    (gen_random_uuid(), 'gemini-2.5-flash-lite-preview-09-2025', 0.100000, 0.010000, 0.400000, NOW(), true, NOW(), NOW()),
+    (gen_random_uuid(), 'gemini-2.5-flash-native-audio-preview-09-2025', 1.000000, NULL, 2.500000, NOW(), true, NOW(), NOW()),
     (gen_random_uuid(), 'gemini-2.5-flash-preview-09-2025', 0.300000, 0.030000, 2.500000, NOW(), true, NOW(), NOW()),
     (gen_random_uuid(), 'gemini-2.5-flash-preview-tts', 0.300000, 0.030000, 2.500000, NOW(), true, NOW(), NOW()),
     (gen_random_uuid(), 'gemini-2.5-pro', 1.250000, 0.125000, 10.000000, NOW(), true, NOW(), NOW()),
@@ -171,6 +169,15 @@ VALUES
     (gen_random_uuid(), 'sonar-reasoning-pro', 2.000000, NULL, 8.000000, NOW(), true, NOW(), NOW()),
 
     -- ========================================================================
+    -- QWEN MODELS (Alibaba Cloud - International pricing)
+    -- ========================================================================
+
+    -- Qwen Series (DashScope international endpoint)
+    (gen_random_uuid(), 'qwen3-max', 1.200000, 0.240000, 6.000000, NOW(), true, NOW(), NOW()),
+    (gen_random_uuid(), 'qwen3.5-plus', 0.400000, 0.040000, 2.400000, NOW(), true, NOW(), NOW()),
+    (gen_random_uuid(), 'qwen3.5-flash', 0.100000, 0.010000, 0.400000, NOW(), true, NOW(), NOW()),
+
+    -- ========================================================================
     -- OLLAMA LOCAL MODELS
     -- ========================================================================
 
@@ -194,15 +201,16 @@ VALUES
 ON CONFLICT (model_name, effective_from) DO NOTHING;
 
 -- Insert Currency Exchange Rates
-INSERT INTO currency_exchange_rates (id,
-                                     from_currency,
-                                     to_currency,
-                                     rate,
-                                     effective_from,
-                                     is_active,
-                                     created_at,
-                                     updated_at)
-VALUES
+INSERT INTO currency_exchange_rates (
+    id,
+    from_currency,
+    to_currency,
+    rate,
+    effective_from,
+    is_active,
+    created_at,
+    updated_at
+) VALUES
     -- EUR to USD
     (gen_random_uuid(), 'EUR', 'USD', 1.052632, NOW(), true, NOW(), NOW()),
 
@@ -217,21 +225,19 @@ ON CONFLICT (from_currency, to_currency, effective_from) DO NOTHING;
 SET session_replication_role = DEFAULT;
 
 -- Verification queries
-DO
-$$
-    DECLARE
-        model_count INTEGER;
-        rate_count  INTEGER;
-    BEGIN
-        SELECT COUNT(*) INTO model_count FROM llm_model_pricing WHERE is_active = true;
-        SELECT COUNT(*) INTO rate_count FROM currency_exchange_rates WHERE is_active = true;
+DO $$
+DECLARE
+    model_count INTEGER;
+    rate_count INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO model_count FROM llm_model_pricing WHERE is_active = true;
+    SELECT COUNT(*) INTO rate_count FROM currency_exchange_rates WHERE is_active = true;
 
-        RAISE NOTICE 'Seed completed successfully:';
-        RAISE NOTICE '  - % active LLM model pricing entries', model_count;
-        RAISE NOTICE '  - % active currency exchange rates', rate_count;
+    RAISE NOTICE 'Seed completed successfully:';
+    RAISE NOTICE '  - % active LLM model pricing entries', model_count;
+    RAISE NOTICE '  - % active currency exchange rates', rate_count;
 
-        IF model_count < 115 THEN
-            RAISE WARNING 'Expected at least 115 models, but found %', model_count;
-        END IF;
-    END
-$$;
+    IF model_count < 115 THEN
+        RAISE WARNING 'Expected at least 115 models, but found %', model_count;
+    END IF;
+END $$;

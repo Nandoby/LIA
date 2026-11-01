@@ -22,9 +22,22 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
   const lng = validateLanguage(lngParam);
   const { t } = await initI18next(lng);
 
+  const title = t('landing.meta.title');
+  const description = t('landing.meta.description');
+
   return {
-    title: t('landing.meta.title'),
-    description: t('landing.meta.description'),
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: '/Title.png', width: 2125, height: 1193, alt: title }],
+    },
+    twitter: {
+      title,
+      description,
+      images: ['/Title.png'],
+    },
   };
 }
 
@@ -39,10 +52,8 @@ export default async function HomePage({ params }: HomePageProps) {
       <AuthRedirect lng={lng} />
 
       <div className="landing-page">
-        <a
-          href="#features"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
-        >
+        {/* Skip to content */}
+        <a href="#features" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md">
           {t('landing.nav.features')}
         </a>
 

@@ -3,7 +3,15 @@
  * Extracted from UserConnectorsSection.tsx for DRY compliance.
  */
 
-import { Plug, Cloud, Book, Search, MapPin, type LucideIcon } from 'lucide-react';
+import {
+  Plug,
+  Cloud,
+  Book,
+  Search,
+  MapPin,
+  Globe,
+  type LucideIcon,
+} from 'lucide-react';
 
 // ============================================================================
 // CONNECTOR TYPES
@@ -25,9 +33,14 @@ export const API_KEY_CONNECTOR_TYPES = [
   'perplexity',
   'brave_search',
   'google_places', // Uses global API key, simple toggle activation
+  'browser', // No API key required, headless browser automation
 ] as const;
 
-export const APPLE_CONNECTOR_TYPES = ['apple_email', 'apple_calendar', 'apple_contacts'] as const;
+export const APPLE_CONNECTOR_TYPES = [
+  'apple_email',
+  'apple_calendar',
+  'apple_contacts',
+] as const;
 
 export const MICROSOFT_CONNECTOR_TYPES = [
   'microsoft_outlook',
@@ -138,6 +151,7 @@ export const CONNECTOR_ICONS: Record<string, ConnectorIconConfig> = {
   wikipedia: { icon: Book, emoji: '📚', color: 'slate' },
   perplexity: { icon: Search, emoji: '🔍', color: 'indigo' },
   brave_search: { icon: Search, emoji: '🦁', color: 'violet' },
+  browser: { icon: Globe, emoji: '🌐', color: 'blue' },
 };
 
 // Uniform background class for all connector icons
@@ -202,6 +216,12 @@ export const API_KEY_CONNECTORS: readonly ApiKeyConnectorConfig[] = [
     color: 'emerald',
     requiresKey: false, // Uses global API key configured on server
   },
+  {
+    type: 'browser',
+    icon: Globe,
+    color: 'blue',
+    requiresKey: false, // No API key — uses local Playwright/Chromium
+  },
 ] as const;
 
 // ============================================================================
@@ -211,11 +231,8 @@ export const API_KEY_CONNECTORS: readonly ApiKeyConnectorConfig[] = [
 // Connectors using the /connectors/{id}/preferences API
 // Note: google_places uses LocationSettings (/users/me/home-location) instead
 export const CONNECTORS_WITH_PREFERENCES = [
-  'google_calendar',
-  'google_tasks',
-  'apple_calendar',
-  'microsoft_calendar',
-  'microsoft_tasks',
+  'google_calendar', 'google_tasks', 'apple_calendar',
+  'microsoft_calendar', 'microsoft_tasks',
 ];
 
 // Preference field mapping by connector type
