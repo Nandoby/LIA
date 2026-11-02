@@ -102,7 +102,7 @@ python-telegram-bot>=21.0  # Telegram Bot API (async, v21+)
 pydub>=0.25.1  # Audio format conversion for voice messages (OGG→PCM, requires ffmpeg)
 
 # Apple iCloud Connectors — Email (IMAP), Calendar (CalDAV), Contacts (CardDAV)
-caldav[async]>=3.0.1  # CalDAV client with async support (caldav.aio)
+caldav[async]>=3.7.0  # CalDAV client with async support (caldav.aio)
 imap-tools>=1.7.0  # IMAP email client (synchronous, wrapped via asyncio.to_thread)
 vobject>=0.9.8  # vCard/vCalendar parser (iCloud uses vCard 3.0)
 
