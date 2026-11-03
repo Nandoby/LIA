@@ -6,6 +6,7 @@ import { ChevronDown } from 'lucide-react';
 import { buildLocalizedPath } from '@/utils/i18n-path-utils';
 import type { Language } from '@/i18n/settings';
 import { HeroBackground } from './HeroBackground';
+import { LANDING_STATS } from './constants';
 
 interface HeroSectionProps {
   lng: string;
@@ -17,20 +18,18 @@ export async function HeroSection({ lng }: HeroSectionProps) {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background image - theme & gender aware, click to toggle */}
+      {/* Background image — theme & gender aware, click to toggle */}
       <HeroBackground />
 
       <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
         {/* Badges */}
         <div className="flex items-center gap-3 justify-center mb-6">
-          <Badge
-            pulse
-            variant="destructive"
-            className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30"
-          >
+          <Badge pulse variant="destructive" className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30">
             {t('landing.hero.badge_beta')}
           </Badge>
-          <Badge variant="secondary">{t('landing.hero.badge')}</Badge>
+          <Badge variant="secondary">
+            {t('landing.hero.badge')}
+          </Badge>
         </div>
 
         {/* Tagline */}
@@ -52,25 +51,29 @@ export async function HeroSection({ lng }: HeroSectionProps) {
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
           <Button asChild size="lg" className="text-base px-8">
-            <Link href={registerHref}>{t('landing.hero.cta_primary')}</Link>
+            <Link href={registerHref}>
+              {t('landing.hero.cta_primary')}
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="lg" className="text-base px-8">
+            <a href="#features">
+              {t('landing.hero.cta_secondary')}
+            </a>
           </Button>
         </div>
 
         {/* Trust badges */}
         <div className="flex flex-wrap items-center gap-4 justify-center text-sm text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <span className="font-semibold text-foreground">16+</span>{' '}
-            {t('landing.hero.trust_agents')}
+            <span className="font-semibold text-foreground">{LANDING_STATS.agents}+</span> {t('landing.hero.trust_agents')}
           </span>
           <span className="w-px h-4 bg-border" />
           <span className="flex items-center gap-1.5">
-            <span className="font-semibold text-foreground">6</span>{' '}
-            {t('landing.hero.trust_providers')}
+            <span className="font-semibold text-foreground">{LANDING_STATS.providers}</span> {t('landing.hero.trust_providers')}
           </span>
           <span className="w-px h-4 bg-border" />
           <span className="flex items-center gap-1.5">
-            <span className="font-semibold text-foreground">99+</span>{' '}
-            {t('landing.hero.trust_voices')}
+            <span className="font-semibold text-foreground">{LANDING_STATS.voiceLanguages}+</span> {t('landing.hero.trust_voices')}
           </span>
           <span className="w-px h-4 bg-border hidden sm:block" />
           <span className="hidden sm:flex items-center gap-1.5">
