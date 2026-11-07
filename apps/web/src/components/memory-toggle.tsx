@@ -7,7 +7,7 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useAuth } from '@/hooks/useAuth';
 import apiClient from '@/lib/api-client';
 import { toast } from 'sonner';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/i18n/client';
 import { type Language } from '@/i18n/settings';
 
 interface MemoryToggleProps {
@@ -20,7 +20,7 @@ export function MemoryToggle({ lng = 'fr' }: MemoryToggleProps) {
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  /* Avoid hydration mismatch */
+  // Avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -36,7 +36,7 @@ export function MemoryToggle({ lng = 'fr' }: MemoryToggleProps) {
         memory_enabled: newState,
       });
 
-      /* Refresh user to get updated state */
+      // Refresh user to get updated state
       await refreshUser();
 
       toast.success(newState ? t('memory.toggle.enabled') : t('memory.toggle.disabled'));
@@ -48,7 +48,7 @@ export function MemoryToggle({ lng = 'fr' }: MemoryToggleProps) {
     }
   };
 
-  /* Show placeholder during SSR */
+  // Show placeholder during SSR
   if (!mounted) {
     return (
       <Button variant="ghost" size="sm" className="w-11 h-11 px-0">

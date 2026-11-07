@@ -25,8 +25,11 @@ export async function UseCasesSection({ lng }: UseCasesSectionProps) {
               id="use-cases-title"
               className="text-3xl mobile:text-4xl font-bold tracking-tight mb-4"
             >
-              {t('landing.use_cases.subtitle')}
+              {t('landing.use_cases.title')}
             </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              {t('landing.use_cases.subtitle')}
+            </p>
           </div>
         </FadeInOnScroll>
 

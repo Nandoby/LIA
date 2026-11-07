@@ -645,7 +645,8 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = memo(
               // Replaces sentinel div with interactive sandboxed iframe + JSON-RPC bridge
               if (className?.includes('lia-mcp-app')) {
                 const registryId = (props as Record<string, unknown>)['data-registry-id'] as
-                  string | undefined;
+                  | string
+                  | undefined;
                 if (registryId) {
                   return (
                     <Suspense

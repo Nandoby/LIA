@@ -6,10 +6,15 @@ import { useApiMutation } from './useApiMutation';
  * Memory category types matching backend schema.
  */
 export type MemoryCategory =
-  'preference' | 'personal' | 'relationship' | 'event' | 'pattern' | 'sensitivity';
+  | 'preference'
+  | 'personal'
+  | 'relationship'
+  | 'event'
+  | 'pattern'
+  | 'sensitivity';
 
 /**
- * Memory item from the API
+ * Memory item from the API.
  */
 export interface Memory {
   id: string;
@@ -40,7 +45,7 @@ export interface MemoryCreate {
 }
 
 /**
- * Memory update payload
+ * Memory update payload.
  */
 export interface MemoryUpdate {
   content?: string;
@@ -206,7 +211,7 @@ export function useMemories() {
   );
 
   /**
-   * Update a memory (optimistic update)
+   * Update a memory (optimistic update).
    */
   const updateMemory = useCallback(
     async (memoryId: string, data: MemoryUpdate) => {

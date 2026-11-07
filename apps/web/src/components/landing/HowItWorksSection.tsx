@@ -31,6 +31,9 @@ export async function HowItWorksSection({ lng }: HowItWorksSectionProps) {
             >
               {t('landing.how_it_works.title')}
             </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              {t('landing.how_it_works.subtitle')}
+            </p>
           </div>
         </FadeInOnScroll>
 

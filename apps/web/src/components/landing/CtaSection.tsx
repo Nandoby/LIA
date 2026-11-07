@@ -18,7 +18,7 @@ export async function CtaSection({ lng }: CtaSectionProps) {
       {/* Gradient background */}
       <div
         className="absolute inset-0 bg-gradient-to-br from-[#2563eb] via-[#5b3fce] to-[#7c3aed] opacity-90"
-        aria-labelledby="true"
+        aria-hidden="true"
       />
 
       {/* Subtle constellation overlay */}

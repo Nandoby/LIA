@@ -5,7 +5,7 @@ import { onForegroundMessage } from '@/lib/firebase';
 import type { MessagePayload } from 'firebase/messaging';
 
 /**
- * Broadcast message info from the backend
+ * Broadcast message info from the backend.
  */
 export interface BroadcastInfo {
   id: string;
@@ -105,7 +105,7 @@ export function BroadcastProvider({ children, isAuthenticated }: BroadcastProvid
    * Fetch unread broadcasts from the backend.
    *
    * @param debounceMs - Debounce duration in ms (default: INITIAL_CHECK_DEBOUNCE_MS)
-   *                     Use shorter debounce for visibility changes to catch missed broadcast.
+   *                     Use shorter debounce for visibility changes to catch missed broadcasts
    */
   const fetchUnread = useCallback(
     async (debounceMs: number = INITIAL_CHECK_DEBOUNCE_MS) => {
@@ -150,7 +150,7 @@ export function BroadcastProvider({ children, isAuthenticated }: BroadcastProvid
   }, [isAuthenticated, fetchUnread]);
 
   /**
-   * Handle a new broadcast from SSE (via useNotification) or FCM.
+   * Handle a new broadcast from SSE (via useNotifications) or FCM.
    * Pure state update - no side effects inside setQueue.
    */
   const handleNewBroadcast = useCallback((message: string, broadcastId: string) => {
@@ -171,7 +171,7 @@ export function BroadcastProvider({ children, isAuthenticated }: BroadcastProvid
     handleNewBroadcastRef.current = handleNewBroadcast;
   }, [handleNewBroadcast]);
 
-  // React for FCM foreground messages for broadcasts
+  // React to queue changes: show modal if queue has items and modal is not shown
   useEffect(() => {
     if (queue.length > 0 && !showModal) {
       showNext(queue);

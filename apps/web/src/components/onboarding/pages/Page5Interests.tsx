@@ -38,7 +38,7 @@ const interestExamples = [
 ];
 
 /**
- * Page 5 - Interests (Centers of Interests)
+ * Page 5 - Interests (Centers of Interest)
  *
  * Explains how LIA learns user interests for personalized conversations.
  */

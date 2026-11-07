@@ -1,7 +1,7 @@
 /**
  * LoadingSpinner - Reusable loading indicator component.
  *
- * Standardize the spinner pattern used across the application.
+ * Standardizes the spinner pattern used across the application.
  * Built on top of Lucide's Loader2 icon with animation.
  */
 

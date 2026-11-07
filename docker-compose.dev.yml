@@ -26,7 +26,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./infrastructure/docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
     networks:
       - lia-network
 
@@ -65,7 +65,7 @@ services:
     volumes:
       - redis_data:/data
     healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -114,6 +114,7 @@ services:
       - ./apps/api:/app
       - api_venv:/app/.venv
       - ./.git:/app/.git:ro  # Mount .git for prompt versioning (read-only)
+      - ./docs/knowledge:/app/docs/knowledge:ro  # System RAG knowledge files
       - ssl_certs:/certs:ro  # Shared SSL certificates (kept for future use)
       # Persistent HuggingFace model cache (survives container restarts)
       - huggingface_cache:/app/.cache/huggingface
@@ -133,7 +134,7 @@ services:
       ssl-init:
         condition: service_completed_successfully
     healthcheck:
-      test: [ "CMD", "curl", "-f", "-k", "https://localhost:8000/health" ]
+      test: ["CMD", "curl", "-f", "-k", "https://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -172,7 +173,7 @@ services:
       # Shared SSL certificates from ssl-init (covers configured SSL_DOMAIN)
       - ssl_certs:/certs:ro
     # Enable HTTPS with ssl-init certificates (covers nip.io domain for LAN access)
-    command: [ "pnpm", "run", "dev", "--experimental-https", "--experimental-https-key", "/certs/key.pem", "--experimental-https-cert", "/certs/cert.pem" ]
+    command: ["pnpm", "run", "dev", "--experimental-https", "--experimental-https-key", "/certs/key.pem", "--experimental-https-cert", "/certs/cert.pem"]
     depends_on:
       api:
         condition: service_started
@@ -399,7 +400,7 @@ services:
     networks:
       - lia-network
     healthcheck:
-      test: [ "CMD", "mc", "ready", "local" ]
+      test: ["CMD", "mc", "ready", "local"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -423,7 +424,7 @@ services:
     networks:
       - lia-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${LANGFUSE_DB_USER}" ]
+      test: ["CMD-SHELL", "pg_isready -U ${LANGFUSE_DB_USER}"]
       interval: 3s
       timeout: 3s
       retries: 10
@@ -463,7 +464,7 @@ services:
     networks:
       - lia-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "${LANGFUSE_REDIS_PASSWORD}", "ping" ]
+      test: ["CMD", "redis-cli", "-a", "${LANGFUSE_REDIS_PASSWORD}", "ping"]
       interval: 3s
       timeout: 10s
       retries: 10
@@ -560,7 +561,7 @@ services:
     networks:
       - lia-network
     healthcheck:
-      test: [ "CMD", "wget", "--spider", "-q", "http://0.0.0.0:3000/api/public/health" ]
+      test: ["CMD", "wget", "--spider", "-q", "http://0.0.0.0:3000/api/public/health"]
       interval: 30s
       timeout: 10s
       retries: 3

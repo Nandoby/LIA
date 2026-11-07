@@ -96,14 +96,16 @@ function ProviderKeyRow({
           <div className="font-medium text-sm">
             {provider.display_name}
             <span className="ml-1.5 text-xs font-normal text-muted-foreground">
-              ({isOllama ? t('settings.admin.llmConfig.providers.baseUrl') : t('settings.admin.llmConfig.providers.apiKey')})
+              (
+              {isOllama
+                ? t('settings.admin.llmConfig.providers.baseUrl')
+                : t('settings.admin.llmConfig.providers.apiKey')}
+              )
             </span>
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
             {provider.masked_key && (
-              <span className="text-xs text-muted-foreground font-mono">
-                {provider.masked_key}
-              </span>
+              <span className="text-xs text-muted-foreground font-mono">{provider.masked_key}</span>
             )}
             {!provider.has_db_key && (
               <span className="text-xs text-destructive">

@@ -29,16 +29,8 @@ const TECH_ITEMS = [
     icon: Search,
     iconBg: 'bg-gradient-to-br from-purple-500/15 to-violet-500/15',
   },
-  {
-    key: 'realtime',
-    icon: Radio,
-    iconBg: 'bg-gradient-to-br from-rose-500/15 to-pink-500/15',
-  },
-  {
-    key: 'stack',
-    icon: Layers,
-    iconBg: 'bg-gradient-to-br from-cyan-500/15 to-sky-500/15',
-  },
+  { key: 'realtime', icon: Radio, iconBg: 'bg-gradient-to-br from-rose-500/15 to-pink-500/15' },
+  { key: 'stack', icon: Layers, iconBg: 'bg-gradient-to-br from-cyan-500/15 to-sky-500/15' },
 ];
 
 export async function TechSection({ lng }: TechSectionProps) {
@@ -58,7 +50,7 @@ export async function TechSection({ lng }: TechSectionProps) {
           </div>
         </FadeInOnScroll>
 
-        {/* 2x3 grid with per-tech accent colors*/}
+        {/* 2x3 grid with per-tech accent colors */}
         <div className="grid grid-cols-1 sm:grid-cols-2 mobile:grid-cols-3 gap-6">
           {TECH_ITEMS.map(({ key, icon: Icon, iconBg }, i) => (
             <FadeInOnScroll key={key} delay={i * 80}>

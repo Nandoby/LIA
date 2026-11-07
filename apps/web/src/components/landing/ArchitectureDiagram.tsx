@@ -33,7 +33,7 @@ const PIPELINE_NODES = [
     key: 'hitl',
     icon: UserCheck,
     color: 'from-amber-500/20 to-amber-600/20',
-    iconColor: 'text-amber-600',
+    iconColor: 'text-amber-500',
   },
   {
     key: 'orchestrator',
@@ -53,7 +53,8 @@ const PIPELINE_NODES = [
     color: 'from-green-500/20 to-green-600/20',
     iconColor: 'text-green-500',
   },
-];
+] as const;
+
 export function ArchitectureDiagram() {
   const { t } = useTranslation();
 

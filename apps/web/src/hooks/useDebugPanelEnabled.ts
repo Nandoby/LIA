@@ -6,7 +6,7 @@
  * - Non-admin: enabled = system_setting.debug_panel_user_access_enabled AND user.debug_panel_enabled
  *
  * Also exposes `userAccessAvailable` for the settings page to conditionally
- * shows the debug panel toggle in user preferences.
+ * show the debug panel toggle in user preferences.
  *
  * Uses useApiQuery for consistency with codebase patterns (abort on unmount, etc.).
  */
@@ -29,7 +29,7 @@ interface UseDebugPanelEnabledReturn {
   refresh: () => Promise<void>;
 }
 
-/* Public endpoint for debug panel status (authenticated) */
+/** Public endpoint for debug panel status (authenticated) */
 const DEBUG_PANEL_ENDPOINT = '/system-settings/debug-panel-status';
 
 /** Safe initial state when setting hasn't been fetched yet */
@@ -50,7 +50,7 @@ export function useDebugPanelEnabled(): UseDebugPanelEnabledReturn {
     initialData: INITIAL_DATA,
   });
 
-  // During loading, default to false (no flash or debug panel)
+  // During loading, default to false (no flash of debug panel)
   const isEnabled = loading ? false : (data?.enabled ?? false);
   const userAccessAvailable = loading ? false : (data?.user_access_available ?? false);
 

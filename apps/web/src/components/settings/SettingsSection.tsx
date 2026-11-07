@@ -103,7 +103,7 @@ export function SettingsSection({
   if (!collapsible) {
     return (
       <Card className={cn('overflow-hidden', className)}>
-        <CardHeader>
+        <CardHeader className="px-6 py-6 flex-row items-center gap-4 space-y-0">
           {Icon && (
             <div className="rounded-lg bg-primary/10 p-2.5">
               <Icon className="h-6 w-6 text-primary" />

@@ -116,9 +116,10 @@ export function middleware(request: NextRequest) {
 
 // Apply middleware to all routes except:
 // - API routes (/api/*)
-// - Static files (_next/static/*)
-// - Images (_next/image/*)
-// - Favicon
+// - Static files (_next/static/*, _next/image/*)
+// - Favicon and other root-level static files
+// - SEO files (robots.txt, sitemap.xml, llms.txt, manifest.json)
 export const config = {
-  matcher: '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)',
+  matcher:
+    '/((?!api|_next/static|_next/image|favicon.ico|robots\\.txt|sitemap\\.xml|llms\\.txt|manifest\\.json|.*\\..*).*)',
 };

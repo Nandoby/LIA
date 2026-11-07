@@ -3,7 +3,13 @@
 import { Sparkles, Link2, MessageCircleHeart, Brain, Bell, Terminal, Heart } from 'lucide-react';
 
 export type IllustrationType =
-  'welcome' | 'connectors' | 'personality' | 'memory' | 'interests' | 'notifications' | 'examples';
+  | 'welcome'
+  | 'connectors'
+  | 'personality'
+  | 'memory'
+  | 'interests'
+  | 'notifications'
+  | 'examples';
 
 interface OnboardingIllustrationProps {
   type: IllustrationType;

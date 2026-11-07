@@ -17,7 +17,7 @@ export function AnimatedCounter({ target, suffix = '', duration = 2000 }: Animat
     const el = ref.current;
     if (!el || hasAnimated) return;
 
-    // Check prefers-reduced-motion - show final value instantly
+    // Check prefers-reduced-motion — show final value instantly
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (prefersReducedMotion) {
