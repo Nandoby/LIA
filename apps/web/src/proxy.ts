@@ -110,7 +110,7 @@ const i18nConfig = {
   localeDetector,
 };
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   return i18nRouter(request, i18nConfig);
 }
 
@@ -121,5 +121,5 @@ export function middleware(request: NextRequest) {
 // - SEO files (robots.txt, sitemap.xml, llms.txt, manifest.json)
 export const config = {
   matcher:
-    '/((?!api|_next/static|_next/image|favicon.ico|robots\\.txt|sitemap\\.xml|llms\\.txt|manifest\\.json|.*\\..*).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|robots\\.txt|sitemap\\.xml|llms\\.txt|manifest\\.json|google.*\\.html|.*\\..*).*)',
 };

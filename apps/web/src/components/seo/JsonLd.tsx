@@ -81,10 +81,10 @@ interface SoftwareApplicationJsonLdProps {
  * Provides structured product information to search engines and AI systems.
  */
 export function SoftwareApplicationJsonLd({
-                                            lng,
-                                            title,
-                                            description,
-                                          }: SoftwareApplicationJsonLdProps) {
+  lng,
+  title,
+  description,
+}: SoftwareApplicationJsonLdProps) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -113,7 +113,7 @@ export function SoftwareApplicationJsonLd({
       'Extensible via MCP protocol',
     ],
     screenshot: `${BASE_URL}/Title.png`,
-    softwareVersion: '1.6.1',
+    softwareVersion: '1.7.0',
     inLanguage: LOCALE_MAP[lng],
     image: `${BASE_URL}/Title.png`,
   };

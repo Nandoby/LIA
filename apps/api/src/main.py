@@ -37,6 +37,7 @@ from src.core.constants import (
     SCHEDULER_JOB_HEARTBEAT_NOTIFICATION,
     SCHEDULER_JOB_INTEREST_CLEANUP,
     SCHEDULER_JOB_INTEREST_NOTIFICATION,
+    SCHEDULER_JOB_JOURNAL_CONSOLIDATION,
     SCHEDULER_JOB_MEMORY_CLEANUP,
     SCHEDULER_JOB_OAUTH_HEALTH,
     SCHEDULER_JOB_REMINDER_NOTIFICATION,
@@ -140,8 +141,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Startup
     # Eagerly import all domain models so SQLAlchemy mappers are fully configured
     # before any query. Required for models referenced via string in relationships
-    # (e.g., User.skill_states → UserSkillState).
-    import src.domains.skills.models  # noqa: F401
+    # (e.g., User.skill_states → UserSkillState, User.journal_entries → JournalEntry),
+    # independently of feature flags that gate router imports (e.g., journals_enabled).
+    from src.infrastructure.database.registry import import_all_models
+
+    import_all_models()
 
     logger.info(
         "application_startup",
@@ -773,6 +777,28 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 interval_minutes=settings.heartbeat_notification_interval_minutes,
             )
 
+        # Schedule journal consolidation (Personal Journals — Carnets de Bord)
+        # Runs every N hours (configurable) to review and maintain journal entries
+        if getattr(settings, "journals_enabled", False):
+            from src.infrastructure.scheduler.journal_consolidation import (
+                process_journal_consolidation,
+            )
+
+            scheduler.add_job(
+                process_journal_consolidation,
+                trigger="interval",
+                hours=settings.journal_consolidation_interval_hours,
+                id=SCHEDULER_JOB_JOURNAL_CONSOLIDATION,
+                name="Journal consolidation",
+                replace_existing=True,
+                max_instances=1,
+                misfire_grace_time=300,
+            )
+            logger.info(
+                "journal_consolidation_job_scheduled",
+                interval_hours=settings.journal_consolidation_interval_hours,
+            )
+
         # Schedule attachment cleanup (evolution F4 — File Attachments)
         # Runs every 6 hours as TTL safety net for orphan files
         if getattr(settings, "attachments_enabled", False):
@@ -812,6 +838,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             scheduled_jobs.append(SCHEDULER_JOB_HEARTBEAT_NOTIFICATION)
         if getattr(settings, "attachments_enabled", False):
             scheduled_jobs.append(SCHEDULER_JOB_ATTACHMENT_CLEANUP)
+        if getattr(settings, "journals_enabled", False):
+            scheduled_jobs.append(SCHEDULER_JOB_JOURNAL_CONSOLIDATION)
+        if getattr(settings, "sub_agents_enabled", False):
+            scheduled_jobs.append(SCHEDULER_JOB_SUBAGENT_STALE_RECOVERY)
+        if SCHEDULER_JOB_BROWSER_CLEANUP in {j.id for j in scheduler.get_jobs()}:
+            scheduled_jobs.append(SCHEDULER_JOB_BROWSER_CLEANUP)
         logger.info("scheduler_started", jobs=scheduled_jobs)
     except (RuntimeError, ValueError) as exc:
         logger.error("scheduler_initialization_failed", error=str(exc), exc_info=True)
