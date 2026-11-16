@@ -225,7 +225,7 @@ def extract_text_epub(file_path: Path) -> str:
     """Extract chapter text from EPUB in spine (reading) order."""
     import warnings
 
-    import ebooklib  # type: ignore[import-untyped]
+    import ebooklib
     from ebooklib import epub
     from markdownify import markdownify
 
@@ -240,7 +240,12 @@ def extract_text_epub(file_path: Path) -> str:
             continue
         if item.get_type() != ebooklib.ITEM_DOCUMENT:
             continue
-        html_content = item.get_content().decode("utf-8", errors="replace")
+        raw_content = item.get_content()
+        html_content = (
+            raw_content.decode("utf-8", errors="replace")
+            if isinstance(raw_content, bytes)
+            else raw_content
+        )
         chapter_text = markdownify(html_content, strip=["img", "script", "style"])
         if chapter_text.strip():
             text_parts.append(chapter_text.strip())

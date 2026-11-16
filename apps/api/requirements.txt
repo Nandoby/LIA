@@ -115,5 +115,5 @@ python-pptx>=1.0.0  # PPTX text extraction for RAG Spaces
 openpyxl>=3.1.0  # XLSX text extraction for RAG Spaces
 striprtf>=0.0.26  # RTF text extraction for RAG Spaces (pure Python)
 odfpy>=1.4.1  # ODF (ODT/ODS/ODP) text extraction for RAG Spaces
-ebooklib>=0.18  # EPUB text extraction for RAG Spaces
+ebooklib>=0.21  # EPUB text extraction for RAG Spaces
 defusedxml>=0.7.1  # Secure XML parsing (prevents XXE, XML bombs) for RAG Spaces
