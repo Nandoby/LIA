@@ -65,7 +65,7 @@ class SubAgentRepository(BaseRepository[SubAgent]):
             (SubAgent.timeout_seconds + timeout_margin_seconds)
             * literal_column("'1 second'::interval"),
             Interval(),
-            )
+        )
 
         stmt = (
             select(SubAgent)

@@ -123,9 +123,9 @@ class FeedbackLoopService:
 
         self.storage = storage or InMemoryRecoveryStorage()
         self._pattern_cache: dict[str, list[tuple[str, RecoveryOutcome]]] = {}
-        self._strategy_stats: dict[
-            tuple[str, str], tuple[int, int]
-        ] = {}  # (strategy, domain) -> (success, failure)
+        self._strategy_stats: dict[tuple[str, str], tuple[int, int]] = (
+            {}
+        )  # (strategy, domain) -> (success, failure)
 
     async def record_recovery(
         self,

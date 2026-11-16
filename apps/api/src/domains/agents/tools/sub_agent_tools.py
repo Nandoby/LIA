@@ -107,7 +107,7 @@ async def delegate_to_sub_agent_tool(
             if user_obj and not getattr(user_obj, "sub_agents_enabled", True):
                 return UnifiedToolOutput.failure(
                     message="Sub-agents are disabled in your preferences. "
-                            "Enable them in Settings to use this feature.",
+                    "Enable them in Settings to use this feature.",
                     error_code="FEATURE_DISABLED",
                 )
 

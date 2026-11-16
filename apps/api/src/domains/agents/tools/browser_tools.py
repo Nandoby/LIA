@@ -268,7 +268,7 @@ async def browser_task_tool(
             final_message,
             current_url or "browser_agent",
             source_type="browser_page",
-            )
+        )
 
         return UnifiedToolOutput.data_success(
             message=wrapped_content,
@@ -282,7 +282,7 @@ async def browser_task_tool(
                 current_title or "Browser Task",
                 0,
                 final_message,
-                ),
+            ),
         )
 
     except ValueError as e:

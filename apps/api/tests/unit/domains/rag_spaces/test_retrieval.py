@@ -300,7 +300,7 @@ class TestRetrieveRagContext:
     @pytest.mark.asyncio
     @pytest.mark.unit
     async def test_no_semantic_results_returns_empty_context(
-            self, user_id, mock_db, mock_settings
+        self, user_id, mock_db, mock_settings
     ) -> None:
         """When semantic search returns nothing, returns RAGContext with empty chunks."""
         space = MagicMock()
@@ -528,7 +528,7 @@ class TestRetrieveRagContext:
     @pytest.mark.asyncio
     @pytest.mark.unit
     async def test_bm25_failure_falls_back_to_semantic_only(
-            self, user_id, mock_db, mock_settings
+        self, user_id, mock_db, mock_settings
     ) -> None:
         """If BM25 scoring fails, retrieval still works with semantic-only scores."""
         space_id = uuid4()
@@ -599,7 +599,7 @@ class TestRetrieveRagContext:
     @pytest.mark.asyncio
     @pytest.mark.unit
     async def test_chunks_below_min_score_filtered_out(
-            self, user_id, mock_db, mock_settings
+        self, user_id, mock_db, mock_settings
     ) -> None:
         """Chunks with hybrid scores below min_score are excluded."""
         space_id = uuid4()
@@ -672,7 +672,7 @@ class TestRetrieveRagContext:
     @pytest.mark.asyncio
     @pytest.mark.unit
     async def test_redis_unavailable_does_not_block_retrieval(
-            self, user_id, mock_db, mock_settings
+        self, user_id, mock_db, mock_settings
     ) -> None:
         """If Redis is unreachable, retrieval continues (reindex check skipped)."""
         space_id = uuid4()
