@@ -26,7 +26,7 @@ tzdata==2025.3  # IANA timezone database for Windows/Python 3.9+
 python-jose[cryptography]==3.5.0  # CVE-2024-33663 fix (algorithm confusion)
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.33  # CVE-2024-53981, CVE-2026-24486 fixes (DoS)
-cryptography==46.0.5  # CVE-2024-12797, CVE-2026-26007 fixes
+cryptography==50.0.2  # CVE-2024-12797, CVE-2026-26007 fixes
 
 # Observability
 structlog==25.5.0
@@ -85,7 +85,7 @@ rank-bm25==0.2.2  # Okapi BM25 algorithm for keyword-based retrieval
 langchain-deepseek==1.1.1  # DeepSeek V3/R1 models
 langchain-anthropic==1.7.10  # Claude models (auto-compaction, effort="max" sans beta, cache_control fix)
 langchain-google-genai==4.5.0  # Gemini models
-anthropic==0.85.0  # Anthropic SDK (Claude Opus 4.6, structured outputs natifs, cache control GA)
+anthropic==0.125.0  # Anthropic SDK (Claude Opus 4.6, structured outputs natifs, cache control GA)
 
 # MCP (Model Context Protocol) — evolution F2
 mcp>=1.20.0,<2.0.0  # MCP 1.20+ adds list_resources/read_resource (MCP Apps support). Requires starlette>=0.27
