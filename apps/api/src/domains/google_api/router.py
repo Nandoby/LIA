@@ -711,7 +711,7 @@ async def export_consumption_summary(
     user_emails = {row[0]: row[1] for row in users_result.all()}
 
     # Build combined data
-    data = list[dict[str, Any]] = []
+    data: list[dict[str, Any]] = []
     for uid in all_user_ids:
         token_data = token_rows.get(uid)
         google_data = google_rows.get(uid)
