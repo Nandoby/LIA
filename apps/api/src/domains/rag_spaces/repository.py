@@ -269,7 +269,7 @@ class RAGDocumentRepository(BaseRepository[RAGDocument]):
             RAGDocument.drive_file_id.is_not(None),
         )
         result = await self.db.execute(stmt)
-        return {row[0] for row in result.all()}
+        return {row[0] for row in result.all() if row[0] is not None}
 
 
 class RAGChunkRepository(BaseRepository[RAGChunk]):

@@ -10,7 +10,8 @@ scripts, resources, technical metadata). This service manages display metadata
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from collections.abc import Iterable
+from typing import Any, cast
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -314,7 +315,7 @@ class SkillPreferenceService:
             rows = await self.db.execute(
                 text("SELECT user_id, disabled_skills FROM _legacy_disabled_skills")
             )
-            for user_id, disabled_list in rows:
+            for user_id, disabled_list in cast(Iterable[tuple[UUID, list[str] | None]], rows):
                 if not disabled_list:
                     continue
                 for skill_name in disabled_list:
@@ -343,7 +344,9 @@ class SkillPreferenceService:
                 )
             )
             system_disabled_names: set[str] = set()
-            for _admin_id, sys_disabled_list in rows2:
+            for _admin_id, sys_disabled_list in cast(
+                Iterable[tuple[UUID, list[str] | None]], rows2
+            ):
                 if sys_disabled_list:
                     system_disabled_names.update(sys_disabled_list)
 

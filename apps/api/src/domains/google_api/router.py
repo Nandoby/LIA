@@ -33,6 +33,7 @@ from src.domains.google_api.schemas import (
     GoogleApiPricingUpdate,
 )
 from src.domains.users.models import AdminAuditLog
+from typing import Any
 
 logger = structlog.get_logger(__name__)
 
@@ -710,7 +711,7 @@ async def export_consumption_summary(
     user_emails = {row[0]: row[1] for row in users_result.all()}
 
     # Build combined data
-    data = []
+    data = list[dict[str, Any]] = []
     for uid in all_user_ids:
         token_data = token_rows.get(uid)
         google_data = google_rows.get(uid)
