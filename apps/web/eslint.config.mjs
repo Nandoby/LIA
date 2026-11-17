@@ -19,6 +19,10 @@ const eslintConfig = defineConfig([
       // TODO: Address these React 19 strict mode rules in a separate PR
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/immutability": "off",
+      "react-hooks/purity": "warn",
+      "react-hooks/refs": "warn",
+      "react-hooks/use-memo": "warn",
+      "react-hooks/preserve-manual-memoization": "warn",
     },
   },
 ]);
