@@ -9,6 +9,7 @@ Date: 2026-02-04
 """
 
 import uuid
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, Request, status
@@ -710,7 +711,7 @@ async def export_consumption_summary(
     user_emails = {row[0]: row[1] for row in users_result.all()}
 
     # Build combined data
-    data = []
+    data: list[dict[str, Any]] = []
     for uid in all_user_ids:
         token_data = token_rows.get(uid)
         google_data = google_rows.get(uid)

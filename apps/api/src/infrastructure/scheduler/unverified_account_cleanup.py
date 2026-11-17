@@ -108,8 +108,8 @@ async def cleanup_unverified_accounts() -> dict[str, Any]:
                     User.oauth_provider.is_(None),
                     User.created_at < cutoff,
                 )
-                result = await session.execute(select_query)
-                emails = [row[0] for row in result.fetchall()]
+                email_result = await session.execute(select_query)
+                emails = [row[0] for row in email_result.fetchall()]
 
                 # Delete the accounts
                 delete_query = delete(User).where(
