@@ -9,8 +9,8 @@ scripts, resources, technical metadata). This service manages display metadata
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from collections.abc import Iterable
+from dataclasses import dataclass, field
 from typing import Any, cast
 from uuid import UUID
 
