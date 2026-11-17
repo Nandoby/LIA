@@ -29,7 +29,7 @@ python-multipart==0.0.33  # CVE-2024-53981, CVE-2026-24486 fixes (DoS)
 cryptography==50.0.2  # CVE-2024-12797, CVE-2026-26007 fixes
 
 # Observability
-structlog==25.5.0
+structlog==26.1.0
 geoip2==5.3.0  # IP geolocation (DB-IP Lite MMDB — free, CC-BY-4.0)
 opentelemetry-api==1.45.2
 opentelemetry-sdk==1.45.2
