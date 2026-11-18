@@ -1,6 +1,6 @@
 import { initI18next } from '@/i18n';
 import Image from 'next/image';
-import { Github } from 'lucide-react';
+import { GithubIcon } from '@/components/icons/GithubIcon';
 import { APP_VERSION } from '@/lib/version';
 
 const GITHUB_REPO_URL = 'https://github.com/jgouviergmail/LIA-Assistant';
@@ -39,7 +39,7 @@ export async function LandingFooter({ lng }: LandingFooterProps) {
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 hover:text-foreground transition-colors"
             >
-              <Github className="w-4 h-4" />
+              <GithubIcon className="w-4 h-4" />
               {t('landing.footer.github')}
             </a>
             <a href="#security" className="hover:text-foreground transition-colors">
