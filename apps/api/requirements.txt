@@ -29,7 +29,7 @@ python-multipart==0.0.33  # CVE-2024-53981, CVE-2026-24486 fixes (DoS)
 cryptography==50.0.2  # CVE-2024-12797, CVE-2026-26007 fixes
 
 # Observability
-structlog==25.5.0
+structlog==26.1.0
 geoip2==5.3.0  # IP geolocation (DB-IP Lite MMDB — free, CC-BY-4.0)
 opentelemetry-api==1.45.2
 opentelemetry-sdk==1.45.2
@@ -76,7 +76,7 @@ tiktoken==0.14.0
 # Replaces OpenAI text-embedding-3-small for better Q/A matching (0.90 vs 0.61 avg score)
 # PyTorch is pulled as dependency - pip installs CPU-only by default (no CUDA index)
 # ARM64 (Raspberry Pi): CPU-only wheels automatically (CUDA not supported on ARM)
-sentence-transformers==5.3.0  # HuggingFace E5 model (intfloat/multilingual-e5-small)
+sentence-transformers==6.3.0  # HuggingFace E5 model (intfloat/multilingual-e5-small)
 
 # Hybrid Memory Search - BM25 keyword matching combined with semantic search
 rank-bm25==0.2.2  # Okapi BM25 algorithm for keyword-based retrieval
@@ -109,7 +109,7 @@ vobject>=0.9.9  # vCard/vCalendar parser (iCloud uses vCard 3.0)
 # Attachments — File Uploads & Vision Analysis (evolution F4)
 Pillow>=13.0.0  # Image validation, HEIC→JPEG conversion
 filetype>=1.2.0  # MIME detection by magic bytes (pure Python, ARM64 native)
-PyMuPDF>=1.25.0  # PDF text extraction (lightweight, ARM64 compatible)
+PyMuPDF>=2.1  # PDF text extraction (lightweight, ARM64 compatible)
 python-docx>=1.1.0  # DOCX text extraction for RAG Spaces
 python-pptx>=1.0.0  # PPTX text extraction for RAG Spaces
 openpyxl>=3.1.0  # XLSX text extraction for RAG Spaces
