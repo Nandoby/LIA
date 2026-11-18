@@ -378,8 +378,8 @@ jobs:
           context: ./apps/api
           file: ./apps/api/Dockerfile.prod
           push: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=api
+          cache-to: ${{ github.event_name == 'push' && 'type=gha,scope=api,mode=max' || '' }}
 
       - name: Build Web image
         uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
@@ -387,8 +387,8 @@ jobs:
           context: .
           file: ./apps/web/Dockerfile.prod
           push: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=web
+          cache-to: ${{ github.event_name == 'push' && 'type=gha,scope=web,mode=max' || '' }}
 
   secret-scan:
     name: Secret Scan
