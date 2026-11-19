@@ -21,11 +21,11 @@ def upgrade() -> None:
     """Add Philips Hue to connector_global_config."""
     op.execute("""
         INSERT INTO connector_global_config (id, connector_type, is_enabled, disabled_reason)
-        VALUES (gen_random_uuid(), 'philips_hue', true, NULL)
+        VALUES (gen_random_uuid(), 'PHILIPS_HUE', true, NULL)
         ON CONFLICT (connector_type) DO NOTHING
     """)
 
 
 def downgrade() -> None:
     """Remove Philips Hue from connector_global_config."""
-    op.execute("DELETE FROM connector_global_config WHERE connector_type = 'philips_hue'")
+    op.execute("DELETE FROM connector_global_config WHERE connector_type = 'PHILIPS_HUE'")
