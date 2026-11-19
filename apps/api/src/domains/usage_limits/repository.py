@@ -44,13 +44,13 @@ def _build_user_stats_columns() -> list[Any]:
         + UserStatistics.cycle_completion_tokens
         + UserStatistics.cycle_cached_tokens,
         0,
-        )
+    )
     total_tokens = func.coalesce(
         UserStatistics.total_prompt_tokens
         + UserStatistics.total_completion_tokens
         + UserStatistics.total_cached_tokens,
         0,
-        )
+    )
 
     return [
         User.id.label("user_id"),
@@ -76,13 +76,13 @@ def _build_user_stats_columns() -> list[Any]:
         func.coalesce(
             UserStatistics.cycle_cost_eur + UserStatistics.cycle_google_api_cost_eur,
             Decimal("0"),
-            ).label("cycle_cost"),
+        ).label("cycle_cost"),
         total_tokens.label("total_tokens"),
         func.coalesce(UserStatistics.total_messages, 0).label("total_messages"),
         func.coalesce(
             UserStatistics.total_cost_eur + UserStatistics.total_google_api_cost_eur,
             Decimal("0"),
-            ).label("total_cost"),
+        ).label("total_cost"),
         # Cycle tracking
         UserStatistics.current_cycle_start,
     ]
