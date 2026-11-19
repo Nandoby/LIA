@@ -5,14 +5,14 @@ Enum(native_enum=False), which persists the member NAME ('PHILIPS_HUE').
 Loading the row raised LookupError and broke GET /connectors/admin/global-config.
 
 Revision ID: hue_global_config_fix_001
-Revises: usage_limits_001
+Revises: hue_global_config_001
 Create Date: 2026-11-19
 """
 
 from alembic import op
 
 revision: str = "hue_global_config_fix_001"
-down_revision: str | None = "usage_limits_001"
+down_revision: str | None = "hue_global_config_001"
 branch_labels = None
 depends_on = None
 
