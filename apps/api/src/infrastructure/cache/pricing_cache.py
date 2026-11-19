@@ -125,7 +125,7 @@ class PricingCacheData:
         )
 
     @classmethod
-    def from_json(cls, data: str) -> PricingCacheData:
+    def from_json(cls, data: str | bytes) -> PricingCacheData:
         """Deserialize from Redis JSON."""
         parsed = json.loads(data)
         models = {k: CachedModelPrice(**v) for k, v in parsed["models"].items()}
