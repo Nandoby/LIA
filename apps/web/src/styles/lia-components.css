@@ -33,7 +33,7 @@
   --lia-info-light: #60a5fa;
   --lia-info-subtle: rgba(59, 130, 246, 0.08);
 
-  /* Domain accent colors - all use theme color */
+  /* Domain accent colors - all use user theme color */
   --lia-email-accent: var(--lia-primary);
   --lia-email-gradient: linear-gradient(135deg, var(--lia-primary), var(--lia-primary-light));
   --lia-contact-accent: var(--lia-primary);
