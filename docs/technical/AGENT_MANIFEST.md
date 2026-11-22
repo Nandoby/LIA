@@ -4,7 +4,7 @@
 **Date**: 2025-12-27
 **Auteur**: Documentation Technique LIA
 **Statut**: ✅ Complète et Validée
-**Updated**: LOT 9/10 agents, Voice domain, Philips Hue Smart Home, 11 agents total
+**Updated**: LOT 9/10 agents, Voice domain, Philips Hue Smart Home, 11 agents total, context_save_mode field
 
 ---
 
