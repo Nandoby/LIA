@@ -2,7 +2,7 @@
 
 # Linting & Formatting
 black==26.10.1
-ruff==0.17.5
+ruff==0.17.6
 mypy==1.19.1
 
 # Testing
