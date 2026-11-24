@@ -18,8 +18,11 @@ updates:
           - patch
 
   # Node.js frontend dependencies
+  # pnpm workspace: point at the root so Dependabot updates the root
+  # pnpm-lock.yaml (the only lockfile; CI and Docker use --frozen-lockfile).
+  # Workspace packages (apps/web) are discovered via pnpm-workspace.yaml.
   - package-ecosystem: npm
-    directory: /apps/web
+    directory: /
     schedule:
       interval: weekly
       day: monday
