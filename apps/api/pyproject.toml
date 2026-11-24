@@ -20,7 +20,7 @@ Repository = "https://github.com/jgouviergmail/LIA-Assistant"
 dev = [
     # Linting & Formatting
     "black==26.10.1",
-    "ruff==0.17.5",
+    "ruff==0.17.6",
     "mypy==1.19.1",
     # Testing
     "pytest==9.2.0",
