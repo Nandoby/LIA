@@ -1,6 +1,6 @@
 [project]
 name = "lia-api"
-version = "1.9.4"
+version = "1.10.0"
 description = "LIA Assistant - AI conversational assistant with multi-agent orchestration"
 license = "AGPL-3.0-or-later"
 authors = [
@@ -20,7 +20,7 @@ Repository = "https://github.com/jgouviergmail/LIA-Assistant"
 dev = [
     # Linting & Formatting
     "black==26.10.1",
-    "ruff==0.17.5",
+    "ruff==0.17.6",
     "mypy==1.19.1",
     # Testing
     "pytest==9.2.0",
