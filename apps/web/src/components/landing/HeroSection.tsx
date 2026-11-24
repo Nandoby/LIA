@@ -2,8 +2,7 @@ import Link from 'next/link';
 import { initI18next } from '@/i18n';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronDown } from 'lucide-react';
-import { GithubIcon } from '@/components/icons/GithubIcon';
+import { ChevronDown, Github } from 'lucide-react';
 import { buildLocalizedPath } from '@/utils/i18n-path-utils';
 import type { Language } from '@/i18n/settings';
 import { HeroBackground } from './HeroBackground';
@@ -39,7 +38,7 @@ export async function HeroSection({ lng }: HeroSectionProps) {
               variant="outline"
               className="gap-1.5 cursor-pointer hover:bg-muted/50 transition-colors"
             >
-              <GithubIcon className="w-3.5 h-3.5" />
+              <Github className="w-3.5 h-3.5" />
               {t('landing.hero.badge_opensource')}
             </Badge>
           </a>
@@ -84,7 +83,7 @@ export async function HeroSection({ lng }: HeroSectionProps) {
           </Button>
           <Button asChild variant="outline" size="lg" className="text-base px-8 gap-2">
             <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer">
-              <GithubIcon className="w-5 h-5" />
+              <Github className="w-5 h-5" />
               {t('landing.hero.cta_github')}
             </a>
           </Button>

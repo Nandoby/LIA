@@ -212,7 +212,9 @@
           "unit": "short",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "blue" }]
+            "steps": [
+              { "value": null, "color": "blue" }
+            ]
           }
         },
         "overrides": []
@@ -247,7 +249,9 @@
           "unit": "short",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "blue" }]
+            "steps": [
+              { "value": null, "color": "blue" }
+            ]
           }
         },
         "overrides": []
@@ -283,7 +287,9 @@
           "decimals": 0,
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "green" }]
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
           }
         },
         "overrides": []
@@ -319,7 +325,9 @@
           "decimals": 0,
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "purple" }]
+            "steps": [
+              { "value": null, "color": "purple" }
+            ]
           }
         },
         "overrides": []
@@ -355,7 +363,9 @@
           "decimals": 0,
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "orange" }]
+            "steps": [
+              { "value": null, "color": "orange" }
+            ]
           }
         },
         "overrides": []
@@ -391,7 +401,9 @@
           "decimals": 0,
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "yellow" }]
+            "steps": [
+              { "value": null, "color": "yellow" }
+            ]
           }
         },
         "overrides": []
@@ -821,8 +833,8 @@
                 "mode": "absolute",
                 "steps": [
                   { "value": null, "color": "green" },
-                  { "value": 0.1, "color": "yellow" },
-                  { "value": 0.5, "color": "red" }
+                  { "value": 0.10, "color": "yellow" },
+                  { "value": 0.50, "color": "red" }
                 ]
               }
             },
@@ -859,7 +871,9 @@
               "decimals": 0,
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "blue" }]
+                "steps": [
+                  { "value": null, "color": "blue" }
+                ]
               }
             },
             "overrides": []

@@ -19,28 +19,23 @@ Adapte tes conseils au contexte et aux contraintes de l'utilisateur.
 ## Frameworks disponibles
 
 ### Matrice d'Eisenhower
-
 Classifier chaque tâche selon 2 axes :
-
 - **Urgent + Important** → Faire immédiatement
 - **Important + Non urgent** → Planifier (bloc calendrier)
 - **Urgent + Non important** → Déléguer si possible
 - **Ni urgent ni important** → Éliminer ou reporter
 
 ### Méthode Pomodoro
-
 - Blocs de 25 min de focus intense
 - Pause de 5 min entre chaque bloc
 - Pause longue de 15-30 min après 4 blocs
 - Adapter la durée selon le type de tâche
 
 ### Règle des 2 minutes (GTD)
-
-- Si une tâche prend poins de 2 minutes → la faire immédiatement
+- Si une tâche prend moins de 2 minutes → la faire immédiatement
 - Sinon → la capturer dans la liste de tâches avec une date
 
 ### Time blocking
-
 - Réserver des créneaux dédiés pour le travail de fond
 - Regrouper les tâches similaires (batching)
 - Protéger les heures de haute énergie pour les tâches complexes
@@ -63,5 +58,5 @@ Classifier chaque tâche selon 2 axes :
 
 ## Ressources disponibles
 
-- `references/matrice-eisenhower.md` - Guide complet de la matrice d'Eisenhower avec exemples
-- `references/techniques.md` - Fiches détaillées : Pomodoro, GTD, Time Blocking, Eat the Frog
+- `references/matrice-eisenhower.md` — Guide complet de la matrice d'Eisenhower avec exemples
+- `references/techniques.md` — Fiches détaillées : Pomodoro, GTD, Time Blocking, Eat the Frog

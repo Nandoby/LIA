@@ -29,7 +29,7 @@ export const languageNames: Record<Language, { native: string; english: string }
 
 /**
  * Language flag emojis
- * Centralized to avoid application across components
+ * Centralized to avoid duplication across components
  */
 export const languageFlags: Record<Language, string> = {
   fr: '🇫🇷',

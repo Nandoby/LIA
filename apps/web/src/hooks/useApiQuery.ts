@@ -20,15 +20,15 @@ import { logger } from '@/lib/logger';
  * @example
  * ```tsx
  * const { data, loading, error, refetch } = useApiQuery<User[]>('/users', {
- *    componentName: 'UserList',
- *    initialData: [],
+ *   componentName: 'UserList',
+ *   initialData: [],
  * });
  * ```
  */
 export interface UseApiQueryOptions<T> {
   /** Component name for logging */
   componentName: string;
-  /** Initial data value **/
+  /** Initial data value */
   initialData?: T;
   /** Whether to fetch on mount (default: true) */
   enabled?: boolean;

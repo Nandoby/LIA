@@ -79,7 +79,9 @@
           "unit": "short",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "green" }]
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
           }
         },
         "overrides": []
@@ -220,7 +222,9 @@
           "unit": "s",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "green" }]
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
           }
         },
         "overrides": []
@@ -255,7 +259,9 @@
           "unit": "s",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "green" }]
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
           }
         },
         "overrides": []
@@ -415,7 +421,9 @@
               "unit": "percent",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []
@@ -666,7 +674,9 @@
               "unit": "percent",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []

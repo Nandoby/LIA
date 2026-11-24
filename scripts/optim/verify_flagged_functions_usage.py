@@ -38,14 +38,8 @@ FLAGGED_FUNCTIONS = [
     ("verify_refresh_token", "infrastructure\\cache\\redis.py"),
     ("delete_oauth_state", "infrastructure\\cache\\redis.py"),
     ("init_db", "infrastructure\\database\\session.py"),
-    (
-        "async_wrapper",
-        "infrastructure\\observability\\decorators.py",
-    ),  # Multiple instances
-    (
-        "sync_wrapper",
-        "infrastructure\\observability\\decorators.py",
-    ),  # Multiple instances
+    ("async_wrapper", "infrastructure\\observability\\decorators.py"),  # Multiple instances
+    ("sync_wrapper", "infrastructure\\observability\\decorators.py"),  # Multiple instances
     ("add_opentelemetry_context", "infrastructure\\observability\\logging.py"),
     ("parse_agent_result_key", "domains\\agents\\constants.py"),
     ("route_from_router", "domains\\agents\\graph.py"),
@@ -58,40 +52,22 @@ FLAGGED_FUNCTIONS = [
     ("get_confidence", "domains\\agents\\context\\manager.py"),
     ("model_post_init", "domains\\agents\\context\\registry.py"),
     ("reset_tool_context_store", "domains\\agents\\context\\store.py"),
-    (
-        "_get_current_datetime_formatted",
-        "domains\\agents\\graphs\\contacts_agent_builder.py",
-    ),
+    ("_get_current_datetime_formatted", "domains\\agents\\graphs\\contacts_agent_builder.py"),
     ("approval_gate_node", "domains\\agents\\nodes\\approval_gate_node.py"),
     ("route_from_planner", "domains\\agents\\nodes\\routing.py"),
     ("route_from_approval_gate", "domains\\agents\\nodes\\routing.py"),
     ("has_tool", "domains\\agents\\orchestration\\parallel_executor.py"),
     ("list_tools", "domains\\agents\\orchestration\\parallel_executor.py"),
-    (
-        "replace_ref",
-        "domains\\agents\\orchestration\\parallel_executor.py",
-    ),  # Multiple files
+    ("replace_ref", "domains\\agents\\orchestration\\parallel_executor.py"),  # Multiple files
     ("replacer", "domains\\agents\\orchestration\\plan_executor.py"),
-    (
-        "_convert_execution_plan_to_dict",
-        "domains\\agents\\orchestration\\plan_executor.py",
-    ),
+    ("_convert_execution_plan_to_dict", "domains\\agents\\orchestration\\plan_executor.py"),
     ("_request_hitl_approval", "domains\\agents\\orchestration\\plan_executor.py"),
     ("_save_to_store", "domains\\agents\\orchestration\\plan_executor.py"),
     ("matches_keyword", "domains\\agents\\registry\\domain_taxonomy.py"),
-    (
-        "export_domain_metadata_for_prompt",
-        "domains\\agents\\registry\\domain_taxonomy.py",
-    ),
+    ("export_domain_metadata_for_prompt", "domains\\agents\\registry\\domain_taxonomy.py"),
     ("store_tool_call_mapping", "domains\\agents\\services\\hitl_orchestrator.py"),
-    (
-        "validate_and_normalize_list_response",
-        "domains\\agents\\tools\\contacts_validators.py",
-    ),
-    (
-        "validate_and_normalize_details_response",
-        "domains\\agents\\tools\\contacts_validators.py",
-    ),
+    ("validate_and_normalize_list_response", "domains\\agents\\tools\\contacts_validators.py"),
+    ("validate_and_normalize_details_response", "domains\\agents\\tools\\contacts_validators.py"),
     ("format_single_response", "domains\\agents\\tools\\formatters.py"),
     ("invalidate_user", "domains\\agents\\utils\\contacts_cache.py"),
     ("is_locked", "domains\\agents\\utils\\oauth_lock.py"),
@@ -127,7 +103,7 @@ def search_usage(function_name: str) -> Tuple[int, List[str]]:
                 ["rg", "-l", pattern, str(ROOT)],
                 capture_output=True,
                 text=True,
-                timeout=10,
+                timeout=10
             )
             if result.returncode == 0:
                 files = result.stdout.strip().split("\n")
@@ -138,7 +114,7 @@ def search_usage(function_name: str) -> Tuple[int, List[str]]:
                     ["rg", "-c", pattern, str(ROOT)],
                     capture_output=True,
                     text=True,
-                    timeout=10,
+                    timeout=10
                 )
                 if count_result.returncode == 0:
                     for line in count_result.stdout.strip().split("\n"):
@@ -169,7 +145,7 @@ def check_if_fastapi_route(file_path: str, function_name: str) -> bool:
             if f"def {function_name}(" in line or f"async def {function_name}(" in line:
                 # Check 10 lines before for route decorator
                 start = max(0, i - 10)
-                context = "\n".join(lines[start : i + 1])
+                context = "\n".join(lines[start:i+1])
 
                 if re.search(r"@(app|router)\.(get|post|put|delete|patch)", context):
                     return True
@@ -200,9 +176,7 @@ def analyze_flagged_functions():
 
         # Check if it's a FastAPI route
         if check_if_fastapi_route(file_path, func_name):
-            results["FASTAPI_ROUTE"].append(
-                (func_name, file_path, "FastAPI route (should be protected)")
-            )
+            results["FASTAPI_ROUTE"].append((func_name, file_path, "FastAPI route (should be protected)"))
             continue
 
         # Search for usage
@@ -213,17 +187,9 @@ def analyze_flagged_functions():
             filtered_files = [f for f in files if file_path not in f]
 
             if filtered_files:
-                results["USED"].append(
-                    (
-                        func_name,
-                        file_path,
-                        f"Used {count} times in {len(filtered_files)} files",
-                    )
-                )
+                results["USED"].append((func_name, file_path, f"Used {count} times in {len(filtered_files)} files"))
             else:
-                results["MAYBE_UNUSED"].append(
-                    (func_name, file_path, "Only self-definition found")
-                )
+                results["MAYBE_UNUSED"].append((func_name, file_path, f"Only self-definition found"))
         else:
             results["MAYBE_UNUSED"].append((func_name, file_path, "No usage found"))
 
@@ -283,12 +249,7 @@ def main():
 
     # Generate report
     report = generate_report(results)
-    output_path = (
-        Path(__file__).parent.parent.parent
-        / "docs"
-        / "optim"
-        / "PHASE_5_MANUAL_REVIEW.md"
-    )
+    output_path = Path(__file__).parent.parent.parent / "docs" / "optim" / "PHASE_5_MANUAL_REVIEW.md"
     output_path.write_text(report, encoding="utf-8")
     print()
     print(f"Report saved to: {output_path}")

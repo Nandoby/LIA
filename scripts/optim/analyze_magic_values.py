@@ -58,9 +58,9 @@ def analyze_magic_strings():
     results = grep_in_directory(
         r'["\'][^"\']{3,}["\']',  # Strings with 3+ chars
         SRC_ROOT,
-        extensions=[".py"],
-        exclude_dirs=EXCLUDE_DIRS + ["tests"],  # Exclude tests
-        regex=True,
+        extensions=['.py'],
+        exclude_dirs=EXCLUDE_DIRS + ['tests'],  # Exclude tests
+        regex=True
     )
 
     # Extract and count strings
@@ -69,7 +69,7 @@ def analyze_magic_strings():
 
     for result in results:
         # Extract string value (remove quotes)
-        match = re.search(r'["\']([^"\']+)["\']', result["context"])
+        match = re.search(r'["\']([^"\']+)["\']', result['context'])
         if match:
             string_value = match.group(1)
 
@@ -79,15 +79,15 @@ def analyze_magic_strings():
                 continue
 
             # 2. URLs, paths with /
-            if "://" in string_value or string_value.count("/") > 2:
+            if '://' in string_value or string_value.count('/') > 2:
                 continue
 
             # 3. SQL queries
-            if "SELECT" in string_value.upper() or "INSERT" in string_value.upper():
+            if 'SELECT' in string_value.upper() or 'INSERT' in string_value.upper():
                 continue
 
             # 4. Log messages (start with uppercase + space)
-            if re.match(r"^[A-Z][a-z]+\s", string_value):
+            if re.match(r'^[A-Z][a-z]+\s', string_value):
                 continue
 
             string_counter[string_value] += 1
@@ -99,9 +99,7 @@ def analyze_magic_strings():
     # Filter by minimum occurrences
     repeated_strings = {k: v for k, v in string_counter.items() if v >= MIN_OCCURRENCES}
 
-    print(
-        f"   Found {len(repeated_strings)} repeated strings (>={MIN_OCCURRENCES} occurrences)"
-    )
+    print(f"   Found {len(repeated_strings)} repeated strings (>={MIN_OCCURRENCES} occurrences)")
 
     return repeated_strings, string_locations
 
@@ -112,11 +110,11 @@ def analyze_magic_numbers():
 
     # Find all numeric literals (2+ digits)
     results = grep_in_directory(
-        r"\b[0-9]{2,}\b",
+        r'\b[0-9]{2,}\b',
         SRC_ROOT,
-        extensions=[".py"],
-        exclude_dirs=EXCLUDE_DIRS + ["tests"],
-        regex=True,
+        extensions=['.py'],
+        exclude_dirs=EXCLUDE_DIRS + ['tests'],
+        regex=True
     )
 
     # Extract and count numbers
@@ -125,7 +123,7 @@ def analyze_magic_numbers():
 
     for result in results:
         # Extract number
-        match = re.search(r"\b([0-9]+)\b", result["context"])
+        match = re.search(r'\b([0-9]+)\b', result['context'])
         if match:
             number_value = int(match.group(1))
 
@@ -142,9 +140,7 @@ def analyze_magic_numbers():
     # Filter by minimum occurrences
     repeated_numbers = {k: v for k, v in number_counter.items() if v >= MIN_OCCURRENCES}
 
-    print(
-        f"   Found {len(repeated_numbers)} repeated numbers (>={MIN_OCCURRENCES} occurrences)"
-    )
+    print(f"   Found {len(repeated_numbers)} repeated numbers (>={MIN_OCCURRENCES} occurrences)")
 
     return repeated_numbers, number_locations
 
@@ -155,7 +151,7 @@ def check_if_constant_exists(value):
         return False
 
     try:
-        with open(CONSTANTS_FILE, "r", encoding="utf-8") as f:
+        with open(CONSTANTS_FILE, 'r', encoding='utf-8') as f:
             content = f.read()
             # Check for value (as string representation)
             return repr(value) in content or str(value) in content
@@ -171,63 +167,59 @@ def analyze_magic_values():
 
     findings = []
     stats = {
-        "magic_strings": 0,
-        "magic_numbers": 0,
-        "already_constant": 0,
-        "to_centralize": 0,
+        'magic_strings': 0,
+        'magic_numbers': 0,
+        'already_constant': 0,
+        'to_centralize': 0,
     }
 
     # Analyze strings
     repeated_strings, string_locations = analyze_magic_strings()
-    stats["magic_strings"] = len(repeated_strings)
+    stats['magic_strings'] = len(repeated_strings)
 
     for string_value, count in sorted(repeated_strings.items(), key=lambda x: -x[1]):
         in_constants = check_if_constant_exists(string_value)
 
         if in_constants:
-            stats["already_constant"] += 1
+            stats['already_constant'] += 1
         else:
-            stats["to_centralize"] += 1
-            locations_str = ", ".join(string_locations[string_value][:3])
+            stats['to_centralize'] += 1
+            locations_str = ', '.join(string_locations[string_value][:3])
             if len(string_locations[string_value]) > 3:
                 locations_str += f" (+{len(string_locations[string_value]) - 3} more)"
 
-            findings.append(
-                {
-                    "item": f'"{string_value}"',
-                    "location": locations_str,
-                    "confidence": "high" if count >= 5 else "medium",
-                    "reason": f"{count} occurrences (magic string)",
-                    "details": f"Proposed constant name: {_suggest_constant_name(string_value)}",
-                }
-            )
+            findings.append({
+                'item': f'"{string_value}"',
+                'location': locations_str,
+                'confidence': 'high' if count >= 5 else 'medium',
+                'reason': f'{count} occurrences (magic string)',
+                'details': f'Proposed constant name: {_suggest_constant_name(string_value)}'
+            })
 
     # Analyze numbers
     repeated_numbers, number_locations = analyze_magic_numbers()
-    stats["magic_numbers"] = len(repeated_numbers)
+    stats['magic_numbers'] = len(repeated_numbers)
 
     for number_value, count in sorted(repeated_numbers.items(), key=lambda x: -x[1]):
         in_constants = check_if_constant_exists(number_value)
 
         if in_constants:
-            stats["already_constant"] += 1
+            stats['already_constant'] += 1
         else:
-            stats["to_centralize"] += 1
-            locations_str = ", ".join(number_locations[number_value][:3])
+            stats['to_centralize'] += 1
+            locations_str = ', '.join(number_locations[number_value][:3])
             if len(number_locations[number_value]) > 3:
                 locations_str += f" (+{len(number_locations[number_value]) - 3} more)"
 
-            findings.append(
-                {
-                    "item": str(number_value),
-                    "location": locations_str,
-                    "confidence": "high" if count >= 5 else "medium",
-                    "reason": f"{count} occurrences (magic number)",
-                    "details": "Consider creating constant with semantic name",
-                }
-            )
+            findings.append({
+                'item': str(number_value),
+                'location': locations_str,
+                'confidence': 'high' if count >= 5 else 'medium',
+                'reason': f'{count} occurrences (magic number)',
+                'details': f'Consider creating constant with semantic name'
+            })
 
-    print("\n[SUMMARY] Summary:")
+    print(f"\n[SUMMARY] Summary:")
     print(f"   Magic strings found: {stats['magic_strings']}")
     print(f"   Magic numbers found: {stats['magic_numbers']}")
     print(f"   Already constants: {stats['already_constant']}")
@@ -240,8 +232,8 @@ def analyze_magic_values():
 def _suggest_constant_name(value):
     """Suggest a constant name for a value."""
     # Simple heuristic
-    clean = re.sub(r"[^a-zA-Z0-9_]", "_", value.upper())
-    clean = re.sub(r"_+", "_", clean).strip("_")
+    clean = re.sub(r'[^a-zA-Z0-9_]', '_', value.upper())
+    clean = re.sub(r'_+', '_', clean).strip('_')
 
     if len(clean) > 30:
         clean = clean[:30]
@@ -346,7 +338,7 @@ For each magic value candidate:
 - Trivial numbers (0, 1, 2, 10, 100, 1000) are excluded
 - Tests are excluded from the analysis
 - Some repeated values may be intentional (e.g.: "id" appears everywhere but doesn't need to be a constant)
-""",
+"""
     }
 
     generate_finding_report(
@@ -354,7 +346,7 @@ For each magic value candidate:
         findings=findings,
         output_path=OUTPUT_FILE,
         script_name="analyze_magic_values.py",
-        additional_sections=additional_sections,
+        additional_sections=additional_sections
     )
 
 
@@ -368,7 +360,7 @@ if __name__ == "__main__":
         findings, stats = analyze_magic_values()
         generate_report(findings, stats)
 
-        print("\n[OK] Analysis complete!")
+        print(f"\n[OK] Analysis complete!")
         print(f"   Report: {OUTPUT_FILE}")
         print(f"   Findings: {len(findings)}")
         print(f"\n[NEXT] Next: Review findings manually in {OUTPUT_FILE}")
@@ -379,6 +371,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\n[ERROR] Error during analysis: {e}")
         import traceback
-
         traceback.print_exc()
         sys.exit(1)

@@ -23,7 +23,6 @@ import { SkillGuideModal } from '@/components/settings/SkillGuideModal';
 import { useSkills, type Skill } from '@/hooks/useSkills';
 import { toast } from 'sonner';
 import type { Language } from '@/i18n/settings';
-import type { TFunction } from 'i18next';
 
 interface SkillsSettingsProps {
   lng: Language;
@@ -282,7 +281,7 @@ function SkillCard({
   toggling,
 }: {
   skill: Skill;
-  t: TFunction;
+  t: (key: string, options?: Record<string, string>) => string;
   lng: string;
   onToggle: () => void;
   onDownload: () => void;

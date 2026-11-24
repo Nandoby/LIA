@@ -44,7 +44,10 @@ def check_pylint_available():
     """Check if pylint is installed."""
     try:
         result = subprocess.run(
-            ["pylint", "--version"], capture_output=True, text=True, timeout=5
+            ['pylint', '--version'],
+            capture_output=True,
+            text=True,
+            timeout=5
         )
         return result.returncode == 0
     except (FileNotFoundError, subprocess.TimeoutExpired):
@@ -58,15 +61,15 @@ def run_pylint_duplicate_check():
     try:
         result = subprocess.run(
             [
-                "pylint",
-                "--disable=all",
-                "--enable=duplicate-code",
-                f"--duplicate-code-min-similarity-lines={MIN_DUPLICATE_LINES}",
-                str(SRC_ROOT),
+                'pylint',
+                '--disable=all',
+                '--enable=duplicate-code',
+                f'--duplicate-code-min-similarity-lines={MIN_DUPLICATE_LINES}',
+                str(SRC_ROOT)
             ],
             capture_output=True,
             text=True,
-            timeout=300,  # 5 minutes max
+            timeout=300  # 5 minutes max
         )
 
         output = result.stdout + result.stderr
@@ -92,10 +95,10 @@ def parse_pylint_output(output):
     # path/to/file1.py:startline-endline
     # path/to/file2.py:startline-endline
 
-    blocks = output.split("Similar lines in")
+    blocks = output.split('Similar lines in')
 
     for block in blocks[1:]:  # Skip first empty split
-        lines = block.strip().split("\n")
+        lines = block.strip().split('\n')
         if len(lines) < 2:
             continue
 
@@ -110,31 +113,29 @@ def parse_pylint_output(output):
         locations = []
         for line in lines[1:]:
             line = line.strip()
-            if ":" in line and "-" in line:
+            if ':' in line and '-' in line:
                 locations.append(line)
 
         if len(locations) >= 2:
             # Extract line counts
-            match = first_line.split("lines")
+            match = first_line.split('lines')
             num_lines = MIN_DUPLICATE_LINES  # Default
 
             # Determine severity
             if num_lines > 50:
-                severity = "critical"
+                severity = 'critical'
             elif num_lines >= 20:
-                severity = "high"
+                severity = 'high'
             else:
-                severity = "medium"
+                severity = 'medium'
 
-            findings.append(
-                {
-                    "item": f"Duplication across {num_files} files",
-                    "location": ", ".join(locations[:2]),  # First 2 files
-                    "confidence": "high",
-                    "reason": f"~{num_lines}+ similar lines detected",
-                    "details": f'Files: {", ".join(locations)}',
-                }
-            )
+            findings.append({
+                'item': f"Duplication across {num_files} files",
+                'location': ', '.join(locations[:2]),  # First 2 files
+                'confidence': 'high',
+                'reason': f'~{num_lines}+ similar lines detected',
+                'details': f'Files: {", ".join(locations)}'
+            })
 
     return findings
 
@@ -148,21 +149,21 @@ def analyze_duplication():
 
     findings = []
     stats = {
-        "method": "none",
-        "duplicates_found": 0,
+        'method': 'none',
+        'duplicates_found': 0,
     }
 
     # Check if pylint available
     if check_pylint_available():
         print("[OK] Pylint found, using for duplicate detection\n")
-        stats["method"] = "pylint"
+        stats['method'] = 'pylint'
 
         pylint_output = run_pylint_duplicate_check()
 
         if pylint_output:
             findings = parse_pylint_output(pylint_output)
-            stats["duplicates_found"] = len(findings)
-            print("[OK] Pylint analysis complete")
+            stats['duplicates_found'] = len(findings)
+            print(f"[OK] Pylint analysis complete")
         else:
             print("[WARN]  Pylint analysis failed")
 
@@ -170,20 +171,18 @@ def analyze_duplication():
         print("[WARN]  Pylint not found")
         print("   Install: pip install pylint")
         print("   Skipping automated duplicate detection\n")
-        stats["method"] = "manual"
+        stats['method'] = 'manual'
 
         # Create manual analysis finding
-        findings.append(
-            {
-                "item": "Manual review required",
-                "location": "N/A",
-                "confidence": "low",
-                "reason": "Pylint not available - manual inspection needed",
-                "details": "Install pylint and re-run for automated detection",
-            }
-        )
+        findings.append({
+            'item': 'Manual review required',
+            'location': 'N/A',
+            'confidence': 'low',
+            'reason': 'Pylint not available - manual inspection needed',
+            'details': 'Install pylint and re-run for automated detection'
+        })
 
-    print("\n[SUMMARY] Summary:")
+    print(f"\n[SUMMARY] Summary:")
     print(f"   Method: {stats['method']}")
     print(f"   Duplicates found: {stats['duplicates_found']}")
     print(f"   Findings: {len(findings)}")
@@ -337,7 +336,7 @@ def func2():
 - Some duplications may be intentional (isolation)
 - Verify tests before refactoring
 - Refactoring can introduce coupling - evaluate trade-offs
-""",
+"""
     }
 
     generate_finding_report(
@@ -345,7 +344,7 @@ def func2():
         findings=findings,
         output_path=OUTPUT_FILE,
         script_name="analyze_code_duplication.py",
-        additional_sections=additional_sections,
+        additional_sections=additional_sections
     )
 
 
@@ -359,14 +358,14 @@ if __name__ == "__main__":
         findings, stats = analyze_duplication()
         generate_report(findings, stats)
 
-        print("\n[OK] Analysis complete!")
+        print(f"\n[OK] Analysis complete!")
         print(f"   Report: {OUTPUT_FILE}")
         print(f"   Findings: {len(findings)}")
         print(f"\n[NEXT] Next: Review findings manually in {OUTPUT_FILE}")
 
-        if stats["method"] != "pylint":
-            print("\n[TIP] Tip: Install pylint for automated duplicate detection")
-            print("   pip install pylint")
+        if stats['method'] != 'pylint':
+            print(f"\n[TIP] Tip: Install pylint for automated duplicate detection")
+            print(f"   pip install pylint")
 
     except KeyboardInterrupt:
         print("\n\n[WARN]  Analysis interrupted by user")
@@ -374,6 +373,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\n[ERROR] Error during analysis: {e}")
         import traceback
-
         traceback.print_exc()
         sys.exit(1)

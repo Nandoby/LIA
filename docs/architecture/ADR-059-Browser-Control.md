@@ -1,4 +1,4 @@
-# ADR-057: Browser Control Architecture (Playwright)
+# ADR-059: Browser Control Architecture (Playwright)
 
 ## Status
 

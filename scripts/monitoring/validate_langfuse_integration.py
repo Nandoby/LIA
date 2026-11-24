@@ -94,11 +94,7 @@ class LangfuseValidator:
             data = response.json()
             return data.get("data", [])
         except httpx.HTTPError as e:
-            logger.error(
-                "langfuse_api_error",
-                error=str(e),
-                status=e.response.status_code if hasattr(e, "response") else None,
-            )
+            logger.error("langfuse_api_error", error=str(e), status=e.response.status_code if hasattr(e, 'response') else None)
             return []
 
     async def get_trace_details(self, trace_id: str) -> dict[str, Any] | None:
@@ -120,7 +116,7 @@ class LangfuseValidator:
                 "langfuse_trace_details_error",
                 trace_id=trace_id,
                 error=str(e),
-                status=e.response.status_code if hasattr(e, "response") else None,
+                status=e.response.status_code if hasattr(e, 'response') else None,
             )
             return None
 
@@ -143,9 +139,7 @@ class LangfuseValidator:
             usage = obs.get("usage")
             if usage:
                 total_input += usage.get("input", 0) or usage.get("promptTokens", 0)
-                total_output += usage.get("output", 0) or usage.get(
-                    "completionTokens", 0
-                )
+                total_output += usage.get("output", 0) or usage.get("completionTokens", 0)
                 observation_count += 1
 
         return {
@@ -183,8 +177,7 @@ class LangfuseValidator:
             "output_tokens": usage["total_output_tokens"],
             "total_tokens": usage["total_input_tokens"] + usage["total_output_tokens"],
             "observation_count": usage["observation_count"],
-            "has_usage_data": usage["total_input_tokens"] > 0
-            or usage["total_output_tokens"] > 0,
+            "has_usage_data": usage["total_input_tokens"] > 0 or usage["total_output_tokens"] > 0,
         }
 
     async def run_validation(self, limit: int = 10, hours: int = 24) -> dict[str, Any]:
@@ -199,10 +192,10 @@ class LangfuseValidator:
             Validation summary
         """
         print(f"\n{'='*80}")
-        print("Langfuse Integration Validation (Phase 5)")
+        print(f"Langfuse Integration Validation (Phase 5)")
         print(f"{'='*80}\n")
 
-        print("Configuration:")
+        print(f"Configuration:")
         print(f"  - Langfuse Host: {self.host}")
         print(f"  - Public Key: {self.public_key[:10]}...")
         print(f"  - Look-back: {hours} hours")
@@ -229,49 +222,45 @@ class LangfuseValidator:
             validations.append(result)
 
         # Step 3: Generate summary
-        print("\n" + "=" * 80)
+        print("\n" + "="*80)
         print("Validation Results")
-        print("=" * 80 + "\n")
+        print("="*80 + "\n")
 
         # Table view
         table_data = []
         for v in validations:
             if v["status"] == "success":
-                table_data.append(
-                    [
-                        v["trace_id"][:16] + "...",
-                        v["name"][:30],
-                        v["input_tokens"],
-                        v["output_tokens"],
-                        v["total_tokens"],
-                        v["observation_count"],
-                        "✅" if v["has_usage_data"] else "❌",
-                    ]
-                )
+                table_data.append([
+                    v["trace_id"][:16] + "...",
+                    v["name"][:30],
+                    v["input_tokens"],
+                    v["output_tokens"],
+                    v["total_tokens"],
+                    v["observation_count"],
+                    "✅" if v["has_usage_data"] else "❌",
+                ])
 
         if table_data:
-            print(
-                tabulate(
-                    table_data,
-                    headers=[
-                        "Trace ID",
-                        "Name",
-                        "Input",
-                        "Output",
-                        "Total",
-                        "Obs",
-                        "Usage OK",
-                    ],
-                    tablefmt="grid",
-                )
-            )
+            print(tabulate(
+                table_data,
+                headers=[
+                    "Trace ID",
+                    "Name",
+                    "Input",
+                    "Output",
+                    "Total",
+                    "Obs",
+                    "Usage OK",
+                ],
+                tablefmt="grid",
+            ))
         else:
             print("⚠️  No successful validations")
 
         # Summary statistics
-        print("\n" + "=" * 80)
+        print("\n" + "="*80)
         print("Summary Statistics")
-        print("=" * 80 + "\n")
+        print("="*80 + "\n")
 
         total_traces = len(validations)
         successful = [v for v in validations if v["status"] == "success"]
@@ -287,15 +276,11 @@ class LangfuseValidator:
         print(f"  ✅ Successful: {len(successful)}")
         print(f"  ❌ Errors: {len(errors)}")
         print()
-        print("Token Tracking:")
-        print(
-            f"  ✅ Traces with usage data: {len(with_usage)} ({len(with_usage)/total_traces*100:.1f}%)"
-        )
-        print(
-            f"  ⚠️  Traces without usage data: {len(without_usage)} ({len(without_usage)/total_traces*100:.1f}%)"
-        )
+        print(f"Token Tracking:")
+        print(f"  ✅ Traces with usage data: {len(with_usage)} ({len(with_usage)/total_traces*100:.1f}%)")
+        print(f"  ⚠️  Traces without usage data: {len(without_usage)} ({len(without_usage)/total_traces*100:.1f}%)")
         print()
-        print("Total Tokens:")
+        print(f"Total Tokens:")
         print(f"  - Input: {total_input_tokens:,}")
         print(f"  - Output: {total_output_tokens:,}")
         print(f"  - Total: {total_tokens:,}")
@@ -312,15 +297,13 @@ class LangfuseValidator:
             print()
 
         # Known limitation message
-        print("=" * 80)
+        print("="*80)
         print("Known Limitations (Phase 2.1 - RC4 Fix)")
-        print("=" * 80 + "\n")
+        print("="*80 + "\n")
         print("⚠️  Cache hits don't appear in Langfuse traces (by design)")
         print("   - Reason: Direct Prometheus increment avoids callback replay")
         print("   - Impact: Langfuse token count < Prometheus token count")
-        print(
-            "   - Solution: Use Prometheus as authoritative source for cache hit metrics"
-        )
+        print("   - Solution: Use Prometheus as authoritative source for cache hit metrics")
         print()
         print("✅ This is expected behavior and documented in ADR-015")
         print()

@@ -6,7 +6,7 @@
       "Host": "postgres",
       "Port": 5432,
       "MaintenanceDB": "lia",
-      "Username": "lia_dev",
+      "Username": "lia_admin",
       "SSLMode": "prefer",
       "Comment": "LIA development database with pgvector"
     }

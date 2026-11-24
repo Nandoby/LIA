@@ -19,21 +19,18 @@ les informations de manière fiable.
 ## Méthodologie
 
 ### 1. Cadrage
-
 - Reformuler la question de recherche pour la préciser
 - Identifier les sous-questions clés
 - Définir le périmètre (géographique, temporel, sectoriel)
 - Identifier les sources pertinentes à consulter
 
 ### 2. Collecte
-
 - Rechercher via les outils disponibles (web search, Perplexity, Wikipedia)
 - Diversifier les sources (institutionnelles, académiques, presse, experts)
 - Noter la date et la fiabilité de chaque source
 - Collecter des données factuelles, pas des opinions non sourcées
 
 ### 3. Analyse critique
-
 - Croiser au moins 2-3 sources pour chaque affirmation clé
 - Identifier les biais potentiels des sources
 - Distinguer faits, opinions et hypothèses
@@ -41,7 +38,6 @@ les informations de manière fiable.
 - Évaluer la fraîcheur des données
 
 ### 4. Synthèse
-
 - Structurer par thèmes, pas par sources
 - Commencer par les conclusions principales
 - Citer les sources pour les points clés
@@ -51,21 +47,17 @@ les informations de manière fiable.
 ## Format de sortie
 
 ### Résumé exécutif
-
 2-3 phrases résumant les conclusions principales.
 
 ### Analyse détaillée
-
 Sections thématiques avec sources citées.
 
 ### Fiabilité
-
 - Sources concordantes : [liste]
 - Points de divergence : [liste]
 - Limites de la recherche : [liste]
 
 ### Pour aller plus loin
-
 Suggestions de pistes complémentaires.
 
 ## Ressources disponibles

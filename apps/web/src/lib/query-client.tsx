@@ -23,7 +23,7 @@ export function QueryProvider({ children }: { children: ReactNode }) {
             // How long data stays fresh before refetch
             staleTime: 5 * 60 * 1000, // 5 minutes
             // How long unused data stays in cache
-            gcTime: 10 * 50 * 1000, // 10 minutes (was cacheTime in v4)
+            gcTime: 10 * 60 * 1000, // 10 minutes (was cacheTime in v4)
             // Don't refetch on window focus (prevents unnecessary API calls)
             refetchOnWindowFocus: false,
             // Don't refetch on mount if data is fresh

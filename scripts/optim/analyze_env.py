@@ -47,14 +47,14 @@ def parse_env_file(file_path):
 
     keys = {}
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             for line_num, line in enumerate(f, start=1):
                 line = line.strip()
                 # Skip comments and empty lines
-                if not line or line.startswith("#"):
+                if not line or line.startswith('#'):
                     continue
                 # Extract key=value
-                match = re.match(r"^([A-Z_][A-Z0-9_]*)=", line)
+                match = re.match(r'^([A-Z_][A-Z0-9_]*)=', line)
                 if match:
                     key = match.group(1)
                     keys[key] = line_num
@@ -68,7 +68,11 @@ def check_key_usage(key, src_root):
     """Check if env key is used in source code."""
     # Search in source
     results = grep_in_directory(
-        key, src_root, extensions=[".py"], case_sensitive=True, regex=False
+        key,
+        src_root,
+        extensions=['.py'],
+        case_sensitive=True,
+        regex=False
     )
     return len(results)
 
@@ -83,20 +87,20 @@ def analyze_env():
 
     findings = []
     stats = {
-        "env_example_keys": 0,
-        "env_prod_keys": 0,
-        "unused_keys": 0,
-        "missing_keys": 0,
+        'env_example_keys': 0,
+        'env_prod_keys': 0,
+        'unused_keys': 0,
+        'missing_keys': 0,
     }
 
     # Parse .env files
     env_example_keys = parse_env_file(ENV_EXAMPLE)
     env_prod_keys = parse_env_file(ENV_PROD_EXAMPLE)
 
-    stats["env_example_keys"] = len(env_example_keys)
-    stats["env_prod_keys"] = len(env_prod_keys)
+    stats['env_example_keys'] = len(env_example_keys)
+    stats['env_prod_keys'] = len(env_prod_keys)
 
-    print("[SUMMARY] Parsed:")
+    print(f"[SUMMARY] Parsed:")
     print(f"   .env.example: {len(env_example_keys)} keys")
     print(f"   .env.prod.example: {len(env_prod_keys)} keys\n")
 
@@ -106,16 +110,14 @@ def analyze_env():
         usage_count = check_key_usage(key, SRC_ROOT)
 
         if usage_count == 0:
-            stats["unused_keys"] += 1
-            findings.append(
-                {
-                    "item": key,
-                    "location": f".env.example:{line_num}",
-                    "confidence": "medium",  # Needs manual verification
-                    "reason": "No usages found in source code",
-                    "details": "May be Docker/infrastructure var",
-                }
-            )
+            stats['unused_keys'] += 1
+            findings.append({
+                'item': key,
+                'location': f".env.example:{line_num}",
+                'confidence': 'medium',  # Needs manual verification
+                'reason': 'No usages found in source code',
+                'details': 'May be Docker/infrastructure var'
+            })
             print(f"   [WARN]  {key}: 0 usages")
         else:
             print(f"   [OK] {key}: {usage_count} usages")
@@ -128,19 +130,17 @@ def analyze_env():
 
         for key in expected_keys:
             if key not in env_example_keys:
-                stats["missing_keys"] += 1
-                findings.append(
-                    {
-                        "item": key,
-                        "location": "config.py (missing from .env.example)",
-                        "confidence": "high",
-                        "reason": "Defined in config.py but missing from .env.example",
-                        "details": "Should be documented in .env.example",
-                    }
-                )
+                stats['missing_keys'] += 1
+                findings.append({
+                    'item': key,
+                    'location': "config.py (missing from .env.example)",
+                    'confidence': 'high',
+                    'reason': 'Defined in config.py but missing from .env.example',
+                    'details': 'Should be documented in .env.example'
+                })
                 print(f"   [WARN]  Missing: {key}")
 
-    print("\n[SUMMARY] Summary:")
+    print(f"\n[SUMMARY] Summary:")
     print(f"   .env.example keys: {stats['env_example_keys']}")
     print(f"   .env.prod.example keys: {stats['env_prod_keys']}")
     print(f"   Unused keys: {stats['unused_keys']}")
@@ -155,13 +155,11 @@ def _extract_expected_keys_from_config(config_file):
     expected_keys = set()
 
     try:
-        with open(config_file, "r", encoding="utf-8") as f:
+        with open(config_file, 'r', encoding='utf-8') as f:
             content = f.read()
 
             # Pattern 1: Field(env="VAR_NAME")
-            matches1 = re.findall(
-                r'Field\([^)]*env=["\']([A-Z_][A-Z0-9_]*)["\']', content
-            )
+            matches1 = re.findall(r'Field\([^)]*env=["\']([A-Z_][A-Z0-9_]*)["\']', content)
             expected_keys.update(matches1)
 
             # Pattern 2: os.getenv("VAR_NAME")
@@ -169,9 +167,7 @@ def _extract_expected_keys_from_config(config_file):
             expected_keys.update(matches2)
 
             # Pattern 3: os.environ.get("VAR_NAME")
-            matches3 = re.findall(
-                r'os\.environ\.get\(["\']([A-Z_][A-Z0-9_]*)["\']', content
-            )
+            matches3 = re.findall(r'os\.environ\.get\(["\']([A-Z_][A-Z0-9_]*)["\']', content)
             expected_keys.update(matches3)
 
     except Exception as e:
@@ -287,7 +283,7 @@ GRAFANA_ADMIN_PASSWORD=...
 - Infrastructure keys (Docker, Grafana) are normal in .env but not in code
 - Optional keys should be documented even if rarely used
 - Always check docker-compose*.yml before deleting
-""",
+"""
     }
 
     generate_finding_report(
@@ -295,7 +291,7 @@ GRAFANA_ADMIN_PASSWORD=...
         findings=findings,
         output_path=OUTPUT_FILE,
         script_name="analyze_env.py",
-        additional_sections=additional_sections,
+        additional_sections=additional_sections
     )
 
 
@@ -309,7 +305,7 @@ if __name__ == "__main__":
         findings, stats = analyze_env()
         generate_report(findings, stats)
 
-        print("\n[OK] Analysis complete!")
+        print(f"\n[OK] Analysis complete!")
         print(f"   Report: {OUTPUT_FILE}")
         print(f"   Findings: {len(findings)}")
         print(f"\n[NEXT] Next: Review findings manually in {OUTPUT_FILE}")
@@ -320,6 +316,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\n[ERROR] Error during analysis: {e}")
         import traceback
-
         traceback.print_exc()
         sys.exit(1)

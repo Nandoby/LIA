@@ -4,7 +4,7 @@ Per-user usage limits for tokens, messages, and cost enforcement.
 One record per user (1:1 relationship). Null limits mean unlimited.
 
 Revision ID: usage_limits_001
-Revises: hue_global_config_fix_001
+Revises: hue_global_config_001
 Create Date: 2026-03-21
 """
 
@@ -15,7 +15,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "usage_limits_001"
-down_revision = "hue_global_config_fix_001"
+down_revision = "hue_global_config_001"
 branch_labels = None
 depends_on = None
 

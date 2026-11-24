@@ -35,9 +35,7 @@ class ToolVisitor(ast.NodeVisitor):
         for decorator in node.decorator_list:
             if isinstance(decorator, ast.Name):
                 decorator_ids.append(decorator.id)
-            elif isinstance(decorator, ast.Call) and isinstance(
-                decorator.func, ast.Name
-            ):
+            elif isinstance(decorator, ast.Call) and isinstance(decorator.func, ast.Name):
                 decorator_ids.append(decorator.func.id)
 
         # If "tool" decorator is present
@@ -48,12 +46,10 @@ class ToolVisitor(ast.NodeVisitor):
                 arg_annotation = ""
                 if arg.annotation:
                     arg_annotation = ast.unparse(arg.annotation)
-                args.append(
-                    {
-                        "name": arg.arg,
-                        "annotation": arg_annotation,
-                    }
-                )
+                args.append({
+                    "name": arg.arg,
+                    "annotation": arg_annotation,
+                })
 
             # Extract docstring
             docstring = ast.get_docstring(node) or ""
@@ -65,17 +61,15 @@ class ToolVisitor(ast.NodeVisitor):
             # Determine if async
             is_async = isinstance(node, ast.AsyncFunctionDef)
 
-            self.tools.append(
-                {
-                    "name": node.name,
-                    "module": self.module,
-                    "decorators": decorator_ids,
-                    "args": args,
-                    "docstring": docstring_clean,
-                    "lineno": node.lineno,
-                    "is_async": is_async,
-                }
-            )
+            self.tools.append({
+                "name": node.name,
+                "module": self.module,
+                "decorators": decorator_ids,
+                "args": args,
+                "docstring": docstring_clean,
+                "lineno": node.lineno,
+                "is_async": is_async,
+            })
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         """Visit a sync function definition."""
@@ -102,17 +96,13 @@ def main() -> None:
 
         # Build module name
         relative_path = file_path.relative_to(Path("."))
-        module = (
-            str(relative_path).replace("\\", ".").replace("/", ".").removesuffix(".py")
-        )
+        module = str(relative_path).replace("\\", ".").replace("/", ".").removesuffix(".py")
 
         print(f"  [*] Analyzing {file_path.name}...")
 
         # Parse the file
         try:
-            tree = ast.parse(
-                file_path.read_text(encoding="utf-8"), filename=str(file_path)
-            )
+            tree = ast.parse(file_path.read_text(encoding="utf-8"), filename=str(file_path))
         except SyntaxError as e:
             print(f"    [!] Syntax error: {e}")
             continue
@@ -151,14 +141,10 @@ def main() -> None:
 
     for tool in tools:
         # Format arguments
-        args_str = ", ".join(
-            [
-                f"{arg['name']}: {arg['annotation']}"
-                if arg["annotation"]
-                else arg["name"]
-                for arg in tool["args"]
-            ]
-        )
+        args_str = ", ".join([
+            f"{arg['name']}: {arg['annotation']}" if arg['annotation'] else arg['name']
+            for arg in tool["args"]
+        ])
         if len(args_str) > 50:
             args_str = args_str[:47] + "..."
 

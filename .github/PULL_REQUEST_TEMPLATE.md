@@ -84,9 +84,9 @@ Related to #(issue-number)
 ### Documentation
 
 - [ ] I have updated the **technical documentation** (if applicable)
-    - [ ] Google style docstrings (Python)
-    - [ ] JSDoc comments (TypeScript)
-    - [ ] Domain README.md
+  - [ ] Google style docstrings (Python)
+  - [ ] JSDoc comments (TypeScript)
+  - [ ] Domain README.md
 - [ ] I have updated the **user guides** (if applicable)
 - [ ] I have created/updated an **ADR** (Architecture Decision Record) if an architectural decision was made
 - [ ] I have updated the **CHANGELOG.md** (if feature/breaking change)

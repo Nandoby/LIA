@@ -14,10 +14,8 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 SET client_encoding = 'UTF8';
 
 -- Log successful initialization
-DO
-$$
-    BEGIN
-        RAISE NOTICE 'LIA database initialized successfully';
-        RAISE NOTICE 'Extensions installed: vector, uuid-ossp, pg_trgm';
-    END
-$$;
+DO $$
+BEGIN
+    RAISE NOTICE 'LIA database initialized successfully';
+    RAISE NOTICE 'Extensions installed: vector, uuid-ossp, pg_trgm';
+END$$;

@@ -136,7 +136,7 @@ def extract_text_csv(file_path: Path) -> str:
 
 def extract_text_rtf(file_path: Path) -> str:
     """Extract text from RTF using striprtf."""
-    from striprtf.striprtf import rtf_to_text
+    from striprtf.striprtf import rtf_to_text  # type: ignore[import-untyped]
 
     raw = file_path.read_text(encoding="utf-8", errors="replace")
     return str(rtf_to_text(raw))
@@ -225,7 +225,7 @@ def extract_text_epub(file_path: Path) -> str:
     """Extract chapter text from EPUB in spine (reading) order."""
     import warnings
 
-    import ebooklib
+    import ebooklib  # type: ignore[import-untyped]
     from ebooklib import epub
     from markdownify import markdownify
 
@@ -240,12 +240,7 @@ def extract_text_epub(file_path: Path) -> str:
             continue
         if item.get_type() != ebooklib.ITEM_DOCUMENT:
             continue
-        raw_content = item.get_content()
-        html_content = (
-            raw_content.decode("utf-8", errors="replace")
-            if isinstance(raw_content, bytes)
-            else raw_content
-        )
+        html_content = item.get_content().decode("utf-8", errors="replace")
         chapter_text = markdownify(html_content, strip=["img", "script", "style"])
         if chapter_text.strip():
             text_parts.append(chapter_text.strip())

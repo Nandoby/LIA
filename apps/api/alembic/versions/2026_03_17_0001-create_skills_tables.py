@@ -111,21 +111,21 @@ def upgrade() -> None:
     # Save per-user preferences so the startup sync can restore them.
     op.execute(
         sa.text("""
-                CREATE TABLE IF NOT EXISTS _legacy_disabled_skills AS
-                SELECT id AS user_id, disabled_skills
-                FROM users
-                WHERE disabled_skills IS NOT NULL AND disabled_skills != '[]'::jsonb
-                """)
+            CREATE TABLE IF NOT EXISTS _legacy_disabled_skills AS
+            SELECT id AS user_id, disabled_skills
+            FROM users
+            WHERE disabled_skills IS NOT NULL AND disabled_skills != '[]'::jsonb
+        """)
     )
     op.execute(
         sa.text("""
-                CREATE TABLE IF NOT EXISTS _legacy_system_disabled_skills AS
-                SELECT id AS user_id, system_disabled_skills
-                FROM users
-                WHERE is_superuser = true
-                  AND system_disabled_skills IS NOT NULL
-                  AND system_disabled_skills != '[]'::jsonb
-                """)
+            CREATE TABLE IF NOT EXISTS _legacy_system_disabled_skills AS
+            SELECT id AS user_id, system_disabled_skills
+            FROM users
+            WHERE is_superuser = true
+              AND system_disabled_skills IS NOT NULL
+              AND system_disabled_skills != '[]'::jsonb
+        """)
     )
 
     # ---- 4. Drop legacy JSONB columns ----
@@ -158,19 +158,19 @@ def downgrade() -> None:
     # Restore data from helper tables if they exist
     op.execute(
         sa.text("""
-                UPDATE users u
-                SET disabled_skills = lds.disabled_skills
-                FROM _legacy_disabled_skills lds
-                WHERE u.id = lds.user_id
-                """)
+            UPDATE users u
+            SET disabled_skills = lds.disabled_skills
+            FROM _legacy_disabled_skills lds
+            WHERE u.id = lds.user_id
+        """)
     )
     op.execute(
         sa.text("""
-                UPDATE users u
-                SET system_disabled_skills = lsds.system_disabled_skills
-                FROM _legacy_system_disabled_skills lsds
-                WHERE u.id = lsds.user_id
-                """)
+            UPDATE users u
+            SET system_disabled_skills = lsds.system_disabled_skills
+            FROM _legacy_system_disabled_skills lsds
+            WHERE u.id = lsds.user_id
+        """)
     )
 
     # Drop helper tables

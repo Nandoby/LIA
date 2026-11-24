@@ -34,12 +34,12 @@ scrape_configs:
         refresh_interval: 5s
         filters:
           - name: label
-            values: [ "com.docker.compose.project=lia" ]
+            values: ["com.docker.compose.project=lia"]
 
     # Pipeline de traitement des logs
     pipeline_stages:
       # Stage 1: Extraction des labels Docker
-      - docker: { }
+      - docker: {}
 
       # Stage 2: Parsing JSON (logs structlog de l'API)
       - json:
@@ -116,16 +116,16 @@ scrape_configs:
     # Relabeling pour enrichissement
     relabel_configs:
       # Extraction du nom du conteneur
-      - source_labels: [ '__meta_docker_container_name' ]
+      - source_labels: ['__meta_docker_container_name']
         regex: '/(.*)'
         target_label: 'container'
 
       # Extraction du service depuis les labels Docker Compose
-      - source_labels: [ '__meta_docker_container_label_com_docker_compose_service' ]
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
         target_label: 'service'
 
       # Extraction du projet Docker Compose
-      - source_labels: [ '__meta_docker_container_label_com_docker_compose_project' ]
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_project']
         target_label: 'project'
 
       # Drop des conteneurs non-API (optionnel: garder tous pour observabilité complète)

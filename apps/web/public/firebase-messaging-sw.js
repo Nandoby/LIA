@@ -18,7 +18,7 @@
  * This is called when a push message is received, regardless of whether
  * the app is in the foreground or background.
  */
-self.addEventListener('push', event => {
+self.addEventListener('push', (event) => {
   console.log('[SW] Push received:', event);
 
   let data = {};
@@ -83,7 +83,9 @@ self.addEventListener('push', event => {
   };
 
   // Show notification
-  event.waitUntil(self.registration.showNotification(title, notificationOptions));
+  event.waitUntil(
+    self.registration.showNotification(title, notificationOptions)
+  );
 });
 
 /**
@@ -91,7 +93,7 @@ self.addEventListener('push', event => {
  *
  * Opens the app when user clicks on a notification.
  */
-self.addEventListener('notificationclick', event => {
+self.addEventListener('notificationclick', (event) => {
   console.log('[SW] Notification clicked:', event);
 
   // Close the notification
@@ -102,7 +104,7 @@ self.addEventListener('notificationclick', event => {
 
   // Focus existing window or open new one
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
       // Check if there's already a window/tab open
       for (const client of windowClients) {
         // If a window is already open, focus it
@@ -122,14 +124,14 @@ self.addEventListener('notificationclick', event => {
 /**
  * Handle notification close.
  */
-self.addEventListener('notificationclose', event => {
+self.addEventListener('notificationclose', (event) => {
   console.log('[SW] Notification closed:', event);
 });
 
 /**
  * Handle service worker installation.
  */
-self.addEventListener('install', event => {
+self.addEventListener('install', (event) => {
   console.log('[SW] Installing...');
   // Skip waiting to activate immediately
   self.skipWaiting();
@@ -138,7 +140,7 @@ self.addEventListener('install', event => {
 /**
  * Handle service worker activation.
  */
-self.addEventListener('activate', event => {
+self.addEventListener('activate', (event) => {
   console.log('[SW] Activated');
   // Claim all clients immediately
   event.waitUntil(clients.claim());

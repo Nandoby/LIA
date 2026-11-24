@@ -21,7 +21,6 @@ from typing import Dict, List, Set, Tuple
 DASHBOARDS_DIR = Path("infrastructure/observability/grafana/dashboards")
 METRICS_DIR = Path("apps/api/src/infrastructure/observability")
 
-
 def extract_defined_metrics() -> Set[str]:
     """Extract all Prometheus metrics defined in Python code."""
     metrics = set()
@@ -30,12 +29,11 @@ def extract_defined_metrics() -> Set[str]:
         with open(metrics_file, encoding="utf-8") as f:
             for line in f:
                 # Match: metric_name = Counter( / Histogram( / Gauge(
-                if re.search(r"^\s*\w+ = (Counter|Histogram|Gauge)\(", line):
-                    metric_name = line.split("=")[0].strip()
+                if re.search(r'^\s*\w+ = (Counter|Histogram|Gauge)\(', line):
+                    metric_name = line.split('=')[0].strip()
                     metrics.add(metric_name)
 
     return metrics
-
 
 def extract_dashboard_metrics(dashboard_path: Path) -> List[Tuple[str, str]]:
     """
@@ -67,65 +65,27 @@ def extract_dashboard_metrics(dashboard_path: Path) -> List[Tuple[str, str]]:
 
     return queries
 
-
 def extract_metric_names_from_query(query: str) -> Set[str]:
     """Extract metric names from PromQL query."""
     # Match: metric_name{ or metric_name[ or metric_name)
     # Avoid functions like rate(), sum(), etc.
-    pattern = r"\b([a-z_][a-z0-9_]+)(?:\{|\[|(?=\)))"
+    pattern = r'\b([a-z_][a-z0-9_]+)(?:\{|\[|(?=\)))'
     matches = re.findall(pattern, query)
 
     # Filter out PromQL functions
     promql_functions = {
-        "rate",
-        "irate",
-        "sum",
-        "avg",
-        "max",
-        "min",
-        "count",
-        "increase",
-        "delta",
-        "idelta",
-        "histogram_quantile",
-        "by",
-        "without",
-        "on",
-        "ignoring",
-        "group_left",
-        "group_right",
-        "bool",
-        "label_replace",
-        "label_join",
-        "sort",
-        "sort_desc",
-        "topk",
-        "bottomk",
-        "absent",
-        "ceil",
-        "floor",
-        "round",
-        "clamp_max",
-        "clamp_min",
-        "changes",
-        "resets",
-        "deriv",
-        "predict_linear",
-        "holt_winters",
-        "time",
-        "timestamp",
-        "vector",
-        "scalar",
-        "year",
-        "month",
-        "day",
-        "hour",
-        "minute",
+        'rate', 'irate', 'sum', 'avg', 'max', 'min', 'count',
+        'increase', 'delta', 'idelta', 'histogram_quantile',
+        'by', 'without', 'on', 'ignoring', 'group_left', 'group_right',
+        'bool', 'label_replace', 'label_join', 'sort', 'sort_desc',
+        'topk', 'bottomk', 'absent', 'ceil', 'floor', 'round',
+        'clamp_max', 'clamp_min', 'changes', 'resets', 'deriv',
+        'predict_linear', 'holt_winters', 'time', 'timestamp',
+        'vector', 'scalar', 'year', 'month', 'day', 'hour', 'minute',
     }
 
     metric_names = {m for m in matches if m not in promql_functions}
     return metric_names
-
 
 def analyze_dashboards() -> Dict:
     """Analyze all dashboards and return comprehensive report."""
@@ -134,9 +94,7 @@ def analyze_dashboards() -> Dict:
     analysis = {
         "defined_metrics_count": len(defined_metrics),
         "dashboards": {},
-        "missing_metrics": defaultdict(
-            list
-        ),  # {metric_name: [(dashboard, panel), ...]}
+        "missing_metrics": defaultdict(list),  # {metric_name: [(dashboard, panel), ...]}
         "duplicates": [],
         "deprecated": [],
         "summary": {},
@@ -163,9 +121,7 @@ def analyze_dashboards() -> Dict:
             metric_names = extract_metric_names_from_query(query)
             for metric in metric_names:
                 if metric not in defined_metrics:
-                    analysis["missing_metrics"][metric].append(
-                        (dashboard_name, panel_title)
-                    )
+                    analysis["missing_metrics"][metric].append((dashboard_name, panel_title))
                     missing_in_dashboard.append((panel_title, metric))
 
         analysis["dashboards"][dashboard_name] = {
@@ -177,12 +133,10 @@ def analyze_dashboards() -> Dict:
     # Detect duplicates
     for title, files in dashboard_titles.items():
         if len(files) > 1:
-            analysis["duplicates"].append(
-                {
-                    "title": title,
-                    "files": files,
-                }
-            )
+            analysis["duplicates"].append({
+                "title": title,
+                "files": files,
+            })
 
     # Deprecated dashboards (hardcoded based on user feedback)
     deprecated = [
@@ -201,14 +155,13 @@ def analyze_dashboards() -> Dict:
 
     return analysis
 
-
 def generate_report(analysis: Dict) -> str:
     """Generate markdown report for GitHub issue."""
     report = []
     report.append("# Grafana Dashboards Quality Audit Report")
     report.append("")
-    report.append("**Date**: 2025-11-23")
-    report.append("**Scope**: All 15 Grafana dashboards")
+    report.append(f"**Date**: 2025-11-23")
+    report.append(f"**Scope**: All 15 Grafana dashboards")
     report.append("")
     report.append("---")
     report.append("")
@@ -231,9 +184,7 @@ def generate_report(analysis: Dict) -> str:
     if analysis["missing_metrics"]:
         report.append("## ❌ Missing Metrics (Undefined in Code)")
         report.append("")
-        report.append(
-            "These metrics are referenced in dashboards but not defined in Python code:"
-        )
+        report.append("These metrics are referenced in dashboards but not defined in Python code:")
         report.append("")
 
         for metric, occurrences in sorted(analysis["missing_metrics"].items()):
@@ -242,7 +193,7 @@ def generate_report(analysis: Dict) -> str:
             report.append(f"**Occurrences**: {len(occurrences)}")
             report.append("")
             for dashboard, panel in occurrences:
-                report.append(f'- **Dashboard**: `{dashboard}` | **Panel**: "{panel}"')
+                report.append(f"- **Dashboard**: `{dashboard}` | **Panel**: \"{panel}\"")
             report.append("")
 
     # Duplicates
@@ -255,7 +206,7 @@ def generate_report(analysis: Dict) -> str:
         for dup in analysis["duplicates"]:
             report.append(f"### \"{dup['title']}\"")
             report.append("")
-            report.append("**Files**:")
+            report.append(f"**Files**:")
             for f in dup["files"]:
                 report.append(f"- `{f}.json`")
             report.append("")
@@ -273,9 +224,7 @@ def generate_report(analysis: Dict) -> str:
                 report.append(f"### `{dash}.json`")
                 report.append(f"- **Title**: \"{info['title']}\"")
                 report.append(f"- **Panels**: {info['panels_count']}")
-                report.append(
-                    "- **Reason**: User reported as deprecated (HITL button-based system replaced by conversational)"
-                )
+                report.append(f"- **Reason**: User reported as deprecated (HITL button-based system replaced by conversational)")
                 report.append("")
 
     # Dashboard-by-Dashboard Analysis
@@ -284,9 +233,7 @@ def generate_report(analysis: Dict) -> str:
 
     for dashboard_name, info in sorted(analysis["dashboards"].items()):
         status = "✅" if not info["missing_metrics"] else "❌"
-        deprecated_flag = (
-            " ⚠️ DEPRECATED" if dashboard_name in analysis["deprecated"] else ""
-        )
+        deprecated_flag = " ⚠️ DEPRECATED" if dashboard_name in analysis["deprecated"] else ""
 
         report.append(f"### {status} `{dashboard_name}.json`{deprecated_flag}")
         report.append(f"- **Title**: \"{info['title']}\"")
@@ -294,17 +241,16 @@ def generate_report(analysis: Dict) -> str:
 
         if info["missing_metrics"]:
             report.append(f"- **Missing Metrics**: {len(info['missing_metrics'])}")
-            report.append("")
-            report.append("  **Details**:")
+            report.append(f"")
+            report.append(f"  **Details**:")
             for panel, metric in info["missing_metrics"]:
-                report.append(f'  - Panel: "{panel}" → Missing: `{metric}`')
+                report.append(f"  - Panel: \"{panel}\" → Missing: `{metric}`")
         else:
-            report.append("- **Status**: All metrics defined ✅")
+            report.append(f"- **Status**: All metrics defined ✅")
 
         report.append("")
 
     return "\n".join(report)
-
 
 if __name__ == "__main__":
     analysis = analyze_dashboards()

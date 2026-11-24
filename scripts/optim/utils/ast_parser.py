@@ -30,7 +30,7 @@ def parse_file(file_path: Path) -> Optional[ast.Module]:
         ...     print("Parsed successfully")
     """
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             source = f.read()
         return ast.parse(source, filename=str(file_path))
     except (SyntaxError, UnicodeDecodeError) as e:
@@ -73,7 +73,7 @@ def extract_functions(tree: ast.Module, file_path: str = "") -> List[Dict[str, A
 
         def visit_AsyncFunctionDef(self, node):
             info = _extract_function_info(node, file_path)
-            info["is_async"] = True
+            info['is_async'] = True
             functions.append(info)
             self.generic_visit(node)
 
@@ -140,17 +140,15 @@ def extract_constants(tree: ast.Module, file_path: str = "") -> List[Dict[str, A
                 if isinstance(target, ast.Name):
                     name = target.id
                     # Check if UPPER_CASE naming
-                    if name.isupper() and name.replace("_", "").isalnum():
-                        constants.append(
-                            {
-                                "name": name,
-                                "line": node.lineno,
-                                "col": node.col_offset,
-                                "value": _get_literal_value(node.value),
-                                "value_type": type(node.value).__name__,
-                                "file": file_path,
-                            }
-                        )
+                    if name.isupper() and name.replace('_', '').isalnum():
+                        constants.append({
+                            'name': name,
+                            'line': node.lineno,
+                            'col': node.col_offset,
+                            'value': _get_literal_value(node.value),
+                            'value_type': type(node.value).__name__,
+                            'file': file_path
+                        })
             self.generic_visit(node)
 
     ConstantVisitor().visit(tree)
@@ -179,30 +177,24 @@ def extract_imports(tree: ast.Module) -> List[Dict[str, Any]]:
     class ImportVisitor(ast.NodeVisitor):
         def visit_Import(self, node):
             for alias in node.names:
-                imports.append(
-                    {
-                        "type": "import",
-                        "module": alias.name,
-                        "names": [alias.name],
-                        "aliases": {alias.name: alias.asname} if alias.asname else {},
-                        "line": node.lineno,
-                    }
-                )
+                imports.append({
+                    'type': 'import',
+                    'module': alias.name,
+                    'names': [alias.name],
+                    'aliases': {alias.name: alias.asname} if alias.asname else {},
+                    'line': node.lineno
+                })
             self.generic_visit(node)
 
         def visit_ImportFrom(self, node):
-            imports.append(
-                {
-                    "type": "from",
-                    "module": node.module or "",
-                    "names": [alias.name for alias in node.names],
-                    "aliases": {
-                        alias.name: alias.asname for alias in node.names if alias.asname
-                    },
-                    "line": node.lineno,
-                    "level": node.level,  # For relative imports
-                }
-            )
+            imports.append({
+                'type': 'from',
+                'module': node.module or '',
+                'names': [alias.name for alias in node.names],
+                'aliases': {alias.name: alias.asname for alias in node.names if alias.asname},
+                'line': node.lineno,
+                'level': node.level  # For relative imports
+            })
             self.generic_visit(node)
 
     ImportVisitor().visit(tree)
@@ -229,7 +221,7 @@ def extract_decorators(node: ast.FunctionDef) -> List[str]:
             # Handle @router.get, @field_validator, etc.
             decorators.append(_get_attribute_name(dec))
         else:
-            decorators.append("<complex_decorator>")
+            decorators.append('<complex_decorator>')
     return decorators
 
 
@@ -237,18 +229,17 @@ def extract_decorators(node: ast.FunctionDef) -> List[str]:
 # Private Helper Functions
 # ============================================================================
 
-
 def _extract_function_info(node: ast.FunctionDef, file_path: str) -> Dict[str, Any]:
     """Extract metadata from FunctionDef node."""
     return {
-        "name": node.name,
-        "line": node.lineno,
-        "col": node.col_offset,
-        "args": [arg.arg for arg in node.args.args],
-        "decorators": extract_decorators(node),
-        "is_async": isinstance(node, ast.AsyncFunctionDef),
-        "docstring": ast.get_docstring(node),
-        "file": file_path,
+        'name': node.name,
+        'line': node.lineno,
+        'col': node.col_offset,
+        'args': [arg.arg for arg in node.args.args],
+        'decorators': extract_decorators(node),
+        'is_async': isinstance(node, ast.AsyncFunctionDef),
+        'docstring': ast.get_docstring(node),
+        'file': file_path
     }
 
 
@@ -260,14 +251,14 @@ def _extract_class_info(node: ast.ClassDef, file_path: str) -> Dict[str, Any]:
             methods.append(item.name)
 
     return {
-        "name": node.name,
-        "line": node.lineno,
-        "col": node.col_offset,
-        "bases": [_get_base_name(base) for base in node.bases],
-        "decorators": extract_decorators(node),
-        "methods": methods,
-        "docstring": ast.get_docstring(node),
-        "file": file_path,
+        'name': node.name,
+        'line': node.lineno,
+        'col': node.col_offset,
+        'bases': [_get_base_name(base) for base in node.bases],
+        'decorators': extract_decorators(node),
+        'methods': methods,
+        'docstring': ast.get_docstring(node),
+        'file': file_path
     }
 
 
@@ -278,7 +269,7 @@ def _get_base_name(node: ast.expr) -> str:
     elif isinstance(node, ast.Attribute):
         return _get_attribute_name(node)
     else:
-        return "<complex_base>"
+        return '<complex_base>'
 
 
 def _get_attribute_name(node: ast.Attribute) -> str:
@@ -290,7 +281,7 @@ def _get_attribute_name(node: ast.Attribute) -> str:
         current = current.value
     if isinstance(current, ast.Name):
         parts.append(current.id)
-    return ".".join(reversed(parts))
+    return '.'.join(reversed(parts))
 
 
 def _get_literal_value(node: ast.expr) -> Any:
@@ -324,7 +315,6 @@ def _get_literal_value(node: ast.expr) -> Any:
 # ============================================================================
 # Utility Functions
 # ============================================================================
-
 
 def count_nodes_by_type(tree: ast.Module) -> Dict[str, int]:
     """

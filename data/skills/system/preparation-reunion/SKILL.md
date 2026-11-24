@@ -21,35 +21,28 @@ priority: 65
 ## Format de sortie
 
 ### Informations de la réunion
-
 - Titre, date, heure, durée
 - Lieu ou lien de visioconférence
 - Organisateur
 
 ### Participants
-
 Pour chaque participant :
-
 - Nom, fonction/titre
 - Email, téléphone
 - Dernier échange (date + résumé 1 ligne)
 
 ### Contexte
-
 - Sujets en cours avec les participants
 - Points en suspens des échanges récents
 - Documents mentionnés récemment
 
 ### Ordre du jour suggéré
-
 Basé sur le titre de la réunion et les échanges récents :
-
 1. Point sur [sujet 1]
 2. Discussion [sujet 2]
 3. Prochaines étapes
 
 ### Actions préparatoires
-
 - Documents à relire avant la réunion
 - Questions à préparer
 - Décisions à anticiper

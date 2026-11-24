@@ -37,36 +37,35 @@ SENSITIVE_VARS = [
     # Handled separately with regex
 ]
 
-
 def mask_env_file(input_path: Path, output_path: Path):
     """Mask sensitive values while preserving structure."""
 
-    with open(input_path, "r", encoding="utf-8") as f:
+    with open(input_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
 
     masked_lines = []
 
     for line in lines:
         # Skip comments and empty lines
-        if line.strip().startswith("#") or not line.strip():
+        if line.strip().startswith('#') or not line.strip():
             masked_lines.append(line)
             continue
 
         # Check if line is a variable assignment
-        if "=" in line:
-            var_name = line.split("=")[0].strip()
+        if '=' in line:
+            var_name = line.split('=')[0].strip()
 
             # Mask sensitive variables
             if var_name in SENSITIVE_VARS:
                 # Keep variable name and = sign, mask value
                 masked_lines.append(f"{var_name}=CHANGE_ME_{var_name}\n")
             # Special handling for DATABASE_URL (contains password)
-            elif "DATABASE_URL" in var_name:
+            elif 'DATABASE_URL' in var_name:
                 # Replace password in postgres://user:password@host pattern
                 masked_line = re.sub(
-                    r"(postgresql\+asyncpg://[^:]+:)[^@]+(@)",
-                    r"\1CHANGE_ME_DB_PASSWORD\2",
-                    line,
+                    r'(postgresql\+asyncpg://[^:]+:)[^@]+(@)',
+                    r'\1CHANGE_ME_DB_PASSWORD\2',
+                    line
                 )
                 masked_lines.append(masked_line)
             else:
@@ -76,14 +75,11 @@ def mask_env_file(input_path: Path, output_path: Path):
             masked_lines.append(line)
 
     # Write masked content
-    with open(output_path, "w", encoding="utf-8") as f:
+    with open(output_path, 'w', encoding='utf-8') as f:
         f.writelines(masked_lines)
 
     print(f"[OK] Masked {input_path} -> {output_path}")
-    print(
-        f"     Processed {len(lines)} lines, masked {len(SENSITIVE_VARS)} sensitive variables"
-    )
-
+    print(f"     Processed {len(lines)} lines, masked {len(SENSITIVE_VARS)} sensitive variables")
 
 if __name__ == "__main__":
     project_root = Path(__file__).parent.parent

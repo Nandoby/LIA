@@ -39,11 +39,11 @@ interface AdminUsageLimitsEditModalProps {
  * Also includes manual block toggle with reason textarea.
  */
 export function AdminUsageLimitsEditModal({
-                                            user,
-                                            open,
-                                            onClose,
-                                            onSave,
-                                          }: AdminUsageLimitsEditModalProps) {
+  user,
+  open,
+  onClose,
+  onSave,
+}: AdminUsageLimitsEditModalProps) {
   const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
 
@@ -218,14 +218,14 @@ interface LimitFieldProps {
 }
 
 function LimitField({
-                      label,
-                      value,
-                      onChange,
-                      currentUsage,
-                      step = 1,
-                      isCost,
-                      t,
-                    }: LimitFieldProps) {
+  label,
+  value,
+  onChange,
+  currentUsage,
+  step = 1,
+  isCost,
+  t,
+}: LimitFieldProps) {
   const isUnlimited = value === null;
 
   const formatUsage = (v: number | string) => {

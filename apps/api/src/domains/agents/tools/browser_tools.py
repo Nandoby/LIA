@@ -220,7 +220,6 @@ async def browser_task_tool(
                 browser_press_key_tool,
             ],
             prompt=prompt,
-            store=runtime.store,  # Nested browser tools validate runtime.store
         )
 
         # Build clean config for nested agent (avoid LangGraph internal state conflicts)

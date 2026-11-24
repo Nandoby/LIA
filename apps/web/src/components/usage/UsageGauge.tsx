@@ -50,13 +50,13 @@ interface UsageGaugeProps {
  * Displays "unlimited" when limit is null.
  */
 export function UsageGauge({
-                             detail,
-                             label,
-                             mode: _mode,
-                             formatValue = formatCompact,
-                             t,
-                             size = 'md',
-                           }: UsageGaugeProps) {
+  detail,
+  label,
+  mode: _mode,
+  formatValue = formatCompact,
+  t,
+  size = 'md',
+}: UsageGaugeProps) {
   const isUnlimited = detail.limit === null;
   const pct = detail.usage_pct ?? 0;
   const cappedPct = Math.min(pct, 100);

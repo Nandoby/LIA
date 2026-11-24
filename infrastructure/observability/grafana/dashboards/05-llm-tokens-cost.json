@@ -141,7 +141,9 @@
           "decimals": 2,
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "green" }]
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
           }
         },
         "overrides": []
@@ -177,7 +179,9 @@
           "decimals": 2,
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "green" }]
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
           }
         },
         "overrides": []
@@ -213,7 +217,9 @@
           "decimals": 4,
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "green" }]
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
           }
         },
         "overrides": []
@@ -249,7 +255,9 @@
           "decimals": 0,
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "green" }]
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
           }
         },
         "overrides": []
@@ -285,7 +293,9 @@
           "decimals": 0,
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "green" }]
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
           }
         },
         "overrides": []
@@ -575,7 +585,9 @@
               "decimals": 1,
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []
@@ -620,7 +632,9 @@
               "decimals": 2,
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []
@@ -716,7 +730,9 @@
             "defaults": {
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []
@@ -1126,7 +1142,9 @@
               "unit": "dateTimeFromNow",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []
@@ -1240,7 +1258,9 @@
               "decimals": 0,
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []

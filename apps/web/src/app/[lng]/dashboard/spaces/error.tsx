@@ -7,9 +7,9 @@ import { ErrorPage } from '@/components/errors';
  * Follows Next.js App Router error handling pattern.
  */
 export default function Error({
-                                error,
-                                reset,
-                              }: {
+  error,
+  reset,
+}: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {

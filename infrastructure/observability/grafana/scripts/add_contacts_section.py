@@ -7,12 +7,11 @@ import json
 import sys
 from pathlib import Path
 
-
 def add_contacts_section(dashboard_path: Path) -> None:
     """Add Section 5 with 10 panels for Contacts Agent metrics."""
 
     # Load existing dashboard
-    with open(dashboard_path, "r", encoding="utf-8") as f:
+    with open(dashboard_path, 'r', encoding='utf-8') as f:
         dashboard = json.load(f)
 
     # Starting Y position for new section (after existing panels)
@@ -27,9 +26,12 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "query": "label_values(agent_node_executions_total, node_name)",
             "multi": True,
             "includeAll": True,
-            "current": {"text": "All", "value": "$__all"},
+            "current": {
+                "text": "All",
+                "value": "$__all"
+            },
             "label": "Agent Name",
-            "refresh": 1,
+            "refresh": 1
         },
         {
             "name": "tool_name",
@@ -38,9 +40,12 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "query": "label_values(agent_tool_invocations_total, tool_name)",
             "multi": True,
             "includeAll": True,
-            "current": {"text": "All", "value": "$__all"},
+            "current": {
+                "text": "All",
+                "value": "$__all"
+            },
             "label": "Tool Name",
-            "refresh": 1,
+            "refresh": 1
         },
         {
             "name": "operation",
@@ -49,20 +54,23 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "query": "label_values(contacts_api_calls_total, operation)",
             "multi": True,
             "includeAll": True,
-            "current": {"text": "All", "value": "$__all"},
+            "current": {
+                "text": "All",
+                "value": "$__all"
+            },
             "label": "Contacts Operation",
-            "refresh": 1,
-        },
+            "refresh": 1
+        }
     ]
 
     # Add variables if not already present
-    if "templating" not in dashboard:
-        dashboard["templating"] = {"list": []}
+    if 'templating' not in dashboard:
+        dashboard['templating'] = {'list': []}
 
-    existing_var_names = {v["name"] for v in dashboard["templating"]["list"]}
+    existing_var_names = {v['name'] for v in dashboard['templating']['list']}
     for var in new_variables:
-        if var["name"] not in existing_var_names:
-            dashboard["templating"]["list"].append(var)
+        if var['name'] not in existing_var_names:
+            dashboard['templating']['list'].append(var)
 
     # Define Section 5 panels
     new_panels = [
@@ -71,7 +79,7 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "type": "row",
             "title": "🤝 CONTACTS AGENT & TASK ORCHESTRATION",
             "collapsed": False,
-            "gridPos": {"h": 1, "w": 24, "x": 0, "y": start_y},
+            "gridPos": {"h": 1, "w": 24, "x": 0, "y": start_y}
         },
         # Panel 1: Contacts Agent Executions
         {
@@ -81,15 +89,18 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "datasource": {"type": "prometheus", "uid": "$datasource"},
             "targets": [
                 {
-                    "expr": 'sum(rate(agent_node_executions_total{node_name="contacts_agent"}[5m])) by (status)',
+                    "expr": "sum(rate(agent_node_executions_total{node_name=\"contacts_agent\"}[5m])) by (status)",
                     "legendFormat": "{{status}}",
-                    "refId": "A",
+                    "refId": "A"
                 }
             ],
             "fieldConfig": {
-                "defaults": {"unit": "ops", "color": {"mode": "palette-classic"}}
+                "defaults": {
+                    "unit": "ops",
+                    "color": {"mode": "palette-classic"}
+                }
             },
-            "gridPos": {"h": 8, "w": 12, "x": 0, "y": start_y + 1},
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": start_y + 1}
         },
         # Panel 2: Contacts API Calls by Operation
         {
@@ -99,15 +110,18 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "datasource": {"type": "prometheus", "uid": "$datasource"},
             "targets": [
                 {
-                    "expr": 'sum(rate(contacts_api_calls_total{operation=~"$operation"}[5m])) by (operation, status)',
+                    "expr": "sum(rate(contacts_api_calls_total{operation=~\"$operation\"}[5m])) by (operation, status)",
                     "legendFormat": "{{operation}} ({{status}})",
-                    "refId": "A",
+                    "refId": "A"
                 }
             ],
             "fieldConfig": {
-                "defaults": {"unit": "ops", "color": {"mode": "palette-classic"}}
+                "defaults": {
+                    "unit": "ops",
+                    "color": {"mode": "palette-classic"}
+                }
             },
-            "gridPos": {"h": 8, "w": 12, "x": 12, "y": start_y + 1},
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": start_y + 1}
         },
         # Panel 3: Contacts API Latency P95
         {
@@ -117,15 +131,18 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "datasource": {"type": "prometheus", "uid": "$datasource"},
             "targets": [
                 {
-                    "expr": 'histogram_quantile(0.95, sum(rate(contacts_api_latency_seconds_bucket{operation=~"$operation"}[5m])) by (le, operation))',
+                    "expr": "histogram_quantile(0.95, sum(rate(contacts_api_latency_seconds_bucket{operation=~\"$operation\"}[5m])) by (le, operation))",
                     "legendFormat": "{{operation}}",
-                    "refId": "A",
+                    "refId": "A"
                 }
             ],
             "fieldConfig": {
-                "defaults": {"unit": "s", "color": {"mode": "palette-classic"}}
+                "defaults": {
+                    "unit": "s",
+                    "color": {"mode": "palette-classic"}
+                }
             },
-            "gridPos": {"h": 8, "w": 12, "x": 0, "y": start_y + 9},
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": start_y + 9}
         },
         # Panel 4: Contacts Results Distribution
         {
@@ -135,15 +152,18 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "datasource": {"type": "prometheus", "uid": "$datasource"},
             "targets": [
                 {
-                    "expr": 'sum(contacts_results_count_bucket{operation=~"$operation"}) by (le, operation)',
+                    "expr": "sum(contacts_results_count_bucket{operation=~\"$operation\"}) by (le, operation)",
                     "legendFormat": "{{operation}}",
-                    "refId": "A",
+                    "refId": "A"
                 }
             ],
             "fieldConfig": {
-                "defaults": {"unit": "short", "color": {"mode": "palette-classic"}}
+                "defaults": {
+                    "unit": "short",
+                    "color": {"mode": "palette-classic"}
+                }
             },
-            "gridPos": {"h": 8, "w": 12, "x": 12, "y": start_y + 9},
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": start_y + 9}
         },
         # Panel 5: Contacts Cache Hit Rate
         {
@@ -154,7 +174,7 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "targets": [
                 {
                     "expr": "sum(rate(contacts_cache_hits_total[5m])) / (sum(rate(contacts_cache_hits_total[5m])) + sum(rate(contacts_cache_misses_total[5m]))) * 100",
-                    "refId": "A",
+                    "refId": "A"
                 }
             ],
             "fieldConfig": {
@@ -167,12 +187,12 @@ def add_contacts_section(dashboard_path: Path) -> None:
                         "steps": [
                             {"value": 0, "color": "red"},
                             {"value": 50, "color": "yellow"},
-                            {"value": 80, "color": "green"},
-                        ],
-                    },
+                            {"value": 80, "color": "green"}
+                        ]
+                    }
                 }
             },
-            "gridPos": {"h": 8, "w": 8, "x": 0, "y": start_y + 17},
+            "gridPos": {"h": 8, "w": 8, "x": 0, "y": start_y + 17}
         },
         # Panel 6: Task Orchestrator Plans Created
         {
@@ -183,13 +203,16 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "targets": [
                 {
                     "expr": "sum(increase(task_orchestrator_plans_created_total[24h]))",
-                    "refId": "A",
+                    "refId": "A"
                 }
             ],
             "fieldConfig": {
-                "defaults": {"unit": "short", "color": {"mode": "thresholds"}}
+                "defaults": {
+                    "unit": "short",
+                    "color": {"mode": "thresholds"}
+                }
             },
-            "gridPos": {"h": 8, "w": 8, "x": 8, "y": start_y + 17},
+            "gridPos": {"h": 8, "w": 8, "x": 8, "y": start_y + 17}
         },
         # Panel 7: Orchestrator Agents Distribution
         {
@@ -201,13 +224,16 @@ def add_contacts_section(dashboard_path: Path) -> None:
                 {
                     "expr": "sum(orchestration_plan_agents_count_bucket) by (le)",
                     "legendFormat": "{{le}} agents",
-                    "refId": "A",
+                    "refId": "A"
                 }
             ],
             "fieldConfig": {
-                "defaults": {"unit": "short", "color": {"mode": "palette-classic"}}
+                "defaults": {
+                    "unit": "short",
+                    "color": {"mode": "palette-classic"}
+                }
             },
-            "gridPos": {"h": 8, "w": 8, "x": 16, "y": start_y + 17},
+            "gridPos": {"h": 8, "w": 8, "x": 16, "y": start_y + 17}
         },
         # Panel 8: Orchestrator Execution Duration P95
         {
@@ -217,15 +243,18 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "datasource": {"type": "prometheus", "uid": "$datasource"},
             "targets": [
                 {
-                    "expr": 'histogram_quantile(0.95, sum(rate(task_orchestrator_execution_duration_seconds_bucket{intention=~"$intention"}[5m])) by (le, intention))',
+                    "expr": "histogram_quantile(0.95, sum(rate(task_orchestrator_execution_duration_seconds_bucket{intention=~\"$intention\"}[5m])) by (le, intention))",
                     "legendFormat": "{{intention}}",
-                    "refId": "A",
+                    "refId": "A"
                 }
             ],
             "fieldConfig": {
-                "defaults": {"unit": "s", "color": {"mode": "palette-classic"}}
+                "defaults": {
+                    "unit": "s",
+                    "color": {"mode": "palette-classic"}
+                }
             },
-            "gridPos": {"h": 8, "w": 12, "x": 0, "y": start_y + 25},
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": start_y + 25}
         },
         # Panel 9: Agent Tools Invocations
         {
@@ -235,15 +264,18 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "datasource": {"type": "prometheus", "uid": "$datasource"},
             "targets": [
                 {
-                    "expr": 'sum(rate(agent_tool_invocations_total{tool_name=~"$tool_name",agent_name=~"$agent_name"}[5m])) by (tool_name, success)',
+                    "expr": "sum(rate(agent_tool_invocations_total{tool_name=~\"$tool_name\",agent_name=~\"$agent_name\"}[5m])) by (tool_name, success)",
                     "legendFormat": "{{tool_name}} (success={{success}})",
-                    "refId": "A",
+                    "refId": "A"
                 }
             ],
             "fieldConfig": {
-                "defaults": {"unit": "ops", "color": {"mode": "palette-classic"}}
+                "defaults": {
+                    "unit": "ops",
+                    "color": {"mode": "palette-classic"}
+                }
             },
-            "gridPos": {"h": 8, "w": 12, "x": 12, "y": start_y + 25},
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": start_y + 25}
         },
         # Panel 10: Agent Tools Duration P95
         {
@@ -253,26 +285,29 @@ def add_contacts_section(dashboard_path: Path) -> None:
             "datasource": {"type": "prometheus", "uid": "$datasource"},
             "targets": [
                 {
-                    "expr": 'histogram_quantile(0.95, sum(rate(agent_tool_duration_seconds_bucket{tool_name=~"$tool_name",agent_name=~"$agent_name"}[5m])) by (le, tool_name))',
+                    "expr": "histogram_quantile(0.95, sum(rate(agent_tool_duration_seconds_bucket{tool_name=~\"$tool_name\",agent_name=~\"$agent_name\"}[5m])) by (le, tool_name))",
                     "legendFormat": "{{tool_name}}",
-                    "refId": "A",
+                    "refId": "A"
                 }
             ],
             "fieldConfig": {
-                "defaults": {"unit": "s", "color": {"mode": "palette-classic"}}
+                "defaults": {
+                    "unit": "s",
+                    "color": {"mode": "palette-classic"}
+                }
             },
-            "gridPos": {"h": 8, "w": 24, "x": 0, "y": start_y + 33},
-        },
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": start_y + 33}
+        }
     ]
 
     # Add new panels to dashboard
-    if "panels" not in dashboard:
-        dashboard["panels"] = []
+    if 'panels' not in dashboard:
+        dashboard['panels'] = []
 
-    dashboard["panels"].extend(new_panels)
+    dashboard['panels'].extend(new_panels)
 
     # Save updated dashboard
-    with open(dashboard_path, "w", encoding="utf-8") as f:
+    with open(dashboard_path, 'w', encoding='utf-8') as f:
         json.dump(dashboard, f, indent=2, ensure_ascii=False)
 
     print(f"[OK] Added Section 5 with {len(new_panels)} panels to {dashboard_path}")
@@ -280,20 +315,16 @@ def add_contacts_section(dashboard_path: Path) -> None:
     print(f"   - Starting Y position: {start_y}")
     print(f"   - Total panels now: {len(dashboard['panels'])}")
 
-
 if __name__ == "__main__":
-    dashboard_path = (
-        Path(__file__).parent.parent / "dashboards" / "agents_langgraph.json"
-    )
+    dashboard_path = Path(__file__).parent.parent / "dashboards" / "agents_langgraph.json"
 
     if not dashboard_path.exists():
         print(f"[ERROR] Dashboard not found: {dashboard_path}")
         sys.exit(1)
 
     # Backup original
-    backup_path = dashboard_path.with_suffix(".json.backup")
+    backup_path = dashboard_path.with_suffix('.json.backup')
     import shutil
-
     shutil.copy2(dashboard_path, backup_path)
     print(f"[BACKUP] Created: {backup_path}")
 

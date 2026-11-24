@@ -15,7 +15,9 @@ from datetime import datetime
 
 
 def generate_markdown_table(
-    headers: List[str], rows: List[List[str]], alignments: Optional[List[str]] = None
+    headers: List[str],
+    rows: List[List[str]],
+    alignments: Optional[List[str]] = None
 ) -> str:
     """
     Generate markdown table.
@@ -35,18 +37,11 @@ def generate_markdown_table(
         >>> table = generate_markdown_table(headers, rows)
     """
     if not rows:
-        return (
-            "| "
-            + " | ".join(headers)
-            + " |\n"
-            + "|"
-            + "|".join([" - " for _ in headers])
-            + "|\n"
-        )
+        return "| " + " | ".join(headers) + " |\n" + "|" + "|".join([" - " for _ in headers]) + "|\n"
 
     # Determine alignments
     if alignments is None:
-        alignments = ["left"] * len(headers)
+        alignments = ['left'] * len(headers)
 
     # Calculate column widths
     widths = [len(h) for h in headers]
@@ -56,20 +51,18 @@ def generate_markdown_table(
                 widths[i] = max(widths[i], len(str(cell)))
 
     # Generate header row
-    header_row = (
-        "| " + " | ".join(h.ljust(widths[i]) for i, h in enumerate(headers)) + " |"
-    )
+    header_row = "| " + " | ".join(h.ljust(widths[i]) for i, h in enumerate(headers)) + " |"
 
     # Generate separator row
     separator_cells = []
     for i, alignment in enumerate(alignments):
         width = widths[i] if i < len(widths) else 3
-        if alignment == "center":
-            sep = ":" + "-" * (width - 1) + ":"
-        elif alignment == "right":
-            sep = "-" * (width - 1) + ":"
+        if alignment == 'center':
+            sep = ':' + '-' * (width - 1) + ':'
+        elif alignment == 'right':
+            sep = '-' * (width - 1) + ':'
         else:  # left (default)
-            sep = "-" * (width + 1)
+            sep = '-' * (width + 1)
         separator_cells.append(sep)
     separator_row = "|" + "|".join(separator_cells) + "|"
 
@@ -92,7 +85,7 @@ def generate_finding_report(
     findings: List[Dict[str, Any]],
     output_path: Path,
     script_name: str = "",
-    additional_sections: Optional[Dict[str, str]] = None,
+    additional_sections: Optional[Dict[str, str]] = None
 ):
     """
     Generate structured finding report.
@@ -137,22 +130,22 @@ def generate_finding_report(
     content.append(f"**Date** : {datetime.now().strftime('%Y-%m-%d')}")
     if script_name:
         content.append(f"**Script** : `scripts/optim/{script_name}`")
-    content.append("**Statut** : ✅ ANALYSE COMPLÉTÉE\n")
+    content.append(f"**Statut** : ✅ ANALYSE COMPLÉTÉE\n")
     content.append("---\n")
 
     # Summary
     content.append("## 📊 Résumé\n")
-    content.append("- **Total éléments analysés** : *Voir détails ci-dessous*")
+    content.append(f"- **Total éléments analysés** : *Voir détails ci-dessous*")
     content.append(f"- **Findings identifiés** : {len(findings)}")
 
     # Count by confidence
     confidence_counts = {}
     for finding in findings:
-        conf = finding.get("confidence", "unknown")
+        conf = finding.get('confidence', 'unknown')
         confidence_counts[conf] = confidence_counts.get(conf, 0) + 1
 
     for conf, count in sorted(confidence_counts.items()):
-        emoji = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(conf, "⚪")
+        emoji = {'high': '🔴', 'medium': '🟡', 'low': '🟢'}.get(conf, '⚪')
         content.append(f"- **{emoji} Confiance {conf}** : {count}")
 
     content.append("\n---\n")
@@ -165,14 +158,12 @@ def generate_finding_report(
         headers = ["Élément", "Location", "Confiance", "Raison"]
         rows = []
         for finding in findings:
-            rows.append(
-                [
-                    finding.get("item", "?"),
-                    finding.get("location", "?"),
-                    finding.get("confidence", "?"),
-                    finding.get("reason", "?"),
-                ]
-            )
+            rows.append([
+                finding.get('item', '?'),
+                finding.get('location', '?'),
+                finding.get('confidence', '?'),
+                finding.get('reason', '?')
+            ])
 
         table = generate_markdown_table(headers, rows)
         content.append(table)
@@ -186,7 +177,7 @@ def generate_finding_report(
             content.append(f"- **Confiance** : {finding.get('confidence', '?')}")
             content.append(f"- **Raison** : {finding.get('reason', '?')}")
 
-            if "details" in finding and finding["details"]:
+            if 'details' in finding and finding['details']:
                 content.append(f"- **Détails** : {finding['details']}")
 
             content.append("\n**Vérifications recommandées** :")
@@ -215,14 +206,17 @@ def generate_finding_report(
 
     # Write to file
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, "w", encoding="utf-8") as f:
+    with open(output_path, 'w', encoding='utf-8') as f:
         f.write("\n".join(content))
 
     print(f"[SUCCESS] Report generated: {output_path}")
     print(f"   {len(findings)} findings written")
 
 
-def generate_summary_report(reports: Dict[str, Dict[str, Any]], output_path: Path):
+def generate_summary_report(
+    reports: Dict[str, Dict[str, Any]],
+    output_path: Path
+):
     """
     Generate summary report combining multiple analysis reports.
 
@@ -251,13 +245,15 @@ def generate_summary_report(reports: Dict[str, Dict[str, Any]], output_path: Pat
     total_findings = 0
 
     for report_name, data in reports.items():
-        findings_count = data.get("findings", 0)
-        status = data.get("status", "pending")
-        status_emoji = {"completed": "✅", "pending": "⏳", "error": "❌"}.get(
-            status, "❓"
-        )
+        findings_count = data.get('findings', 0)
+        status = data.get('status', 'pending')
+        status_emoji = {'completed': '✅', 'pending': '⏳', 'error': '❌'}.get(status, '❓')
 
-        rows.append([report_name, str(findings_count), f"{status_emoji} {status}"])
+        rows.append([
+            report_name,
+            str(findings_count),
+            f"{status_emoji} {status}"
+        ])
         total_findings += findings_count
 
     table = generate_markdown_table(headers, rows)
@@ -269,7 +265,7 @@ def generate_summary_report(reports: Dict[str, Dict[str, Any]], output_path: Pat
     # Individual report links
     content.append("## 📁 Rapports Détaillés\n")
     for report_name, data in reports.items():
-        file_path = data.get("file", "")
+        file_path = data.get('file', '')
         if file_path:
             content.append(f"- [{report_name}]({file_path})")
 
@@ -280,7 +276,7 @@ def generate_summary_report(reports: Dict[str, Dict[str, Any]], output_path: Pat
 
     # Write to file (ensure parent directory exists)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, "w", encoding="utf-8") as f:
+    with open(output_path, 'w', encoding='utf-8') as f:
         f.write("\n".join(content))
 
     print(f"[SUCCESS] Summary report generated: {output_path}")
@@ -331,7 +327,11 @@ if __name__ == "__main__":
     # Test 1: Markdown table
     print("Test 1: Markdown Table")
     headers = ["Name", "Value", "Status"]
-    rows = [["Item 1", "100", "✅"], ["Item 2", "50", "⚠️"], ["Item 3", "25", "❌"]]
+    rows = [
+        ["Item 1", "100", "✅"],
+        ["Item 2", "50", "⚠️"],
+        ["Item 3", "25", "❌"]
+    ]
     table = generate_markdown_table(headers, rows)
     print(table)
     print("\n[OK] Table generation passed\n")
@@ -347,16 +347,21 @@ if __name__ == "__main__":
     print("Test 3: Finding Report Generation")
     test_findings = [
         {
-            "item": "test_function",
-            "location": "src/test.py:42",
-            "confidence": "high",
-            "reason": "No usages found",
-            "details": "Checked entire codebase",
+            'item': 'test_function',
+            'location': 'src/test.py:42',
+            'confidence': 'high',
+            'reason': 'No usages found',
+            'details': 'Checked entire codebase'
         }
     ]
 
     test_output = Path("test_report.md")
-    generate_finding_report("Test Report", test_findings, test_output, "test_script.py")
+    generate_finding_report(
+        "Test Report",
+        test_findings,
+        test_output,
+        "test_script.py"
+    )
 
     if test_output.exists():
         print(f"[OK] Report generated: {test_output}")

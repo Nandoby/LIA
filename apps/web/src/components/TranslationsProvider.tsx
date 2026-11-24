@@ -2,7 +2,7 @@
  * Translations Provider
  *
  * Client-side provider that wraps the app with i18next context.
- * Initialize translations for the current language.
+ * Initializes translations for the current language.
  */
 
 'use client';

@@ -57,9 +57,7 @@ HOT_PATHS = [
 ]
 
 
-def profile_function(
-    func: callable, *args: Any, iterations: int = 100
-) -> dict[str, float]:
+def profile_function(func: callable, *args: Any, iterations: int = 100) -> dict[str, float]:
     """Profile function execution time."""
     durations = []
 
@@ -89,21 +87,19 @@ def main():
 
     print("[*] Profiling setup:")
     print(f"   Hot paths: {len(HOT_PATHS)}")
-    print("   Iterations per test: 100")
+    print(f"   Iterations per test: 100")
     print()
 
     results = []
 
     for hot_path in HOT_PATHS:
-        print(
-            f"[{len(results)+1}/{len(HOT_PATHS)}] Profiling: {hot_path['file']} ({hot_path['lines']})"
-        )
+        print(f"[{len(results)+1}/{len(HOT_PATHS)}] Profiling: {hot_path['file']} ({hot_path['lines']})")
         print(f"   Description: {hot_path['description']}")
         print(f"   Dataset: {hot_path['dataset']}")
 
         # TODO: Import actual functions and profile
         # For now, create placeholder
-        print("   [SKIP] Manual profiling required - function not importable directly")
+        print(f"   [SKIP] Manual profiling required - function not importable directly")
         print()
 
     print("[*] Profiling complete!")

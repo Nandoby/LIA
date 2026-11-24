@@ -58,7 +58,7 @@ export function SnowfallEffect() {
         overflow: 'hidden',
         // Progressive fade-out
         maskImage: 'linear-gradient(to bottom, black 0%, black 30%, transparent 100%)',
-        WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 30£, transparent 100%)',
+        WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 30%, transparent 100%)',
       }}
     >
       <Snowfall

@@ -28,11 +28,11 @@ async def main(connector_type: str = "google_drive"):
         """
         SELECT c.id, c.connector_type, c.status, u.email
         FROM connectors c
-                 JOIN users u ON c.user_id = u.id
+        JOIN users u ON c.user_id = u.id
         WHERE c.connector_type = $1
-          AND c.status = 'active'
-            LIMIT 1
-        """,
+        AND c.status = 'active'
+        LIMIT 1
+    """,
         connector_type,
     )
 

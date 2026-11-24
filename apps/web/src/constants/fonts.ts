@@ -5,12 +5,12 @@
  * This file eliminates duplication between font-context.tsx and FontSettings.tsx.
  *
  * Usage:
- *    import { FONT_FAMILIES, FONT_FAMILY_NAMES, type FontFamilyName } from '@/constants/fonts';
+ *   import { FONT_FAMILIES, FONT_FAMILY_NAMES, type FontFamilyName } from '@/constants/fonts';
  *
  * References:
- *    - Backend: apps/api/src/domains/shared/schemas.py (VALID_FONT_FAMILIES)
- *    - CSS: apps/web/src/styles/globals.css (data-font selectors)
- *    - Fonts: apps/web/src/lib/fonts.ts (next/font/google configuration)
+ *   - Backend: apps/api/src/domains/shared/schemas.py (VALID_FONT_FAMILIES)
+ *   - CSS: apps/web/src/styles/globals.css (data-font selectors)
+ *   - Fonts: apps/web/src/lib/fonts.ts (next/font/google configuration)
  */
 
 // ============================================================================
@@ -79,7 +79,7 @@ export const FONT_CATEGORIES: Record<FontCategory, FontFamilyName[]> = {
 // ============================================================================
 
 /**
- * Font definitions with metadata for UI display.
+ * Font definition with metadata for UI display.
  */
 export interface FontDefinition {
   name: FontFamilyName;
@@ -129,7 +129,7 @@ export const FONT_DEFINITIONS: FontDefinition[] = [
   },
   {
     name: 'libre-baskerville',
-    fontFamily: 'ver(--font-libre-baskerville), Georgia,serif',
+    fontFamily: 'var(--font-libre-baskerville), Georgia, serif',
     category: 'serif',
   },
   {
@@ -162,7 +162,7 @@ export function isValidFontFamily(fontFamily: string): fontFamily is FontFamilyN
  * Get the font definition by name.
  *
  * @param fontFamily - The font family name
- * @returns The font definition or undefined it not found
+ * @returns The font definition or undefined if not found
  *
  * @example
  * const font = getFontDefinition('geist');

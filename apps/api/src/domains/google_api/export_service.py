@@ -8,7 +8,6 @@ to avoid code duplication.
 
 import uuid
 from datetime import datetime
-from typing import Any
 
 from fastapi.responses import StreamingResponse
 from sqlalchemy import func, select
@@ -239,7 +238,7 @@ async def export_consumption_summary_csv(
     user_emails = {row[0]: row[1] for row in users_result.all()}
 
     # Build combined data
-    data: list[dict[str, Any]] = []
+    data = []
     for uid in all_user_ids:
         token_data = token_rows.get(uid)
         google_data = google_rows.get(uid)

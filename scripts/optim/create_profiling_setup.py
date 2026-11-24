@@ -179,7 +179,7 @@ def create_profiling_script() -> None:
     """Create profiling script for nested loops."""
     OUTPUT_SCRIPT.parent.mkdir(parents=True, exist_ok=True)
 
-    content = '''#!/usr/bin/env python3
+    content = f'''#!/usr/bin/env python3
 """
 Nested Loops Profiling Script.
 
@@ -206,7 +206,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "apps" / "api" / "src"))
 
 # Hot paths to profile
-HOT_PATHS = {hot_paths}
+HOT_PATHS = {{hot_paths}}
 
 
 def profile_function(func: callable, *args: Any, iterations: int = 100) -> dict[str, float]:
@@ -219,7 +219,7 @@ def profile_function(func: callable, *args: Any, iterations: int = 100) -> dict[
         duration_ms = (time.perf_counter() - start) * 1000
         durations.append(duration_ms)
 
-    return {
+    return {{
         "mean_ms": statistics.mean(durations),
         "median_ms": statistics.median(durations),
         "stdev_ms": statistics.stdev(durations) if len(durations) > 1 else 0.0,
@@ -227,7 +227,7 @@ def profile_function(func: callable, *args: Any, iterations: int = 100) -> dict[
         "max_ms": max(durations),
         "p95_ms": statistics.quantiles(durations, n=20)[18],  # 95th percentile
         "p99_ms": statistics.quantiles(durations, n=100)[98],  # 99th percentile
-    }
+    }}
 
 
 def main():
@@ -238,16 +238,16 @@ def main():
     print()
 
     print("[*] Profiling setup:")
-    print(f"   Hot paths: {len(HOT_PATHS)}")
+    print(f"   Hot paths: {{len(HOT_PATHS)}}")
     print(f"   Iterations per test: 100")
     print()
 
     results = []
 
     for hot_path in HOT_PATHS:
-        print(f"[{len(results)+1}/{len(HOT_PATHS)}] Profiling: {hot_path['file']} ({hot_path['lines']})")
-        print(f"   Description: {hot_path['description']}")
-        print(f"   Dataset: {hot_path['dataset']}")
+        print(f"[{{len(results)+1}}/{{len(HOT_PATHS)}}] Profiling: {{hot_path['file']}} ({{hot_path['lines']}})")
+        print(f"   Description: {{hot_path['description']}}")
+        print(f"   Dataset: {{hot_path['dataset']}}")
 
         # TODO: Import actual functions and profile
         # For now, create placeholder
@@ -287,7 +287,7 @@ def create_profiling_report() -> None:
     """Create profiling setup report."""
     OUTPUT_REPORT.parent.mkdir(parents=True, exist_ok=True)
 
-    content = f"""# Phase 4 - Performance Profiling Setup
+    content = f'''# Phase 4 - Performance Profiling Setup
 
 **Date**: 2025-11-15
 **Status**: [OK] SETUP COMPLETE
@@ -356,18 +356,18 @@ cd apps/api
 
 {len(NESTED_LOOPS_HOT_PATHS)} hot paths identified in Phase 3C:
 
-"""
+'''
 
     for idx, hp in enumerate(NESTED_LOOPS_HOT_PATHS, 1):
-        content += f"""### {idx}. {hp["file"]} ({hp["lines"]})
+        content += f'''### {idx}. {hp["file"]} ({hp["lines"]})
 
 **Description**: {hp["description"]}
 **Dataset**: {hp["dataset"]}
 **Priority**: {hp["priority"]}
 
-"""
+'''
 
-    content += """---
+    content += '''---
 
 ## [METHODOLOGY] Profiling Methodology
 
@@ -486,7 +486,7 @@ py-spy record -o profile.svg --pid <pid>
 **Report Generated**: 2025-11-15
 **Author**: Claude Code (Sonnet 4.5)
 **Status**: ✅ Setup complete - Ready for profiling
-"""
+'''
 
     OUTPUT_REPORT.write_text(content, encoding="utf-8")
     print(f"[OK] Created profiling report: {OUTPUT_REPORT}")
@@ -530,6 +530,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\n[ERROR] Setup failed: {e}")
         import traceback
-
         traceback.print_exc()
         exit(1)

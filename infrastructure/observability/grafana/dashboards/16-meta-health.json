@@ -77,7 +77,9 @@
           "unit": "s",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "green", "value": null }]
+            "steps": [
+              { "color": "green", "value": null }
+            ]
           }
         },
         "overrides": []
@@ -105,7 +107,9 @@
           "unit": "ops",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "green", "value": null }]
+            "steps": [
+              { "color": "green", "value": null }
+            ]
           }
         },
         "overrides": []
@@ -252,7 +256,9 @@
               "unit": "ops",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }]
+                "steps": [
+                  { "color": "green", "value": null }
+                ]
               }
             },
             "overrides": []
@@ -280,7 +286,9 @@
               "unit": "ops",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }]
+                "steps": [
+                  { "color": "green", "value": null }
+                ]
               }
             },
             "overrides": []
@@ -308,7 +316,9 @@
               "unit": "ops",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }]
+                "steps": [
+                  { "color": "green", "value": null }
+                ]
               }
             },
             "overrides": []

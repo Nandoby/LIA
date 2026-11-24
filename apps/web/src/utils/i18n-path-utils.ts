@@ -92,7 +92,7 @@ export function switchLanguageInPath(pathname: string, newLang: Language): strin
 
   if (hasLangPrefix) {
     // Replace existing locale: /en/dashboard → /es/dashboard or /dashboard (for default)
-    if (newLang == fallbackLng) {
+    if (newLang === fallbackLng) {
       // Default language: remove prefix
       segments.shift();
       return '/' + segments.join('/') || '/';

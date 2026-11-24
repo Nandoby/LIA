@@ -42,7 +42,7 @@ OUTPUT_FILE = Path("docs/optim/01_UNUSED_FILES.md")
 EXCLUDE_FILES = [
     "__init__.py",  # Package initialization
     "__main__.py",  # Entry points
-    "main.py",  # Application entry point
+    "main.py",      # Application entry point
 ]
 
 # Directories to exclude
@@ -106,22 +106,20 @@ def analyze_unused_files():
             # No imports found - potentially unused
             confidence = _determine_confidence(py_file, module_name)
 
-            findings.append(
-                {
-                    "item": str(py_file.relative_to(SRC_ROOT)),
-                    "location": str(py_file.relative_to(SRC_ROOT)),
-                    "confidence": confidence,
-                    "reason": "No imports found in codebase",
-                    "details": f"Module name: {module_name}",
-                }
-            )
+            findings.append({
+                'item': str(py_file.relative_to(SRC_ROOT)),
+                'location': str(py_file.relative_to(SRC_ROOT)),
+                'confidence': confidence,
+                'reason': 'No imports found in codebase',
+                'details': f"Module name: {module_name}"
+            })
 
             print(f"   [WARN] No imports found (confidence: {confidence})")
         else:
             print(f"   [OK] Used by {len(importers)} file(s)")
 
     # Print summary
-    print("\n[SUMMARY]")
+    print(f"\n[SUMMARY]")
     print(f"   Total files analyzed: {total_files}")
     print(f"   Excluded files: {excluded_files}")
     print(f"   Potentially unused: {len(findings)}")
@@ -149,60 +147,60 @@ def _determine_confidence(file_path: Path, module_name: str) -> str:
 
     # Read file content for analysis
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             file_content = f.read()
     except Exception as e:
         print(f"[WARN] Could not read {file_path}: {e}")
-        return "low"
+        return 'low'
 
     # Low confidence cases (likely used indirectly)
 
     # 1. Files in tests/ (may not be imported)
-    if "test" in str(file_path).lower():
-        return "low"
+    if 'test' in str(file_path).lower():
+        return 'low'
 
     # 2. Files with FastAPI routes (used via decorators)
-    if "@router." in file_content or "@app." in file_content:
-        return "low"
+    if '@router.' in file_content or '@app.' in file_content:
+        return 'low'
 
     # 3. Files with CLI commands (argparse, click)
-    if "argparse" in file_content or "click" in file_content:
-        return "low"
+    if 'argparse' in file_content or 'click' in file_content:
+        return 'low'
 
     # 4. Files that look like migrations or scripts
-    if "migration" in file_name or "script" in file_name:
-        return "low"
+    if 'migration' in file_name or 'script' in file_name:
+        return 'low'
 
     # 5. Files with __all__ export (package interface)
-    if "__all__" in file_content:
-        return "medium"
+    if '__all__' in file_content:
+        return 'medium'
 
     # Medium confidence cases (needs verification)
 
     # 1. Files in infrastructure/ (may be dynamically loaded)
-    if "infrastructure" in str(file_path):
-        return "medium"
+    if 'infrastructure' in str(file_path):
+        return 'medium'
 
     # 2. Files with classes (may be imported dynamically)
-    if "class " in file_content:
-        return "medium"
+    if 'class ' in file_content:
+        return 'medium'
 
     # 3. Files in domains/ with models (ORM models auto-discovered)
-    if "domains" in str(file_path) and "models.py" in file_name:
-        return "medium"
+    if 'domains' in str(file_path) and 'models.py' in file_name:
+        return 'medium'
 
     # High confidence cases (likely unused)
 
     # 1. Utility files with only functions
-    if "utils" in str(file_path) and "def " in file_content:
-        return "high"
+    if 'utils' in str(file_path) and 'def ' in file_content:
+        return 'high'
 
     # 2. Files with very few lines (< 50)
-    if file_content.count("\n") < 50:
-        return "high"
+    if file_content.count('\n') < 50:
+        return 'high'
 
     # Default: medium confidence
-    return "medium"
+    return 'medium'
 
 
 def generate_report(findings, total_files, excluded_files):
@@ -216,9 +214,7 @@ def generate_report(findings, total_files, excluded_files):
 
 ### Breakdown by Confidence
 
-"""
-        + _generate_confidence_breakdown(findings)
-        + """
+""" + _generate_confidence_breakdown(findings) + """
 
 ---
 
@@ -270,7 +266,7 @@ ORM models in `domains/*/models.py` may be auto-discovered.
 - Alembic migrations are NOT imported (normal)
 - FastAPI routes may appear unused (decorators)
 - Always verify tests before deletion
-""",
+"""
     }
 
     generate_finding_report(
@@ -278,21 +274,21 @@ ORM models in `domains/*/models.py` may be auto-discovered.
         findings=findings,
         output_path=OUTPUT_FILE,
         script_name="analyze_unused_files.py",
-        additional_sections=additional_sections,
+        additional_sections=additional_sections
     )
 
 
 def _generate_confidence_breakdown(findings):
     """Generate confidence breakdown table."""
-    confidence_counts = {"high": 0, "medium": 0, "low": 0}
+    confidence_counts = {'high': 0, 'medium': 0, 'low': 0}
     for finding in findings:
-        conf = finding.get("confidence", "unknown")
+        conf = finding.get('confidence', 'unknown')
         if conf in confidence_counts:
             confidence_counts[conf] += 1
 
     lines = []
     for conf, count in confidence_counts.items():
-        emoji = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(conf, "⚪")
+        emoji = {'high': '🔴', 'medium': '🟡', 'low': '🟢'}.get(conf, '⚪')
         lines.append(f"- **{emoji} Confidence {conf}**: {count} file(s)")
 
     return "\n".join(lines)
@@ -308,7 +304,7 @@ if __name__ == "__main__":
         findings, total_files, excluded_files = analyze_unused_files()
         generate_report(findings, total_files, excluded_files)
 
-        print("\n[SUCCESS] Analysis complete!")
+        print(f"\n[SUCCESS] Analysis complete!")
         print(f"   Report: {OUTPUT_FILE}")
         print(f"   Findings: {len(findings)}")
         print(f"\n[NEXT] Review findings manually in {OUTPUT_FILE}")
@@ -319,6 +315,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\n[ERROR] Error during analysis: {e}")
         import traceback
-
         traceback.print_exc()
         sys.exit(1)

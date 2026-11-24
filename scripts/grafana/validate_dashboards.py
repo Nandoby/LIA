@@ -60,7 +60,7 @@ def extract_metrics_from_promql(expr: str) -> Set[str]:
     # Pattern: metric_name (letters, numbers, underscores, colons)
     # Must not be preceded by a letter/number (to avoid matching function names)
     # Must be followed by: {, [, space, operator, or end of string
-    pattern = r"(?<![a-zA-Z0-9_])([a-z_][a-z0-9_:]*(?:_bucket|_sum|_count|_total)?)"
+    pattern = r'(?<![a-zA-Z0-9_])([a-z_][a-z0-9_:]*(?:_bucket|_sum|_count|_total)?)'
 
     metrics = set()
     for match in re.finditer(pattern, expr):
@@ -68,45 +68,11 @@ def extract_metrics_from_promql(expr: str) -> Set[str]:
 
         # Filter out PromQL functions (they're lowercase but metrics usually have underscores)
         if metric in {
-            "sum",
-            "rate",
-            "increase",
-            "histogram_quantile",
-            "by",
-            "avg",
-            "max",
-            "min",
-            "count",
-            "stddev",
-            "stdvar",
-            "topk",
-            "bottomk",
-            "quantile",
-            "count_values",
-            "le",
-            "and",
-            "or",
-            "unless",
-            "offset",
-            "bool",
-            "on",
-            "ignoring",
-            "group_left",
-            "group_right",
-            "abs",
-            "ceil",
-            "floor",
-            "exp",
-            "ln",
-            "log2",
-            "log10",
-            "sqrt",
-            "time",
-            "timestamp",
-            "sort",
-            "sort_desc",
-            "clamp_max",
-            "clamp_min",
+            'sum', 'rate', 'increase', 'histogram_quantile', 'by', 'avg', 'max', 'min',
+            'count', 'stddev', 'stdvar', 'topk', 'bottomk', 'quantile', 'count_values',
+            'le', 'and', 'or', 'unless', 'offset', 'bool', 'on', 'ignoring', 'group_left',
+            'group_right', 'abs', 'ceil', 'floor', 'exp', 'ln', 'log2', 'log10', 'sqrt',
+            'time', 'timestamp', 'sort', 'sort_desc', 'clamp_max', 'clamp_min'
         }:
             continue
 
@@ -126,7 +92,7 @@ def extract_metrics_from_dashboard(dashboard_path: Path) -> Dict[str, Set[str]]:
         Dict mapping panel title to set of metrics used
     """
     try:
-        with open(dashboard_path, "r", encoding="utf-8") as f:
+        with open(dashboard_path, 'r', encoding='utf-8') as f:
             dashboard = json.load(f)
     except (json.JSONDecodeError, IOError) as e:
         print(f"⚠️  Error reading {dashboard_path.name}: {e}", file=sys.stderr)
@@ -140,15 +106,15 @@ def extract_metrics_from_dashboard(dashboard_path: Path) -> Dict[str, Set[str]]:
             if not isinstance(panel, dict):
                 continue
 
-            panel_title = panel.get("title", "Unknown Panel")
-            panel_type = panel.get("type", "")
+            panel_title = panel.get('title', 'Unknown Panel')
+            panel_type = panel.get('type', '')
 
             # Skip row panels (they're just headers)
-            if panel_type == "row":
+            if panel_type == 'row':
                 continue
 
             # Extract from targets (Prometheus queries)
-            targets = panel.get("targets", [])
+            targets = panel.get('targets', [])
             metrics = set()
 
             for target in targets:
@@ -156,12 +122,12 @@ def extract_metrics_from_dashboard(dashboard_path: Path) -> Dict[str, Set[str]]:
                     continue
 
                 # Prometheus expression
-                expr = target.get("expr", "")
+                expr = target.get('expr', '')
                 if expr:
                     metrics.update(extract_metrics_from_promql(expr))
 
                 # Also check 'query' field (some dashboards use this)
-                query = target.get("query", "")
+                query = target.get('query', '')
                 if isinstance(query, str):
                     metrics.update(extract_metrics_from_promql(query))
 
@@ -169,11 +135,11 @@ def extract_metrics_from_dashboard(dashboard_path: Path) -> Dict[str, Set[str]]:
                 panel_metrics[panel_title] = metrics
 
             # Recursively check nested panels (for collapsed rows)
-            if "panels" in panel:
-                extract_from_panels(panel["panels"])
+            if 'panels' in panel:
+                extract_from_panels(panel['panels'])
 
     # Extract from top-level panels
-    panels = dashboard.get("panels", [])
+    panels = dashboard.get('panels', [])
     extract_from_panels(panels)
 
     return panel_metrics
@@ -196,20 +162,21 @@ def get_prometheus_metrics(prometheus_url: str) -> Set[str]:
 
     try:
         with urlopen(label_values_url) as response:
-            data = json.loads(response.read().decode("utf-8"))
+            data = json.loads(response.read().decode('utf-8'))
 
-            if data.get("status") != "success":
-                raise ValueError(
-                    f"Prometheus API returned status: {data.get('status')}"
-                )
+            if data.get('status') != 'success':
+                raise ValueError(f"Prometheus API returned status: {data.get('status')}")
 
-            return set(data["data"])
+            return set(data['data'])
 
     except URLError as e:
         raise URLError(f"Cannot connect to Prometheus at {prometheus_url}: {e}")
 
 
-def validate_dashboards(dashboards_dir: Path, prometheus_url: str) -> bool:
+def validate_dashboards(
+    dashboards_dir: Path,
+    prometheus_url: str
+) -> bool:
     """
     Validate all dashboards against Prometheus metrics.
 
@@ -232,14 +199,11 @@ def validate_dashboards(dashboards_dir: Path, prometheus_url: str) -> bool:
     except (URLError, ValueError) as e:
         print(f"❌ Error fetching Prometheus metrics: {e}", file=sys.stderr)
         print()
-        print(
-            "💡 Is Prometheus running? Try: docker-compose up -d prometheus",
-            file=sys.stderr,
-        )
+        print("💡 Is Prometheus running? Try: docker-compose up -d prometheus", file=sys.stderr)
         return False
 
     # Validate each dashboard
-    dashboard_files = sorted(dashboards_dir.glob("*.json"))
+    dashboard_files = sorted(dashboards_dir.glob('*.json'))
 
     if not dashboard_files:
         print(f"⚠️  No dashboard files found in {dashboards_dir}", file=sys.stderr)
@@ -256,7 +220,7 @@ def validate_dashboards(dashboards_dir: Path, prometheus_url: str) -> bool:
         panel_metrics = extract_metrics_from_dashboard(dashboard_file)
 
         if not panel_metrics:
-            print("   ⚠️  No Prometheus panels found (might be Loki/Tempo only)")
+            print(f"   ⚠️  No Prometheus panels found (might be Loki/Tempo only)")
             print()
             continue
 
@@ -316,9 +280,7 @@ def validate_dashboards(dashboards_dir: Path, prometheus_url: str) -> bool:
     print("     → Review git history: git log --all --full-history -- '*metrics*.py'")
     print()
     print("  3. Check /metrics endpoint directly")
-    print(
-        f"     → curl {os.getenv('API_URL', 'http://localhost:8000')}/metrics | grep metric_name"
-    )
+    print(f"     → curl {os.getenv('API_URL', 'http://localhost:8000')}/metrics | grep metric_name")
     print()
 
     return False
@@ -340,29 +302,27 @@ Exit codes:
   0 - All metrics found (success)
   1 - Missing metrics detected
   2 - Error (connection, parsing, etc.)
-        """,
+        """
     )
 
     parser.add_argument(
-        "--prometheus-url",
-        default="http://localhost:9090",
-        help="Prometheus base URL (default: http://localhost:9090)",
+        '--prometheus-url',
+        default='http://localhost:9090',
+        help='Prometheus base URL (default: http://localhost:9090)'
     )
 
     parser.add_argument(
-        "--dashboards-dir",
+        '--dashboards-dir',
         type=Path,
-        default=Path("infrastructure/observability/grafana/dashboards"),
-        help="Path to Grafana dashboards directory",
+        default=Path('infrastructure/observability/grafana/dashboards'),
+        help='Path to Grafana dashboards directory'
     )
 
     args = parser.parse_args()
 
     # Validate dashboards directory exists
     if not args.dashboards_dir.exists():
-        print(
-            f"❌ Dashboards directory not found: {args.dashboards_dir}", file=sys.stderr
-        )
+        print(f"❌ Dashboards directory not found: {args.dashboards_dir}", file=sys.stderr)
         print()
         print(f"💡 Run from project root: cd {Path.cwd().parent}", file=sys.stderr)
         return 2
@@ -374,10 +334,9 @@ Exit codes:
     except Exception as e:
         print(f"❌ Unexpected error: {e}", file=sys.stderr)
         import traceback
-
         traceback.print_exc()
         return 2
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     sys.exit(main())

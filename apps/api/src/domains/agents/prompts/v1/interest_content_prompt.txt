@@ -33,5 +33,5 @@ Introduce with an original but natural hook that captures attention.
 - No academic format, just "according to [source]" or "per [source]"
 
 ## FORMAT
-Free text, natural.
+Free text, natural. 
 Airy layout with paragraphs for readability.

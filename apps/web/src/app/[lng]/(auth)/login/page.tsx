@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { LoginForm } from '@/components/auth/login-form';
-import { initI18next } from '@/i18n';
 import { OAuthButtons } from '@/components/auth/oauth-buttons';
+import { initI18next } from '@/i18n';
 
 interface LoginPageProps {
   params: Promise<{ lng: string }>;

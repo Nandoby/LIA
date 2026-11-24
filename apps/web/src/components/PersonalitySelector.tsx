@@ -23,7 +23,7 @@ import { logger } from '@/lib/logger';
  * Personality Selector
  *
  * Displays current personality and allows switching between all active personalities.
- * Updates the user's preference in the database
+ * Updates the user's preference in the database.
  */
 export function PersonalitySelector() {
   const { t } = useTranslation();

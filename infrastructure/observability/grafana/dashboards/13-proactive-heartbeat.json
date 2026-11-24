@@ -65,7 +65,9 @@
           "unit": "short",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "green" }]
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
           }
         },
         "overrides": []
@@ -139,7 +141,9 @@
           "unit": "short",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "green" }]
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
           }
         },
         "overrides": []
@@ -212,7 +216,9 @@
           "unit": "s",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "value": null, "color": "green" }]
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
           }
         },
         "overrides": []
@@ -257,7 +263,9 @@
               },
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []
@@ -288,7 +296,9 @@
               },
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []
@@ -316,7 +326,9 @@
               "unit": "currencyEUR",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []
@@ -343,7 +355,9 @@
             "defaults": {
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []
@@ -381,7 +395,9 @@
               "unit": "ops",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []
@@ -408,7 +424,9 @@
             "defaults": {
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []
@@ -437,7 +455,9 @@
               "unit": "ops",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []
@@ -470,7 +490,9 @@
               "unit": "ops",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "value": null, "color": "green" }]
+                "steps": [
+                  { "value": null, "color": "green" }
+                ]
               }
             },
             "overrides": []

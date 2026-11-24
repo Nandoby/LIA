@@ -5,61 +5,51 @@ Voici 10 variations stylistiques pour le favicon de LIA :
 ## 📋 Liste des variations
 
 ### **v1-lia-letter.svg** - Lettre L stylisée
-
 - Design minimaliste avec lettre "L" bold
 - Accent avec point bleu clair
 - Style professionnel et épuré
 
 ### **v2-lia-minimal.svg** - LIA géométrique
-
 - Représentation minimaliste de "LIA" en formes géométriques
 - Ultra moderne et tech
 - Très lisible même en petite taille
 
 ### **v3-lia-circle.svg** - Badge circulaire
-
 - Badge rond avec texte "LIA"
 - Style classique et élégant
 - Très professionnel
 
 ### **v4-lia-brain.svg** - Réseau neuronal
-
 - Représentation d'un cerveau/réseau de neurones
 - Évoque l'intelligence artificielle
 - Design tech et scientifique
 
 ### **v5-lia-spark.svg** - Éclair d'intelligence
-
 - Éclair symbolisant la rapidité et l'intelligence
 - Dynamique et énergique
 - Accent "L" discret
 
 ### **v6-lia-chat-modern.svg** - Bulle de chat moderne
-
 - Bulle de conversation avec "LIA" dedans
 - Évoque la communication
 - Friendly et accessible
 
 ### **v7-lia-robot-cute.svg** - Robot mignon
-
 - Robot avec double antenne et grand sourire
 - Approche ludique et sympathique
 - Parfait pour une IA amicale
 
 ### **v8-lia-hexagon.svg** - Hexagone tech
-
 - Style tech/futuriste avec hexagone
 - Connexions circuit imprimé
 - Très moderne et technologique
 
 ### **v9-lia-gradient-text.svg** - Texte gradient bold
-
 - "LIA" en texte très bold avec gradient coloré
 - Fond sombre pour contraste maximum
 - Impact visuel fort
 
 ### **v10-lia-orbit.svg** - Orbites atomiques
-
 - Style atomique/orbital
 - Évoque la science et la précision
 - Élégant et sophistiqué

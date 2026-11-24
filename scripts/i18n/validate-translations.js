@@ -30,7 +30,8 @@ langs.forEach(lang => {
       console.log(`  ⚠ Missing sections: ${missingSections.join(', ')}`);
       allValid = false;
     }
-  } catch (e) {
+
+  } catch(e) {
     console.log(`✗ ${lang.toUpperCase()}: ERROR - ${e.message}`);
     allValid = false;
   }

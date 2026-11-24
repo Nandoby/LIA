@@ -116,7 +116,9 @@
           "unit": "percent",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "red", "value": 0 }]
+            "steps": [
+              { "color": "red", "value": 0 }
+            ]
           },
           "custom": {
             "thresholdsStyle": {
@@ -150,7 +152,9 @@
           "unit": "short",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "yellow", "value": 1 }]
+            "steps": [
+              { "color": "yellow", "value": 1 }
+            ]
           },
           "custom": {
             "thresholdsStyle": {
@@ -190,7 +194,9 @@
           "unit": "s",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "red", "value": 0.5 }]
+            "steps": [
+              { "color": "red", "value": 0.5 }
+            ]
           },
           "custom": {
             "thresholdsStyle": {
@@ -528,7 +534,9 @@
               "unit": "s",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "red", "value": 0.1 }]
+                "steps": [
+                  { "color": "red", "value": 0.1 }
+                ]
               },
               "custom": {
                 "thresholdsStyle": {

@@ -45,26 +45,10 @@ EXCLUDE_DIRS = ["__pycache__", ".venv", ".git", "alembic/versions"]
 
 # Special method names to exclude (always used)
 SPECIAL_METHODS = [
-    "__init__",
-    "__str__",
-    "__repr__",
-    "__eq__",
-    "__hash__",
-    "__call__",
-    "__enter__",
-    "__exit__",
-    "__aenter__",
-    "__aexit__",
-    "__iter__",
-    "__next__",
-    "__len__",
-    "__getitem__",
-    "__setitem__",
-    "__delitem__",
-    "__contains__",
-    "__get__",
-    "__set__",
-    "__delete__",
+    '__init__', '__str__', '__repr__', '__eq__', '__hash__',
+    '__call__', '__enter__', '__exit__', '__aenter__', '__aexit__',
+    '__iter__', '__next__', '__len__', '__getitem__', '__setitem__',
+    '__delitem__', '__contains__', '__get__', '__set__', '__delete__',
 ]
 
 
@@ -85,11 +69,11 @@ def analyze_unused_code():
 
     findings = []
     stats = {
-        "files_analyzed": 0,
-        "functions_found": 0,
-        "classes_found": 0,
-        "functions_unused": 0,
-        "classes_unused": 0,
+        'files_analyzed': 0,
+        'functions_found': 0,
+        'classes_found': 0,
+        'functions_unused': 0,
+        'classes_unused': 0,
     }
 
     # Iterate through all Python files
@@ -98,7 +82,7 @@ def analyze_unused_code():
         if any(excl in str(py_file) for excl in EXCLUDE_DIRS):
             continue
 
-        stats["files_analyzed"] += 1
+        stats['files_analyzed'] += 1
 
         print(f"[CHECK] Analyzing: {py_file.relative_to(SRC_ROOT)}")
 
@@ -109,91 +93,74 @@ def analyze_unused_code():
 
         # Extract functions
         functions = extract_functions(tree, str(py_file.relative_to(SRC_ROOT)))
-        stats["functions_found"] += len(functions)
+        stats['functions_found'] += len(functions)
 
         for func in functions:
             # Skip special methods
-            if func["name"] in SPECIAL_METHODS:
+            if func['name'] in SPECIAL_METHODS:
                 continue
 
             # Skip if decorated (likely used via decorator)
-            if _has_special_decorator(func["decorators"]):
+            if _has_special_decorator(func['decorators']):
                 continue
 
             # Search for usages
-            usages = find_function_usages(
-                func["name"],
-                SRC_ROOT,
-                exclude_definition=True,
-                exclude_dirs=EXCLUDE_DIRS,
-            )
+            usages = find_function_usages(func['name'], SRC_ROOT, exclude_definition=True, exclude_dirs=EXCLUDE_DIRS)
 
             if len(usages) == 0:
                 # No usages found
                 confidence = _determine_function_confidence(func, py_file)
 
-                findings.append(
-                    {
-                        "item": f"{func['name']}()",
-                        "location": f"{func['file']}:{func['line']}",
-                        "confidence": confidence,
-                        "reason": "No usages found (excluding definition)",
-                        "details": f"Decorators: {', '.join(func['decorators']) if func['decorators'] else 'None'}",
-                    }
-                )
+                findings.append({
+                    'item': f"{func['name']}()",
+                    'location': f"{func['file']}:{func['line']}",
+                    'confidence': confidence,
+                    'reason': 'No usages found (excluding definition)',
+                    'details': f"Decorators: {', '.join(func['decorators']) if func['decorators'] else 'None'}"
+                })
 
-                stats["functions_unused"] += 1
-                print(
-                    f"   [WARN]  Unused function: {func['name']}() at line {func['line']} (confidence: {confidence})"
-                )
+                stats['functions_unused'] += 1
+                print(f"   [WARN]  Unused function: {func['name']}() at line {func['line']} (confidence: {confidence})")
 
         # Extract classes
         classes = extract_classes(tree, str(py_file.relative_to(SRC_ROOT)))
-        stats["classes_found"] += len(classes)
+        stats['classes_found'] += len(classes)
 
         for cls in classes:
             # Skip if decorated (e.g., Pydantic models with decorators)
-            if _has_special_decorator(cls["decorators"]):
+            if _has_special_decorator(cls['decorators']):
                 continue
 
             # Search for usages (class instantiation or inheritance)
             usages = grep_in_directory(
-                cls["name"],
+                cls['name'],
                 SRC_ROOT,
-                extensions=[".py"],
+                extensions=['.py'],
                 exclude_dirs=EXCLUDE_DIRS,
                 case_sensitive=True,
-                regex=False,
+                regex=False
             )
 
             # Filter out the definition itself
-            usages_filtered = [
-                u
-                for u in usages
-                if u["line"] != cls["line"] or u["file"] != cls["file"]
-            ]
+            usages_filtered = [u for u in usages if u['line'] != cls['line'] or u['file'] != cls['file']]
 
             if len(usages_filtered) == 0:
                 # No usages found
                 confidence = _determine_class_confidence(cls, py_file)
 
-                findings.append(
-                    {
-                        "item": f"class {cls['name']}",
-                        "location": f"{cls['file']}:{cls['line']}",
-                        "confidence": confidence,
-                        "reason": "No usages found (excluding definition)",
-                        "details": f"Bases: {', '.join(cls['bases']) if cls['bases'] else 'None'}, Methods: {len(cls['methods'])}",
-                    }
-                )
+                findings.append({
+                    'item': f"class {cls['name']}",
+                    'location': f"{cls['file']}:{cls['line']}",
+                    'confidence': confidence,
+                    'reason': 'No usages found (excluding definition)',
+                    'details': f"Bases: {', '.join(cls['bases']) if cls['bases'] else 'None'}, Methods: {len(cls['methods'])}"
+                })
 
-                stats["classes_unused"] += 1
-                print(
-                    f"   [WARN]  Unused class: {cls['name']} at line {cls['line']} (confidence: {confidence})"
-                )
+                stats['classes_unused'] += 1
+                print(f"   [WARN]  Unused class: {cls['name']} at line {cls['line']} (confidence: {confidence})")
 
     # Print summary
-    print("\n[SUMMARY] Summary:")
+    print(f"\n[SUMMARY] Summary:")
     print(f"   Files analyzed: {stats['files_analyzed']}")
     print(f"   Functions found: {stats['functions_found']}")
     print(f"   Classes found: {stats['classes_found']}")
@@ -215,21 +182,12 @@ def _has_special_decorator(decorators):
     - Property: @property, @setter, @classmethod, @staticmethod
     """
     special_decorators = [
-        "router",
-        "app",  # FastAPI
-        "tool",  # LangChain
-        "field_validator",
-        "model_validator",
-        "validator",  # Pydantic
-        "property",
-        "setter",
-        "getter",
-        "deleter",
-        "classmethod",
-        "staticmethod",
-        "abstractmethod",
-        "cached_property",
-        "lru_cache",
+        'router', 'app',  # FastAPI
+        'tool',  # LangChain
+        'field_validator', 'model_validator', 'validator',  # Pydantic
+        'property', 'setter', 'getter', 'deleter',
+        'classmethod', 'staticmethod', 'abstractmethod',
+        'cached_property', 'lru_cache',
     ]
 
     for decorator in decorators:
@@ -255,24 +213,24 @@ def _determine_function_confidence(func, file_path):
     # Low confidence (likely used indirectly)
 
     # 1. Test functions (pytest discovers them)
-    if func["name"].startswith("test_"):
-        return "low"
+    if func['name'].startswith('test_'):
+        return 'low'
 
     # 2. Private functions starting with _ (may be internal)
-    if func["name"].startswith("_") and not func["name"].startswith("__"):
-        return "medium"
+    if func['name'].startswith('_') and not func['name'].startswith('__'):
+        return 'medium'
 
     # 3. Async functions (may be callbacks)
-    if func["is_async"]:
-        return "medium"
+    if func['is_async']:
+        return 'medium'
 
     # 4. Functions with decorators (even if not special)
-    if len(func["decorators"]) > 0:
-        return "low"
+    if len(func['decorators']) > 0:
+        return 'low'
 
     # 5. Functions in test files
-    if "test" in str(file_path).lower():
-        return "low"
+    if 'test' in str(file_path).lower():
+        return 'low'
 
     # High confidence (likely unused)
 
@@ -280,11 +238,11 @@ def _determine_function_confidence(func, file_path):
     # Can't determine from AST easily, use medium as default
 
     # 2. Utility functions with simple names
-    if func["name"] in ["helper", "util", "format", "parse"]:
-        return "high"
+    if func['name'] in ['helper', 'util', 'format', 'parse']:
+        return 'high'
 
     # Default: medium confidence
-    return "medium"
+    return 'medium'
 
 
 def _determine_class_confidence(cls, file_path):
@@ -301,41 +259,41 @@ def _determine_class_confidence(cls, file_path):
     # Low confidence (likely used indirectly)
 
     # 1. Test classes (pytest discovers them)
-    if cls["name"].startswith("Test"):
-        return "low"
+    if cls['name'].startswith('Test'):
+        return 'low'
 
     # 2. SQLAlchemy models (auto-discovered)
-    if "Base" in cls["bases"] or "Model" in cls["bases"]:
-        return "low"
+    if 'Base' in cls['bases'] or 'Model' in cls['bases']:
+        return 'low'
 
     # 3. Pydantic models (may be used in type hints)
-    if "BaseModel" in cls["bases"] or "Settings" in cls["bases"]:
-        return "low"
+    if 'BaseModel' in cls['bases'] or 'Settings' in cls['bases']:
+        return 'low'
 
     # 4. Exception classes
-    if "Exception" in cls["bases"] or "Error" in cls["bases"]:
-        return "medium"
+    if 'Exception' in cls['bases'] or 'Error' in cls['bases']:
+        return 'medium'
 
     # 5. Abstract classes
-    if "ABC" in cls["bases"] or "Abstract" in cls["name"]:
-        return "medium"
+    if 'ABC' in cls['bases'] or 'Abstract' in cls['name']:
+        return 'medium'
 
     # 6. Classes in models.py (ORM)
-    if "models.py" in str(file_path):
-        return "low"
+    if 'models.py' in str(file_path):
+        return 'low'
 
     # High confidence (likely unused)
 
     # 1. Classes with no methods
-    if len(cls["methods"]) == 0:
-        return "high"
+    if len(cls['methods']) == 0:
+        return 'high'
 
     # 2. Utility classes
-    if cls["name"].endswith("Helper") or cls["name"].endswith("Util"):
-        return "high"
+    if cls['name'].endswith('Helper') or cls['name'].endswith('Util'):
+        return 'high'
 
     # Default: medium confidence
-    return "medium"
+    return 'medium'
 
 
 def generate_report(findings, stats):
@@ -351,9 +309,7 @@ def generate_report(findings, stats):
 
 ### Breakdown by Confidence
 
-"""
-        + _generate_confidence_breakdown(findings)
-        + """
+""" + _generate_confidence_breakdown(findings) + """
 
 ---
 
@@ -443,7 +399,7 @@ If **any doubt** -> KEEP
 - ORM models (SQLAlchemy) are automatically set to LOW confidence
 - Pydantic models are automatically set to LOW confidence
 - Always verify tests before deletion
-""",
+"""
     }
 
     generate_finding_report(
@@ -451,21 +407,21 @@ If **any doubt** -> KEEP
         findings=findings,
         output_path=OUTPUT_FILE,
         script_name="analyze_unused_code.py",
-        additional_sections=additional_sections,
+        additional_sections=additional_sections
     )
 
 
 def _generate_confidence_breakdown(findings):
     """Generate confidence breakdown."""
-    confidence_counts = {"high": 0, "medium": 0, "low": 0}
+    confidence_counts = {'high': 0, 'medium': 0, 'low': 0}
     for finding in findings:
-        conf = finding.get("confidence", "unknown")
+        conf = finding.get('confidence', 'unknown')
         if conf in confidence_counts:
             confidence_counts[conf] += 1
 
     lines = []
     for conf, count in confidence_counts.items():
-        emoji = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(conf, "⚪")
+        emoji = {'high': '🔴', 'medium': '🟡', 'low': '🟢'}.get(conf, '⚪')
         lines.append(f"- **{emoji} Confidence {conf}**: {count} item(s)")
 
     return "\n".join(lines)
@@ -481,7 +437,7 @@ if __name__ == "__main__":
         findings, stats = analyze_unused_code()
         generate_report(findings, stats)
 
-        print("\n[OK] Analysis complete!")
+        print(f"\n[OK] Analysis complete!")
         print(f"   Report: {OUTPUT_FILE}")
         print(f"   Findings: {len(findings)}")
         print(f"\n[NEXT] Next: Review findings manually in {OUTPUT_FILE}")
@@ -492,6 +448,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\n[ERROR] Error during analysis: {e}")
         import traceback
-
         traceback.print_exc()
         sys.exit(1)

@@ -1,7 +1,7 @@
 ---
 name: Feature Request
 about: Suggest an idea for LIA
-title: "[Feature]"
+title: "[Feature] "
 labels: enhancement
 assignees: ''
 ---

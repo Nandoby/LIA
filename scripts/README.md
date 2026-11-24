@@ -30,7 +30,6 @@ chmod +x scripts/setup-dev.sh
 ```
 
 **Actions:**
-
 - Télécharge le modèle Wake Word WASM (Whisper Tiny.en, ~103MB)
 - Vérifie les fichiers WASM runtime
 - Configure les chemins pour développement local
@@ -60,23 +59,19 @@ chmod +x scripts/setup-dev.sh
 ```
 
 **Arguments:**
-
 - `target_dir` - Répertoire cible (défaut: `apps/api/models/whisper-small`)
 
 **Modèle:**
-
 - **Source**: HuggingFace `csukuangfj/sherpa-onnx-whisper-small`
 - **Taille**: ~375 MB (INT8 quantized)
 - **Langues**: 99+ (FR, EN, DE, ES, IT, ZH, et plus)
 
 **Fichiers téléchargés:**
-
 - `encoder.onnx` (~112 MB)
 - `decoder.onnx` (~262 MB)
 - `tokens.txt` (~817 KB)
 
 **Configuration `.env`:**
-
 ```bash
 VOICE_STT_MODEL_PATH=apps/api/models/whisper-small
 ```
@@ -92,24 +87,20 @@ VOICE_STT_MODEL_PATH=apps/api/models/whisper-small
 ```
 
 **Arguments:**
-
 - `target_dir` - Répertoire cible (défaut: `apps/web/public/models/whisper-tiny-en`)
 
 **Modèle:**
-
 - **Source**: HuggingFace `csukuangfj/sherpa-onnx-whisper-tiny.en`
 - **Taille**: ~75 MB
 - **Langue**: Anglais seulement (pour wake word "OK Guy", "OK Guys")
 
 **Pourquoi Anglais seulement:**
-
 - Wake words sont en anglais ("OK Guy", "OK Guys")
 - Modèle multilingue détecte la langue parlée et transcrit dans cette langue
 - Modèle anglais garantit la transcription en anglais
 - Plus petit = chargement plus rapide dans le navigateur
 
 **Fichiers téléchargés:**
-
 - `encoder.onnx`
 - `decoder.onnx`
 - `tokens.txt`

@@ -30,7 +30,9 @@ class FunctionExtractor(ast.NodeVisitor):
         """Visit function definition and extract metadata."""
         # Get function source
         try:
-            func_lines = ast.get_source_segment(open(self.filepath).read(), node)
+            func_lines = ast.get_source_segment(
+                open(self.filepath).read(), node
+            )
         except:
             func_lines = ""
 
@@ -112,9 +114,7 @@ class ClassExtractor(ast.NodeVisitor):
         """Visit class definition and extract metadata."""
         # Count methods
         methods = [
-            n
-            for n in node.body
-            if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+            n for n in node.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
         ]
 
         class_info = {
@@ -284,7 +284,9 @@ def generate_report(
 
         report.append(f"**Average complexity** : {avg_complexity:.1f}\n")
         report.append(f"**Maximum complexity** : {max_complexity}\n")
-        report.append(f"**High complexity functions (>10)** : {len(high_complexity)}\n")
+        report.append(
+            f"**High complexity functions (>10)** : {len(high_complexity)}\n"
+        )
         report.append("\n")
 
         if high_complexity:
@@ -305,9 +307,7 @@ def generate_report(
     report.append(
         "These functions have identical AST structure (same logic, different names).\n"
     )
-    report.append(
-        "**Recommendation** : HIGH priority - refactor into single function.\n"
-    )
+    report.append("**Recommendation** : HIGH priority - refactor into single function.\n")
     report.append("\n")
 
     if not duplicates:
@@ -318,9 +318,7 @@ def generate_report(
 
             # Show first function as reference
             ref_func = funcs[0]
-            report.append(
-                f"**Reference** : `{ref_func['name']}` ({ref_func['num_lines']} lines, complexity {ref_func['complexity']})\n"
-            )
+            report.append(f"**Reference** : `{ref_func['name']}` ({ref_func['num_lines']} lines, complexity {ref_func['complexity']})\n")
             report.append("\n")
 
             report.append("**Duplicates** :\n")
@@ -339,9 +337,7 @@ def generate_report(
     report.append(
         "These functions have similar signatures/complexity but different implementations.\n"
     )
-    report.append(
-        "**Recommendation** : MEDIUM priority - consider extracting common pattern.\n"
-    )
+    report.append("**Recommendation** : MEDIUM priority - consider extracting common pattern.\n")
     report.append("\n")
 
     if not similar_functions:
@@ -355,12 +351,8 @@ def generate_report(
             filepath2_rel = func2["filepath"].replace(str(ROOT), "")
 
             report.append(f"### Similar Pair {i} (score: {score}/9)\n")
-            report.append(
-                f"1. `{func1['name']}` ({func1['num_lines']} lines) - [{filepath1_rel}:{func1['lineno']}]({func1['filepath']}#L{func1['lineno']})\n"
-            )
-            report.append(
-                f"2. `{func2['name']}` ({func2['num_lines']} lines) - [{filepath2_rel}:{func2['lineno']}]({func2['filepath']}#L{func2['lineno']})\n"
-            )
+            report.append(f"1. `{func1['name']}` ({func1['num_lines']} lines) - [{filepath1_rel}:{func1['lineno']}]({func1['filepath']}#L{func1['lineno']})\n")
+            report.append(f"2. `{func2['name']}` ({func2['num_lines']} lines) - [{filepath2_rel}:{func2['lineno']}]({func2['filepath']}#L{func2['lineno']})\n")
             report.append("\n")
 
         if len(similar_functions) > 20:
@@ -400,9 +392,7 @@ def generate_report(
     report.append("\n")
     report.append("### Medium Priority (Similar Functions)\n")
     if similar_functions:
-        report.append(
-            f"1. Review {len(similar_functions)} pairs of similar functions\n"
-        )
+        report.append(f"1. Review {len(similar_functions)} pairs of similar functions\n")
         report.append("2. Identify common patterns\n")
         report.append("3. Consider extracting base class or utility function\n")
     else:
@@ -454,19 +444,12 @@ def main():
     report = generate_report(all_functions, duplicates, similar_functions, all_classes)
 
     # Save report
-    output_path = (
-        Path(__file__).parent.parent.parent
-        / "docs"
-        / "optim"
-        / "CODE_DUPLICATION_ADVANCED.md"
-    )
+    output_path = Path(__file__).parent.parent.parent / "docs" / "optim" / "CODE_DUPLICATION_ADVANCED.md"
     output_path.write_text(report, encoding="utf-8")
     print(f"Report saved to: {output_path}")
 
     # Save JSON for further analysis
-    json_path = (
-        Path(__file__).parent.parent.parent / "docs" / "optim" / "duplication_data.json"
-    )
+    json_path = Path(__file__).parent.parent.parent / "docs" / "optim" / "duplication_data.json"
     data = {
         "total_functions": len(all_functions),
         "total_classes": len(all_classes),

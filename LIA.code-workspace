@@ -1,10 +1,10 @@
 {
-  "folders": [
-    {
-      "path": ".",
-    },
-  ],
-  "settings": {
-    "chatgpt.commentCodeLensEnabled": false,
-  },
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"chatgpt.commentCodeLensEnabled": false
+	}
 }

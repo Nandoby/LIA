@@ -67,13 +67,11 @@ def parse_findings() -> list[dict[str, str]]:
                 confidence = parts[3]
 
                 if element and location and confidence and element != "---":
-                    findings.append(
-                        {
-                            "element": element,
-                            "location": location,
-                            "confidence": confidence,
-                        }
-                    )
+                    findings.append({
+                        "element": element,
+                        "location": location,
+                        "confidence": confidence
+                    })
 
     return findings
 
@@ -108,36 +106,33 @@ def classify_finding(finding: dict[str, str]) -> dict[str, Any]:
             content = file_path.read_text(encoding="utf-8")
 
             # Search for @app.XXX or @router.XXX decorator
-            endpoint_pattern = (
-                rf"@(app|router)\.(get|post|put|delete|patch).*\n.*def {name}\("
-            )
+            endpoint_pattern = rf'@(app|router)\.(get|post|put|delete|patch).*\n.*def {name}\('
             if re.search(endpoint_pattern, content, re.MULTILINE):
                 return {
                     "status": "USED",
                     "confidence": "high",
                     "reason": "FastAPI endpoint (decorator-based routing)",
-                    "pattern": "FastAPI Endpoint",
+                    "pattern": "FastAPI Endpoint"
                 }
 
     # Pattern 2: FastAPI dependencies (Depends() injection)
-    if name in [
-        "get_db",
-        "get_session_store",
-        "get_current_verified_session",
-        "get_current_superuser_session",
-        "get_optional_session",
-    ]:
+    if name in ["get_db", "get_session_store", "get_current_verified_session",
+                "get_current_superuser_session", "get_optional_session"]:
         # Search for Depends(function_name) usage
         pattern = rf"Depends\({name}\)"
         results = grep_in_directory(
-            pattern, SRC_ROOT, extensions=[".py"], exclude_dirs=EXCLUDE_DIRS, regex=True
+            pattern,
+            SRC_ROOT,
+            extensions=['.py'],
+            exclude_dirs=EXCLUDE_DIRS,
+            regex=True
         )
         if results:
             return {
                 "status": "USED",
                 "confidence": "high",
                 "reason": f"FastAPI dependency injection ({len(results)} usages)",
-                "pattern": "Dependency Injection",
+                "pattern": "Dependency Injection"
             }
 
     # Pattern 3: Middleware dispatch() methods
@@ -146,7 +141,7 @@ def classify_finding(finding: dict[str, str]) -> dict[str, Any]:
             "status": "USED",
             "confidence": "high",
             "reason": "Middleware dispatch() called automatically by FastAPI",
-            "pattern": "Middleware",
+            "pattern": "Middleware"
         }
 
     # Pattern 4: LangGraph nodes (planner_node, response_node, etc.)
@@ -161,16 +156,16 @@ def classify_finding(finding: dict[str, str]) -> dict[str, Any]:
             results = grep_in_directory(
                 pattern,
                 SRC_ROOT,
-                extensions=[".py"],
+                extensions=['.py'],
                 exclude_dirs=EXCLUDE_DIRS,
-                regex=True,
+                regex=True
             )
             if results:
                 return {
                     "status": "USED",
                     "confidence": "high",
                     "reason": f"LangGraph node registration ({len(results)} refs)",
-                    "pattern": "LangGraph Node",
+                    "pattern": "LangGraph Node"
                 }
 
     # Pattern 5: Pydantic hooks
@@ -179,7 +174,7 @@ def classify_finding(finding: dict[str, str]) -> dict[str, Any]:
             "status": "USED",
             "confidence": "high",
             "reason": "Pydantic/dataclass hook (called automatically)",
-            "pattern": "Pydantic Hook",
+            "pattern": "Pydantic Hook"
         }
 
     # Pattern 6: Callback methods (on_llm_end, on_llm_error, etc.)
@@ -189,7 +184,7 @@ def classify_finding(finding: dict[str, str]) -> dict[str, Any]:
                 "status": "USED",
                 "confidence": "high",
                 "reason": "LangChain callback (invoked by framework)",
-                "pattern": "LangChain Callback",
+                "pattern": "LangChain Callback"
             }
 
     # Pattern 7: Decorator functions (decorator, wrapper patterns)
@@ -199,7 +194,7 @@ def classify_finding(finding: dict[str, str]) -> dict[str, Any]:
             "status": "USED",
             "confidence": "medium",
             "reason": "Decorator implementation (internal pattern)",
-            "pattern": "Decorator Pattern",
+            "pattern": "Decorator Pattern"
         }
 
     # Pattern 8: Pydantic model classes
@@ -208,17 +203,17 @@ def classify_finding(finding: dict[str, str]) -> dict[str, Any]:
         patterns = [
             rf":\s*{name}",  # Type hint
             rf"\[{name}\]",  # Generic type
-            rf"{name}\(",  # Instantiation
-            rf"-> {name}",  # Return type
+            rf"{name}\(",    # Instantiation
+            rf"-> {name}",   # Return type
         ]
         total_refs = 0
         for pattern in patterns:
             results = grep_in_directory(
                 pattern,
                 SRC_ROOT,
-                extensions=[".py"],
+                extensions=['.py'],
                 exclude_dirs=EXCLUDE_DIRS,
-                regex=True,
+                regex=True
             )
             total_refs += len(results)
 
@@ -227,7 +222,7 @@ def classify_finding(finding: dict[str, str]) -> dict[str, Any]:
                 "status": "USED",
                 "confidence": "high",
                 "reason": f"Pydantic model ({total_refs} type refs)",
-                "pattern": "Pydantic Model",
+                "pattern": "Pydantic Model"
             }
 
     # Pattern 9: FastAPI endpoint metrics
@@ -236,7 +231,7 @@ def classify_finding(finding: dict[str, str]) -> dict[str, Any]:
             "status": "USED",
             "confidence": "high",
             "reason": "Metrics endpoint (Prometheus /metrics)",
-            "pattern": "Prometheus Endpoint",
+            "pattern": "Prometheus Endpoint"
         }
 
     # Pattern 10: Routing functions
@@ -250,16 +245,16 @@ def classify_finding(finding: dict[str, str]) -> dict[str, Any]:
             results = grep_in_directory(
                 pattern,
                 SRC_ROOT,
-                extensions=[".py"],
+                extensions=['.py'],
                 exclude_dirs=EXCLUDE_DIRS,
-                regex=True,
+                regex=True
             )
             if results:
                 return {
                     "status": "USED",
                     "confidence": "high",
                     "reason": f"LangGraph routing function ({len(results)} refs)",
-                    "pattern": "LangGraph Routing",
+                    "pattern": "LangGraph Routing"
                 }
 
     # Default: UNCERTAIN (needs manual review)
@@ -267,7 +262,7 @@ def classify_finding(finding: dict[str, str]) -> dict[str, Any]:
         "status": "UNCERTAIN",
         "confidence": "low",
         "reason": "No pattern detected - manual review required",
-        "pattern": "Unknown",
+        "pattern": "Unknown"
     }
 
 
@@ -294,15 +289,16 @@ def verify_findings():
         classification = classify_finding(finding)
         status = classification["status"]
 
-        result = {**finding, **classification}
+        result = {
+            **finding,
+            **classification
+        }
         results[status].append(result)
 
         emoji = {"USED": "[OK]", "UNUSED": "[WARN]", "UNCERTAIN": "[CHECK]"}
-        print(
-            f"   {emoji[status]} {status} - {classification['pattern']} - {classification['reason']}"
-        )
+        print(f"   {emoji[status]} {status} - {classification['pattern']} - {classification['reason']}")
 
-    print("\n[*] Verification complete!")
+    print(f"\n[*] Verification complete!")
     print(f"   USED: {len(results['USED'])}")
     print(f"   UNUSED: {len(results['UNUSED'])}")
     print(f"   UNCERTAIN: {len(results['UNCERTAIN'])}")
@@ -326,9 +322,7 @@ def generate_report(results: dict[str, list[dict[str, Any]]]) -> None:
 
         f.write("## [SUMMARY] Résumé Exécutif\n\n")
         f.write("### Découverte Critique\n\n")
-        f.write(
-            "Le script d'analyse initial (`analyze_unused_code.py`) a produit des **FAUX POSITIFS** "
-        )
+        f.write("Le script d'analyse initial (`analyze_unused_code.py`) a produit des **FAUX POSITIFS** ")
         f.write("car il ne détectait que les appels directs de fonctions.\n\n")
         f.write("**Raison** : Beaucoup de fonctions sont utilisées via :\n")
         f.write("- FastAPI decorators (`@app.get`, `@router.post`)\n")
@@ -339,15 +333,9 @@ def generate_report(results: dict[str, list[dict[str, Any]]]) -> None:
 
         f.write("### Statistiques\n\n")
         f.write(f"- **Total éléments vérifiés** : {total}\n")
-        f.write(
-            f"- **[OK] USED (actifs)** : {len(results['USED'])} ({len(results['USED'])*100//total}%)\n"
-        )
-        f.write(
-            f"- **[WARN] UNUSED (vraiment inutilisés)** : {len(results['UNUSED'])} ({len(results['UNUSED'])*100//total if total > 0 else 0}%)\n"
-        )
-        f.write(
-            f"- **[CHECK] UNCERTAIN (revue manuelle)** : {len(results['UNCERTAIN'])} ({len(results['UNCERTAIN'])*100//total if total > 0 else 0}%)\n\n"
-        )
+        f.write(f"- **[OK] USED (actifs)** : {len(results['USED'])} ({len(results['USED'])*100//total}%)\n")
+        f.write(f"- **[WARN] UNUSED (vraiment inutilisés)** : {len(results['UNUSED'])} ({len(results['UNUSED'])*100//total if total > 0 else 0}%)\n")
+        f.write(f"- **[CHECK] UNCERTAIN (revue manuelle)** : {len(results['UNCERTAIN'])} ({len(results['UNCERTAIN'])*100//total if total > 0 else 0}%)\n\n")
 
         f.write("---\n\n")
 
@@ -366,9 +354,7 @@ def generate_report(results: dict[str, list[dict[str, Any]]]) -> None:
             for pattern, items in sorted(by_pattern.items()):
                 f.write(f"### {pattern} ({len(items)} items)\n\n")
                 for item in items[:10]:  # Show first 10
-                    f.write(
-                        f"- **{item['element']}** - `{item['location']}` - {item['reason']}\n"
-                    )
+                    f.write(f"- **{item['element']}** - `{item['location']}` - {item['reason']}\n")
                 if len(items) > 10:
                     f.write(f"- ... et {len(items) - 10} autres\n")
                 f.write("\n")
@@ -376,13 +362,9 @@ def generate_report(results: dict[str, list[dict[str, Any]]]) -> None:
         # UNUSED section
         if results["UNUSED"]:
             f.write(f"## [WARN] UNUSED ({len(results['UNUSED'])} éléments)\n\n")
-            f.write(
-                "Vraiment inutilisés - **CANDIDATS SUPPRESSION** (après revue manuelle)\n\n"
-            )
+            f.write("Vraiment inutilisés - **CANDIDATS SUPPRESSION** (après revue manuelle)\n\n")
             for item in results["UNUSED"]:
-                f.write(
-                    f"- **{item['element']}** - `{item['location']}` - {item['reason']}\n"
-                )
+                f.write(f"- **{item['element']}** - `{item['location']}` - {item['reason']}\n")
             f.write("\n")
 
         # UNCERTAIN section
@@ -414,6 +396,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\n[ERROR] Verification failed: {e}")
         import traceback
-
         traceback.print_exc()
         sys.exit(1)

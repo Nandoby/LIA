@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /data/geoip
 
 # DB-IP Lite City database — free, no account needed, updated monthly
-ARG DBIP_DATE=2026-10
+ARG DBIP_DATE=2026-03
 RUN curl -L -o dbip-city-lite.mmdb.gz \
         "https://download.db-ip.com/free/dbip-city-lite-${DBIP_DATE}.mmdb.gz" && \
     gunzip dbip-city-lite.mmdb.gz
@@ -62,9 +62,7 @@ COPY requirements.txt requirements-dev.txt ./
 
 # Install Python dependencies with uv (10-100x faster than pip)
 # No cache mount = Docker layer cache works = instant rebuild if requirements unchanged
-# torch CPU-only first: PyPI ships the CUDA build on x86_64 (several GB of nvidia-* wheels)
-RUN uv pip install --system torch --index-url https://download.pytorch.org/whl/cpu && \
-    uv pip install --system -r requirements.txt -r requirements-dev.txt
+RUN uv pip install --system -r requirements.txt -r requirements-dev.txt
 
 # Copy STT model from model-downloader stage
 COPY --from=model-downloader /models/whisper-small /models/whisper-small

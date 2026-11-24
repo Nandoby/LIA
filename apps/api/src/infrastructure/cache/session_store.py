@@ -168,7 +168,8 @@ class SessionStore:
         # Performance gain: 80× improvement for logout-all operations
         # ========================================================================
         user_sessions_key = f"user:{user_id}:sessions"
-        await self.redis.sadd(user_sessions_key, session_id)
+        # Note: cast() needed due to redis.asyncio type stubs incorrectly returning Awaitable[int] | int
+        await cast(Awaitable[int], self.redis.sadd(user_sessions_key, session_id))
 
         # Set TTL on user sessions SET to prevent orphaned indexes
         # Use max possible TTL (remember_me case) to ensure index outlives session
@@ -248,7 +249,8 @@ class SessionStore:
             # Remove from user's session index if we know the user_id
             if session:
                 user_sessions_key = f"user:{session.user_id}:sessions"
-                await self.redis.srem(user_sessions_key, session_id)
+                # Note: cast() needed due to redis.asyncio type stubs bug
+                await cast(Awaitable[int], self.redis.srem(user_sessions_key, session_id))
 
             logger.info(
                 "session_deleted",

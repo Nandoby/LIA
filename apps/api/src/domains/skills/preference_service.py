@@ -9,9 +9,8 @@ scripts, resources, technical metadata). This service manages display metadata
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Any, cast
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -306,16 +305,16 @@ class SkillPreferenceService:
 
         # --- Per-user disabled_skills ---
         check = await self.db.execute(text("""
-                                           SELECT EXISTS (
-                                               SELECT 1 FROM information_schema.tables
-                                               WHERE table_name = '_legacy_disabled_skills'
-                                           )
-                                           """))
+                SELECT EXISTS (
+                    SELECT 1 FROM information_schema.tables
+                    WHERE table_name = '_legacy_disabled_skills'
+                )
+            """))
         if check.scalar():
             rows = await self.db.execute(
                 text("SELECT user_id, disabled_skills FROM _legacy_disabled_skills")
             )
-            for user_id, disabled_list in cast(Iterable[tuple[UUID, list[str] | None]], rows):
+            for user_id, disabled_list in rows:
                 if not disabled_list:
                     continue
                 for skill_name in disabled_list:
@@ -332,11 +331,11 @@ class SkillPreferenceService:
 
         # --- Admin system_disabled_skills ---
         check2 = await self.db.execute(text("""
-                                            SELECT EXISTS (
-                                                SELECT 1 FROM information_schema.tables
-                                                WHERE table_name = '_legacy_system_disabled_skills'
-                                            )
-                                            """))
+                SELECT EXISTS (
+                    SELECT 1 FROM information_schema.tables
+                    WHERE table_name = '_legacy_system_disabled_skills'
+                )
+            """))
         if check2.scalar():
             rows2 = await self.db.execute(
                 text(
@@ -344,9 +343,7 @@ class SkillPreferenceService:
                 )
             )
             system_disabled_names: set[str] = set()
-            for _admin_id, sys_disabled_list in cast(
-                Iterable[tuple[UUID, list[str] | None]], rows2
-            ):
+            for _admin_id, sys_disabled_list in rows2:
                 if sys_disabled_list:
                     system_disabled_names.update(sys_disabled_list)
 

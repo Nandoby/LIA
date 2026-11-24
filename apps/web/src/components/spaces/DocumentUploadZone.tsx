@@ -165,7 +165,7 @@ export function DocumentUploadZone({
       {/* Upload progress list */}
       {uploads.length > 0 && (
         <div className="space-y-2">
-          {uploads.map((upload) => (
+          {uploads.map(upload => (
             <div
               key={upload.tempId}
               className="flex items-center gap-3 rounded-lg border p-3 bg-card"

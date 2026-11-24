@@ -51,10 +51,9 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /data/geoip
 
 # DB-IP Lite City database — free, no account needed, updated monthly
-# Snapshot date: current month, falling back to previous month (older ones are removed upstream)
-RUN for d in $(date -u +%Y-%m) $(date -u -d "$(date -u +%Y-%m-01) -1 month" +%Y-%m); do \
-        curl -fsSL -o dbip-city-lite.mmdb.gz "https://download.db-ip.com/free/dbip-city-lite-${d}.mmdb.gz" && break; \
-    done && \
+ARG DBIP_DATE=2026-03
+RUN curl -L -o dbip-city-lite.mmdb.gz \
+        "https://download.db-ip.com/free/dbip-city-lite-${DBIP_DATE}.mmdb.gz" && \
     gunzip dbip-city-lite.mmdb.gz
 
 # =============================================================================

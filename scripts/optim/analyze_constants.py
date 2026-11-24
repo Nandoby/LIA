@@ -59,10 +59,10 @@ def analyze_constants():
 
     findings = []
     stats = {
-        "total_constants": 0,
-        "unused": 0,
-        "barely_used": 0,
-        "well_used": 0,
+        'total_constants': 0,
+        'unused': 0,
+        'barely_used': 0,
+        'well_used': 0,
     }
 
     # Parse constants file
@@ -73,30 +73,29 @@ def analyze_constants():
 
     # Extract constants
     constants = extract_constants(tree, str(CONSTANTS_FILE))
-    stats["total_constants"] = len(constants)
+    stats['total_constants'] = len(constants)
 
     print(f"[SUMMARY] Found {len(constants)} constants\n")
 
     # Analyze each constant
     for const in constants:
-        const_name = const["name"]
+        const_name = const['name']
         print(f"[CHECK] Checking: {const_name}")
 
         # Search for usages (exclude constants.py itself)
         usages = grep_in_directory(
             const_name,
             SRC_ROOT,
-            extensions=[".py"],
+            extensions=['.py'],
             exclude_dirs=EXCLUDE_DIRS,
             case_sensitive=True,
-            regex=False,
+            regex=False
         )
 
         # Filter out definition in constants.py
         usages_filtered = [
-            u
-            for u in usages
-            if not (u["file"].endswith("constants.py") and u["line"] == const["line"])
+            u for u in usages
+            if not (u['file'].endswith('constants.py') and u['line'] == const['line'])
         ]
 
         usage_count = len(usages_filtered)
@@ -104,40 +103,36 @@ def analyze_constants():
         # Classify
         if usage_count == 0:
             # UNUSED
-            stats["unused"] += 1
-            findings.append(
-                {
-                    "item": const_name,
-                    "location": f"constants.py:{const['line']}",
-                    "confidence": "high",
-                    "reason": "0 usages found",
-                    "details": f"Value: {const['value']}",
-                }
-            )
-            print("   [WARN]  UNUSED (0 usages)")
+            stats['unused'] += 1
+            findings.append({
+                'item': const_name,
+                'location': f"constants.py:{const['line']}",
+                'confidence': 'high',
+                'reason': f'0 usages found',
+                'details': f"Value: {const['value']}"
+            })
+            print(f"   [WARN]  UNUSED (0 usages)")
 
         elif usage_count == 1:
             # BARELY_USED
-            stats["barely_used"] += 1
-            usage_file = usages_filtered[0]["file"]
-            findings.append(
-                {
-                    "item": const_name,
-                    "location": f"constants.py:{const['line']}",
-                    "confidence": "medium",
-                    "reason": "Only 1 usage found",
-                    "details": f"Used in: {usage_file}. Consider inlining.",
-                }
-            )
+            stats['barely_used'] += 1
+            usage_file = usages_filtered[0]['file']
+            findings.append({
+                'item': const_name,
+                'location': f"constants.py:{const['line']}",
+                'confidence': 'medium',
+                'reason': f'Only 1 usage found',
+                'details': f"Used in: {usage_file}. Consider inlining."
+            })
             print(f"   [WARN]  BARELY_USED (1 usage in {usage_file})")
 
         else:
             # WELL_USED
-            stats["well_used"] += 1
+            stats['well_used'] += 1
             print(f"   [OK] OK ({usage_count} usages)")
 
     # Print summary
-    print("\n[SUMMARY] Summary:")
+    print(f"\n[SUMMARY] Summary:")
     print(f"   Total constants: {stats['total_constants']}")
     print(f"   Unused (0 usages): {stats['unused']}")
     print(f"   Barely used (1 usage): {stats['barely_used']}")
@@ -242,7 +237,7 @@ __all__ = ["MY_CONSTANT"]
 - Constants with 1 usage can be inlined (depending on context)
 - Always check indirect usages before deletion
 - Semantic constants (avoiding magic values) should be kept even with 1 usage
-""",
+"""
     }
 
     generate_finding_report(
@@ -250,7 +245,7 @@ __all__ = ["MY_CONSTANT"]
         findings=findings,
         output_path=OUTPUT_FILE,
         script_name="analyze_constants.py",
-        additional_sections=additional_sections,
+        additional_sections=additional_sections
     )
 
 
@@ -264,7 +259,7 @@ if __name__ == "__main__":
         findings, stats = analyze_constants()
         generate_report(findings, stats)
 
-        print("\n[OK] Analysis complete!")
+        print(f"\n[OK] Analysis complete!")
         print(f"   Report: {OUTPUT_FILE}")
         print(f"   Findings: {len(findings)}")
         print(f"\n[NEXT] Next: Review findings manually in {OUTPUT_FILE}")
@@ -275,6 +270,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\n[ERROR] Error during analysis: {e}")
         import traceback
-
         traceback.print_exc()
         sys.exit(1)

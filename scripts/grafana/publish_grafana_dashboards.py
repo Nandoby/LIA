@@ -45,7 +45,7 @@ def log_warn(msg):
 def load_dashboard(filepath):
     """Load dashboard JSON file"""
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, 'r', encoding='utf-8') as f:
             return json.load(f)
     except Exception as e:
         log_error(f"Failed to load {filepath}: {e}")
@@ -59,7 +59,7 @@ def publish_dashboard(grafana_url, auth, dashboard_data):
     payload = {
         "dashboard": dashboard_data,
         "overwrite": True,
-        "message": "Updated via publish_grafana_dashboards.py script",
+        "message": "Updated via publish_grafana_dashboards.py script"
     }
 
     # Remove id and version to allow creation/update
@@ -77,12 +77,15 @@ def publish_dashboard(grafana_url, auth, dashboard_data):
         if auth.get("api_key"):
             headers = {
                 "Authorization": f"Bearer {auth['api_key']}",
-                "Content-Type": "application/json",
+                "Content-Type": "application/json"
             }
             response = requests.post(url, json=payload, headers=headers, timeout=10)
         else:
             response = requests.post(
-                url, json=payload, auth=(auth["username"], auth["password"]), timeout=10
+                url,
+                json=payload,
+                auth=(auth['username'], auth['password']),
+                timeout=10
             )
 
         if response.status_code in [200, 201]:
@@ -109,7 +112,9 @@ def check_grafana_health(grafana_url, auth):
             response = requests.get(url, headers=headers, timeout=5)
         else:
             response = requests.get(
-                url, auth=(auth["username"], auth["password"]), timeout=5
+                url,
+                auth=(auth['username'], auth['password']),
+                timeout=5
             )
 
         if response.status_code == 200:
@@ -127,26 +132,26 @@ def main():
     parser.add_argument(
         "--grafana-url",
         default=os.getenv("GRAFANA_URL", "http://localhost:3001"),
-        help="Grafana URL (default: http://localhost:3001)",
+        help="Grafana URL (default: http://localhost:3001)"
     )
     parser.add_argument(
         "--api-key",
         default=os.getenv("GRAFANA_API_KEY"),
-        help="Grafana API key (optional, uses basic auth if not provided)",
+        help="Grafana API key (optional, uses basic auth if not provided)"
     )
     parser.add_argument(
         "--username",
         default=os.getenv("GRAFANA_USER", "admin"),
-        help="Grafana username for basic auth (default: admin)",
+        help="Grafana username for basic auth (default: admin)"
     )
     parser.add_argument(
         "--password",
         default=os.getenv("GRAFANA_PASSWORD", "admin"),
-        help="Grafana password for basic auth (default: admin)",
+        help="Grafana password for basic auth (default: admin)"
     )
     parser.add_argument(
         "--dashboard",
-        help="Specific dashboard file to publish (optional, publishes all if not specified)",
+        help="Specific dashboard file to publish (optional, publishes all if not specified)"
     )
 
     args = parser.parse_args()
@@ -160,7 +165,7 @@ def main():
     auth = {}
     if args.api_key:
         auth["api_key"] = args.api_key
-        log_info("Using API key authentication")
+        log_info(f"Using API key authentication")
     else:
         auth["username"] = args.username
         auth["password"] = args.password
@@ -225,7 +230,7 @@ def main():
         success, result = publish_dashboard(args.grafana_url, auth, dashboard_data)
 
         if success:
-            log_success("  Published successfully")
+            log_success(f"  Published successfully")
             if isinstance(result, dict):
                 log_info(f"  Dashboard UID: {result.get('uid', 'N/A')}")
                 log_info(f"  Dashboard URL: {result.get('url', 'N/A')}")

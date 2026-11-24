@@ -133,6 +133,7 @@ COPY --from=builder --chown=nextjs:nodejs /monorepo/apps/web/.next/static ./apps
 COPY --from=builder --chown=nextjs:nodejs /monorepo/apps/web/public ./apps/web/public
 
 # Copy sherpa-onnx WASM runtime for wake word detection (downloaded in model-downloader stage)
+# The .data file includes Silero VAD + Whisper Tiny.en (no separate model dir needed)
 COPY --from=model-downloader --chown=nextjs:nodejs /models/sherpa-wasm ./apps/web/public/models/sherpa-wasm
 COPY --from=model-downloader --chown=nextjs:nodejs /models/keywords.txt ./apps/web/public/models/keywords.txt
 

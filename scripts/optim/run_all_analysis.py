@@ -118,7 +118,6 @@ def count_findings_in_report(report_path: Path) -> int:
         content = report_path.read_text(encoding="utf-8")
         # Look for "Findings identified: X" or legacy French pattern
         import re
-
         match = re.search(r"Findings (?:identifi[eé]s|identified)[^\d]*(\d+)", content)
         if match:
             return int(match.group(1))
@@ -140,12 +139,7 @@ def generate_summary(results: Dict[str, Dict]) -> None:
 
     reports = {}
     for script_name, data in results.items():
-        report_name = (
-            script_name.replace("analyze_", "")
-            .replace(".py", "")
-            .replace("_", " ")
-            .title()
-        )
+        report_name = script_name.replace("analyze_", "").replace(".py", "").replace("_", " ").title()
         output_file = SCRIPT_OUTPUT_MAP.get(script_name, "")
 
         reports[report_name] = {
@@ -165,12 +159,12 @@ def main():
     parser.add_argument(
         "--skip-slow",
         action="store_true",
-        help="Skip time-intensive analyses (duplication, complexity)",
+        help="Skip time-intensive analyses (duplication, complexity)"
     )
     parser.add_argument(
         "--only",
         nargs="+",
-        help="Run only specific scripts (e.g., --only analyze_unused_files.py)",
+        help="Run only specific scripts (e.g., --only analyze_unused_files.py)"
     )
     args = parser.parse_args()
 
@@ -247,7 +241,7 @@ def main():
 
     try:
         generate_summary(results)
-        print("✅ Summary report: docs/optim/SUMMARY.md")
+        print(f"✅ Summary report: docs/optim/SUMMARY.md")
         log_lines.append("\n## Summary")
         log_lines.append("Summary report generated: docs/optim/SUMMARY.md")
     except Exception as e:

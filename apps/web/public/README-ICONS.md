@@ -3,7 +3,6 @@
 ## Current Active Icon
 
 **v3-lia-circle.svg** - Badge circulaire professionnel avec texte "LIA"
-
 - Style classique et élégant
 - Très professionnel
 - Excellente lisibilité
@@ -13,7 +12,6 @@
 See [FAVICON-VARIATIONS.md](FAVICON-VARIATIONS.md) for all 10 design variations.
 
 ### Quick Access to Popular Styles:
-
 - **v1-lia-letter.svg** - Lettre L stylisée
 - **v3-lia-circle.svg** ⭐ (ACTIVE) - Badge circulaire
 - **v7-lia-robot-cute.svg** - Robot mignon

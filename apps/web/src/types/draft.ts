@@ -108,7 +108,11 @@ export interface NoteDraftContent {
  * Union type for all draft content types.
  */
 export type DraftContent =
-  EmailDraftContent | EventDraftContent | ContactDraftContent | TaskDraftContent | NoteDraftContent;
+  | EmailDraftContent
+  | EventDraftContent
+  | ContactDraftContent
+  | TaskDraftContent
+  | NoteDraftContent;
 
 // ============================================================================
 // Draft Payload (from registry_update SSE)

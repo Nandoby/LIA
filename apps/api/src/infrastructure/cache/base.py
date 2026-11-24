@@ -124,7 +124,7 @@ def create_cache_entry(data: dict[str, Any], ttl_seconds: int) -> CacheEntryV2:
 
 
 def parse_cache_entry(
-    cached_json: str | bytes,
+    cached_json: str,
     cache_type: str,
     context_info: dict[str, Any] | None = None,
 ) -> CacheResult:

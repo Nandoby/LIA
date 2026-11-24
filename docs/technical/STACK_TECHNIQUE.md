@@ -86,7 +86,7 @@ Ce document constitue la **reference officielle** des versions de toutes les tec
 
 | Technologie | Version | Role |
 |-------------|---------|------|
-| **SQLAlchemy** | 2.0.45 | ORM async |
+| **SQLAlchemy** | 2.0.48 | ORM async |
 | **Alembic** | 1.14.0 | Migrations |
 | **asyncpg** | 0.31.0 | PostgreSQL driver async |
 | **psycopg** | 3.3.x | PostgreSQL driver |

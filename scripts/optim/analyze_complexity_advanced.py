@@ -73,9 +73,7 @@ class ComplexityAnalyzer(ast.NodeVisitor):
         if node.body:
             start_line = node.lineno
             end_line = max(
-                getattr(n, "lineno", start_line)
-                for n in ast.walk(node)
-                if hasattr(n, "lineno")
+                getattr(n, "lineno", start_line) for n in ast.walk(node) if hasattr(n, "lineno")
             )
             length = end_line - start_line + 1
         else:
@@ -167,9 +165,7 @@ class DuplicationDetector:
 
         # Sliding window approach
         for start_idx in range(len(lines)):
-            for window_size in range(
-                self.min_lines, min(50, len(lines) - start_idx + 1)
-            ):
+            for window_size in range(self.min_lines, min(50, len(lines) - start_idx + 1)):
                 end_idx = start_idx + window_size
                 block = "\n".join(lines[start_idx:end_idx])
 
@@ -219,9 +215,7 @@ class DuplicationDetector:
         return duplications
 
 
-def analyze_directory(
-    root_dir: Path,
-) -> Tuple[List[FunctionMetrics], List[DuplicationBlock]]:
+def analyze_directory(root_dir: Path) -> Tuple[List[FunctionMetrics], List[DuplicationBlock]]:
     """Analyze all Python files in directory."""
     all_functions = []
     duplication_detector = DuplicationDetector(min_lines=10)
@@ -282,9 +276,7 @@ def generate_report(
             "long_functions": len(long_functions),
             "high_parameter_functions": len(many_params),
             "duplication_blocks": len(duplications),
-            "total_duplicated_lines": sum(
-                d.lines * (len(d.locations) - 1) for d in duplications
-            ),
+            "total_duplicated_lines": sum(d.lines * (len(d.locations) - 1) for d in duplications),
         },
         "top_complex_functions": [
             {
@@ -342,22 +334,20 @@ def main():
     output_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
 
     # Print summary
-    print("\nSummary:")
+    print(f"\nSummary:")
     print(f"  Total functions analyzed: {report['summary']['total_functions']}")
     print(f"  Complex functions (CC > 10): {report['summary']['complex_functions']}")
     print(f"  Very complex (CC > 20): {report['summary']['very_complex_functions']}")
-    print(
-        f"  Extremely complex (CC > 50): {report['summary']['extremely_complex_functions']}"
-    )
+    print(f"  Extremely complex (CC > 50): {report['summary']['extremely_complex_functions']}")
     print(f"  Long functions (>50 lines): {report['summary']['long_functions']}")
-    print(
-        f"  High parameter count (>5): {report['summary']['high_parameter_functions']}"
-    )
-    print("\nDuplication:")
+    print(f"  High parameter count (>5): {report['summary']['high_parameter_functions']}")
+    print(f"\nDuplication:")
     print(f"  Duplication blocks found: {report['summary']['duplication_blocks']}")
-    print(f"  Total duplicated lines: {report['summary']['total_duplicated_lines']}")
+    print(
+        f"  Total duplicated lines: {report['summary']['total_duplicated_lines']}"
+    )
 
-    print("\nTop 10 Most Complex Functions:")
+    print(f"\nTop 10 Most Complex Functions:")
     for i, func in enumerate(report["top_complex_functions"][:10], 1):
         file_short = func["file"].replace("src\\", "")
         print(
@@ -365,7 +355,7 @@ def main():
             f"Length: {func['length']} lines ({file_short}:{func['line']})"
         )
 
-    print("\nTop 10 Duplication Blocks (by impact):")
+    print(f"\nTop 10 Duplication Blocks (by impact):")
     for i, dup in enumerate(report["top_duplications"][:10], 1):
         impact = dup["total_duplicated_lines"]
         print(
