@@ -1,56 +1,56 @@
 # Core Framework
-fastapi==0.135.1
-uvicorn[standard]==0.42.0
+fastapi==0.165.0
+uvicorn[standard]==0.54.0
 
 # Database
-sqlalchemy[asyncio]==2.0.48
-asyncpg==0.31.0
-psycopg[binary]==3.3.3  # PostgreSQL adapter v3 (modern, for LangGraph checkpointer & SQLAlchemy)
-alembic==1.18.4
-pgvector==0.4.2
+sqlalchemy[asyncio]==2.1.9
+asyncpg==0.32.0
+psycopg[binary]==3.3.9  # PostgreSQL adapter v3 (modern, for LangGraph checkpointer & SQLAlchemy)
+alembic==1.20.1
+pgvector==0.5.1
 
 # Cache & Session
 redis==7.3.0
 
 # Configuration
-python-dotenv==1.2.2
-pydantic==2.12.5
+python-dotenv==1.2.4
+pydantic==2.14.4
 jinja2==3.1.6  # Template engine for orchestration queries
-pydantic-settings==2.13.1
+pydantic-settings==2.16.3
 pyyaml>=6.0  # YAML parsing for SKILL.md files (agentskills.io standard)
-email-validator==2.3.0
+email-validator==2.4.0
 python-dateutil==2.9.0.post0  # Date utilities for billing cycle calculations
 tzdata==2025.3  # IANA timezone database for Windows/Python 3.9+
 
 # Authentication & Security
 python-jose[cryptography]==3.5.0  # CVE-2024-33663 fix (algorithm confusion)
 passlib[bcrypt]==1.7.4
-python-multipart==0.0.22  # CVE-2024-53981, CVE-2026-24486 fixes (DoS)
+python-multipart==0.0.34  # CVE-2024-53981, CVE-2026-24486 fixes (DoS)
 cryptography==46.0.5  # CVE-2024-12797, CVE-2026-26007 fixes
 
 # Observability
 structlog==25.5.0
-geoip2==5.2.0  # IP geolocation (DB-IP Lite MMDB — free, CC-BY-4.0)
-opentelemetry-api==1.40.0
-opentelemetry-sdk==1.40.0
-opentelemetry-instrumentation-fastapi==0.61b0
-opentelemetry-exporter-otlp==1.40.0
-prometheus-client==0.24.1
+geoip2==5.4.0  # IP geolocation (DB-IP Lite MMDB — free, CC-BY-4.0)
+opentelemetry-api==1.45.2
+opentelemetry-sdk==1.45.2
+opentelemetry-instrumentation-fastapi==0.66b2
+opentelemetry-exporter-otlp==1.45.2
+prometheus-client==0.26.0
 langfuse==3.14.5  # Phase 6 - LLM Observability
 
 # Rate Limiting
-slowapi==0.1.9
+slowapi==0.1.10
 
 # HTTP Client
 httpx==0.28.1
 
 # Web Page Content Extraction (evolution F1 — Web Fetch Tool)
-readability-lxml==0.8.4.1    # Mozilla Readability algorithm (article extraction)
-lxml_html_clean==0.4.4     # Required by readability-lxml (split from lxml 5.2+)
-markdownify==1.2.2        # HTML → Markdown conversion
+readability-lxml==0.9    # Mozilla Readability algorithm (article extraction)
+lxml_html_clean==0.4.6     # Required by readability-lxml (split from lxml 5.2+)
+markdownify==1.2.4        # HTML → Markdown conversion
 
 # Text-to-Speech (Edge TTS - Microsoft neural voices, free)
-edge-tts==7.2.7
+edge-tts==7.3.1
 
 # Speech-to-Text (Sherpa-onnx - Offline, multi-language STT)
 # Uses SenseVoiceSmall model: FR/EN/DE/ES/IT/ZH/JA/KO in a single model
@@ -58,19 +58,19 @@ edge-tts==7.2.7
 sherpa-onnx>=1.10.0
 
 # Task Scheduling
-apscheduler==3.11.2
+apscheduler==3.11.3
 
 # AI/ML Stack - LangChain/LangGraph 1.0.x ecosystem
-langchain-core==1.2.19
-langchain==1.2.12  # Updated 2026-03-09 for ecosystem upgrade (merge_lists fix, SummarizationMiddleware, ContextOverflowError)
-langchain-text-splitters==1.1.1  # RecursiveCharacterTextSplitter for RAG Spaces document chunking
-langchain-openai==1.1.11
-openai==2.28.0  # Requis par langchain-openai 1.1.10 (pin 2.14.0 levé — gardes adapter L229-239 protègent input_items)
-langgraph==1.1.2
-langgraph-checkpoint==4.0.1  # Pinné explicitement (transitif de langgraph, reproductibilité builds)
-langgraph-prebuilt==1.0.8  # Pinné explicitement (requis par langgraph 1.0.10)
-langgraph-checkpoint-postgres==3.0.4
-tiktoken==0.12.0
+langchain-core==1.8.4
+langchain==1.5.2  # Updated 2026-03-09 for ecosystem upgrade (merge_lists fix, SummarizationMiddleware, ContextOverflowError)
+langchain-text-splitters==1.1.3  # RecursiveCharacterTextSplitter for RAG Spaces document chunking
+langchain-openai==1.8.5
+openai==2.54.0  # Requis par langchain-openai 1.1.10 (pin 2.14.0 levé — gardes adapter L229-239 protègent input_items)
+langgraph==1.2.24
+langgraph-checkpoint==4.3.2  # Pinné explicitement (transitif de langgraph, reproductibilité builds)
+langgraph-prebuilt==1.1.3  # Pinné explicitement (requis par langgraph 1.0.10)
+langgraph-checkpoint-postgres==3.2.1
+tiktoken==0.14.0
 
 # Local Embedding Model - E5 for semantic memory search
 # Replaces OpenAI text-embedding-3-small for better Q/A matching (0.90 vs 0.61 avg score)
@@ -82,20 +82,20 @@ sentence-transformers==5.3.0  # HuggingFace E5 model (intfloat/multilingual-e5-s
 rank-bm25==0.2.2  # Okapi BM25 algorithm for keyword-based retrieval
 
 # LLM Provider Integrations
-langchain-deepseek==1.0.1  # DeepSeek V3/R1 models
-langchain-anthropic==1.3.5  # Claude models (auto-compaction, effort="max" sans beta, cache_control fix)
-langchain-google-genai==4.2.1  # Gemini models
+langchain-deepseek==1.2.1  # DeepSeek V3/R1 models
+langchain-anthropic==1.7.12  # Claude models (auto-compaction, effort="max" sans beta, cache_control fix)
+langchain-google-genai==4.5.2  # Gemini models
 anthropic==0.85.0  # Anthropic SDK (Claude Opus 4.6, structured outputs natifs, cache control GA)
 
 # MCP (Model Context Protocol) — evolution F2
 mcp>=1.20.0,<2.0.0  # MCP 1.20+ adds list_resources/read_resource (MCP Apps support). Requires starlette>=0.27
 
 # Browser Automation — Interactive web browsing (evolution F7)
-playwright==1.51.0  # Headless Chromium for web interaction via accessibility tree
+playwright==1.65.2  # Headless Chromium for web interaction via accessibility tree
 
 # Push Notifications
-firebase-admin==7.2.0  # Firebase Cloud Messaging for push notifications
-pytz==2026.1.post1  # Timezone handling for reminders
+firebase-admin==7.8.0  # Firebase Cloud Messaging for push notifications
+pytz==2026.6  # Timezone handling for reminders
 
 # Channels — Multi-Channel Messaging (evolution F3)
 python-telegram-bot>=21.0  # Telegram Bot API (async, v21+)
