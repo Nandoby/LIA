@@ -78,6 +78,8 @@ services:
       dockerfile: Dockerfile.prod
     container_name: lia-api-prod
     restart: unless-stopped
+    group_add:
+      - "${DOCKER_GID:-999}"  # Host docker group GID for DevOps Claude CLI socket access
     security_opt:
       - no-new-privileges:true
     env_file:
