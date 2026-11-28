@@ -66,7 +66,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 256M
+          memory: 128M  # Was 256M — actual usage ~7M
         reservations:
           cpus: '0.1'
           memory: 64M
@@ -112,8 +112,7 @@ services:
       - skills_data:/app/data/skills/users
       # DevOps Claude CLI: Docker socket for container management + auth + workspace
       - /var/run/docker.sock:/var/run/docker.sock
-      - claude_auth:/home/appuser/.claude
-      - ~/.claude/.credentials.json:/home/appuser/.claude/.credentials.json:ro
+      - ~/.claude:/home/appuser/.claude
       - ./infrastructure/claude-cli/CLAUDE.server.md:/opt/claude-workspace/CLAUDE.md:ro
     ports:
       - "8000:8000"
@@ -177,7 +176,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 512M
+          memory: 256M  # Was 512M — actual usage ~105M
         reservations:
           cpus: '0.25'
           memory: 128M
@@ -206,7 +205,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 512M
+          memory: 768M  # Was 512M — actual usage ~459M (90%)
         reservations:
           cpus: '0.1'
           memory: 128M
@@ -239,7 +238,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 512M
+          memory: 256M  # Was 512M — actual usage ~98M
         reservations:
           cpus: '0.1'
           memory: 128M
@@ -272,7 +271,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 512M
+          memory: 256M  # Was 512M — actual usage ~86M
         reservations:
           cpus: '0.1'
           memory: 128M
@@ -296,7 +295,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 512M
+          memory: 256M  # Was 512M — actual usage ~66M
         reservations:
           cpus: '0.1'
           memory: 128M
@@ -451,7 +450,7 @@ services:
       resources:
         limits:
           cpus: '0.25'
-          memory: 256M
+          memory: 128M  # Was 256M — actual usage ~20M
         reservations:
           cpus: '0.05'
           memory: 64M
@@ -467,7 +466,6 @@ volumes:
   huggingface_cache:  # Persistent storage for E5 embedding model (~500MB)
   attachments_data:  # Persistent storage for file attachments (images, PDF)
   skills_data:  # Persistent storage for user-imported skills
-  claude_auth:  # Persistent Claude CLI auth (survives container rebuilds)
   portainer_data:
 
 networks:
